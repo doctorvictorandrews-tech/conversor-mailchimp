@@ -8,140 +8,130 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
     <style>
-        body { font-family: 'Inter', sans-serif; background-color: #f4f4f4; }
+        body { font-family: 'Inter', sans-serif; background-color: #f8f9fa; }
         .brand-orange { color: #F15A24; }
         .bg-brand-orange { background-color: #F15A24; }
         .brand-grey { color: #4D4D4D; }
         .bg-brand-grey { background-color: #4D4D4D; }
         
-        /* Estilização da área de renderização oculta */
-        #render-area {
-            width: 800px; /* Largura padrão de e-mails Mailchimp */
+        /* Container de renderização: Visível apenas para o motor do PDF */
+        #render-container {
             position: absolute;
             left: -9999px;
             top: 0;
+            width: 800px; /* Largura padrão Mailchimp */
             background: white;
         }
     </style>
 </head>
 <body class="text-slate-800 min-h-screen">
 
-    <div class="max-w-3xl mx-auto py-12 px-6">
+    <div id="ui-main" class="max-w-3xl mx-auto py-12 px-6">
         <div class="text-center mb-10">
-            <h1 class="text-4xl font-black brand-grey tracking-tighter">
-                in<span class="brand-orange">.pacto</span>
+            <h1 class="text-5xl font-black tracking-tighter">
+                <span class="brand-orange">in</span><span class="brand-grey">.pacto</span>
             </h1>
-            <p class="text-slate-500 mt-2 font-medium uppercase tracking-widest text-xs">Inteligência em Comunicação | Conversor de Relatórios</p>
+            <p class="text-slate-500 mt-2 font-bold uppercase tracking-widest text-[10px]">Inteligência em Comunicação | Conversor de Relatórios</p>
         </div>
 
-        <div class="bg-white rounded-2xl shadow-xl border border-slate-200 overflow-hidden mb-8">
-            <div class="bg-brand-grey px-8 py-4">
-                <h2 class="text-white text-sm font-bold uppercase tracking-widest flex items-center gap-2">
-                    Tutorial de Extração
-                </h2>
+        <div class="bg-white rounded-3xl shadow-2xl border border-slate-200 overflow-hidden">
+            <div class="bg-brand-grey p-6 flex justify-between items-center">
+                <h2 class="text-white text-xs font-bold uppercase tracking-widest">Painel de Conversão</h2>
+                <span class="text-slate-400 text-[10px]">v3.0 - Estável</span>
             </div>
-            <div class="p-8 border-b border-slate-100">
-                <div class="grid md:grid-cols-2 gap-8">
-                    <div class="space-y-4">
-                        <div class="flex gap-3">
-                            <span class="flex-none w-6 h-6 bg-orange-100 text-brand-orange rounded-full flex items-center justify-center font-bold text-xs">1</span>
-                            <p class="text-sm text-slate-600 font-semibold">No Mailchimp:</p>
-                        </div>
-                        <ul class="text-xs text-slate-500 space-y-2 ml-9 list-disc">
-                            <li>Vá em <strong>Campaigns</strong> > <strong>All Campaigns</strong>.</li>
-                            <li>Ache seu relatório, clique na seta ao lado de <em>View Report</em> ou <em>Edit</em>.</li>
-                            <li>Escolha a opção <strong class="brand-grey">View in Browser</strong>.</li>
-                        </ul>
+
+            <div class="p-8">
+                <div class="grid grid-cols-2 gap-4 mb-8 text-[11px] border-b border-slate-100 pb-6">
+                    <div class="flex gap-2">
+                        <span class="brand-orange font-bold text-lg">01.</span>
+                        <p class="text-slate-600 italic">No Mailchimp, use o <strong>View in Browser</strong> e copie o código fonte (<kbd class="bg-slate-100 px-1">CTRL+U</kbd>).</p>
                     </div>
-                    <div class="space-y-4">
-                        <div class="flex gap-3">
-                            <span class="flex-none w-6 h-6 bg-orange-100 text-brand-orange rounded-full flex items-center justify-center font-bold text-xs">2</span>
-                            <p class="text-sm text-slate-600 font-semibold">No seu Navegador:</p>
-                        </div>
-                        <ul class="text-xs text-slate-500 space-y-2 ml-9 list-disc">
-                            <li>Na página do e-mail, aperte <kbd class="bg-slate-200 px-1 rounded">CTRL + U</kbd>.</li>
-                            <li>Uma aba cheia de códigos abrirá. Selecione tudo (<kbd class="bg-slate-200 px-1 rounded">CTRL + A</kbd>) e copie.</li>
-                        </ul>
+                    <div class="flex gap-2">
+                        <span class="brand-orange font-bold text-lg">02.</span>
+                        <p class="text-slate-600 italic">Cole abaixo e clique no botão. O processo pode levar alguns segundos.</p>
                     </div>
                 </div>
-            </div>
 
-            <div class="p-8 bg-slate-50/50">
-                <label class="block text-xs font-bold brand-grey uppercase mb-3">Cole o código fonte abaixo:</label>
                 <textarea id="htmlInput" 
-                    class="w-full h-48 bg-white border-2 border-slate-200 rounded-xl p-4 text-slate-400 font-mono text-[10px] focus:border-brand-orange focus:outline-none transition-all resize-none mb-6 shadow-inner"
-                    placeholder="<!DOCTYPE html ..."></textarea>
+                    class="w-full h-56 bg-slate-50 border-2 border-slate-200 rounded-2xl p-4 text-slate-500 font-mono text-[10px] focus:border-brand-orange focus:outline-none transition-all resize-none mb-6 shadow-inner"
+                    placeholder="Cole aqui o código fonte que começa com <!DOCTYPE html>..."></textarea>
 
-                <button onclick="generatePDF()" id="mainBtn"
-                    class="w-full bg-brand-orange hover:bg-orange-700 text-white font-extrabold py-5 rounded-xl transition-all shadow-lg shadow-orange-200 flex items-center justify-center gap-3 text-lg">
-                    GERAR RELATÓRIO PDF
+                <button onclick="generatePDF()" id="btnAction"
+                    class="w-full bg-brand-orange hover:bg-orange-600 text-white font-black py-5 rounded-2xl transition-all shadow-xl shadow-orange-200 flex items-center justify-center gap-3 text-lg">
+                    GERAR PDF AGORA
                 </button>
-                
-                <div id="loader" class="hidden mt-4 text-center">
-                    <p class="text-sm brand-grey animate-pulse font-bold">Processando design e gráficos... aguarde.</p>
+
+                <div id="statusMsg" class="hidden mt-6 text-center">
+                    <div class="inline-flex items-center gap-2 px-4 py-2 bg-blue-50 text-blue-700 rounded-full text-xs font-bold animate-pulse">
+                        <svg class="animate-spin h-4 w-4" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" fill="none"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
+                        PROCESSANDO DESIGN... (NÃO FECHE A PÁGINA)
+                    </div>
                 </div>
             </div>
         </div>
         
-        <p class="text-center text-slate-400 text-[10px] uppercase tracking-widest font-bold">
-            Exclusivo para uso interno - in.pacto Inteligência
+        <p class="text-center text-slate-400 text-[9px] mt-8 font-bold uppercase tracking-[0.2em]">
+            Tecnologia Interna in.pacto - 2026
         </p>
     </div>
 
-    <div id="render-area"></div>
+    <div id="render-container"></div>
 
     <script>
         async function generatePDF() {
             const code = document.getElementById('htmlInput').value;
-            const btn = document.getElementById('mainBtn');
-            const loader = document.getElementById('loader');
-            
-            if (!code) {
-                alert("Por favor, cole o código fonte do Mailchimp.");
+            const btn = document.getElementById('btnAction');
+            const status = document.getElementById('statusMsg');
+            const container = document.getElementById('render-container');
+
+            if (!code.trim()) {
+                alert("O campo está vazio. Por favor, cole o código HTML.");
                 return;
             }
 
-            // UI Feedback
+            // Iniciar Processamento
             btn.disabled = true;
-            btn.classList.add('opacity-50');
-            loader.classList.remove('hidden');
+            btn.innerText = "CONVERTENDO...";
+            status.classList.remove('hidden');
 
-            const renderArea = document.getElementById('render-area');
-            
-            // 1. Limpeza de Scripts e Barras do Mailchimp
-            let cleanCode = code.replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, "");
-            cleanCode = cleanCode.replace(/id="awesomewrap"|id="awesomebar"|class="archive_header"/gi, 'style="display:none;"');
-
-            // 2. Injeta no container de renderização
-            renderArea.innerHTML = cleanCode;
-
-            // 3. Configurações do PDF (Foco em Fidelidade Visual)
-            const opt = {
-                margin:       0,
-                filename:     'Relatorio_InPacto.pdf',
-                image:        { type: 'jpeg', quality: 0.98 },
-                html2canvas:  { 
-                    scale: 2, 
-                    useCORS: true, 
-                    letterRendering: true,
-                    scrollX: 0,
-                    scrollY: 0
-                },
-                jsPDF:        { unit: 'in', format: 'a4', orientation: 'portrait' },
-                pagebreak:    { mode: ['avoid-all', 'css', 'legacy'] }
-            };
-
-            // 4. Executa a conversão
             try {
-                await html2pdf().set(opt).from(renderArea).save();
-            } catch (error) {
-                console.error("Erro na geração:", error);
-                alert("Ocorreu um erro ao processar o PDF. Verifique se o código colado está correto.");
+                // 1. Limpeza do HTML
+                let cleanCode = code.replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, "");
+                // Remove barras do Mailchimp
+                cleanCode = cleanCode.replace(/id="awesomewrap"|id="awesomebar"|class="archive_header"|#awesomewrap|#awesomebar/gi, 'style="display:none !important;"');
+
+                // 2. Inserir no container de renderização
+                container.innerHTML = cleanCode;
+
+                // 3. Aguardar renderização de imagens (Essencial para não sair em branco)
+                await new Promise(resolve => setTimeout(resolve, 2000));
+
+                // 4. Configurações de Alta Fidelidade (Baseado no seu MDA)
+                const opt = {
+                    margin: [0.2, 0, 0.2, 0], // Pequena margem topo/fundo
+                    filename: 'Relatorio_MDA_InPacto.pdf',
+                    image: { type: 'jpeg', quality: 1 },
+                    html2canvas: { 
+                        scale: 2, // Aumenta a resolução
+                        useCORS: true, // Tenta carregar imagens externas do Mailchimp
+                        logging: false,
+                        letterRendering: true
+                    },
+                    jsPDF: { unit: 'in', format: 'a4', orientation: 'portrait' },
+                    pagebreak: { mode: ['avoid-all', 'css', 'legacy'] }
+                };
+
+                // 5. Gerar PDF
+                await html2pdf().set(opt).from(container).save();
+
+            } catch (err) {
+                console.error(err);
+                alert("Erro ao gerar PDF. Certifique-se de que copiou o código completo.");
             } finally {
                 btn.disabled = false;
-                btn.classList.remove('opacity-50');
-                loader.classList.add('hidden');
-                renderArea.innerHTML = ''; // Limpa memória
+                btn.innerText = "GERAR PDF AGORA";
+                status.classList.add('hidden');
+                container.innerHTML = ""; // Limpa memória
             }
         }
     </script>
