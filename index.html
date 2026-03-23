@@ -2,35 +2,46 @@
 <html lang="pt-br">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Conversor in.pacto | Página Única</title>
+    <title>Conversor in.pacto | 6 Páginas Exatas</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
     <style>
-        body { font-family: 'Inter', sans-serif; background-color: #f8f9fa; }
+        body { font-family: 'Inter', sans-serif; background-color: #f4f4f4; margin: 0; }
         .brand-orange { color: #F15A24; }
         .brand-grey { color: #4D4D4D; }
         
-        /* Container de renderização oculto */
-        #render-area {
-            position: absolute;
-            left: -9999px;
-            top: 0;
-            width: 800px;
-            background: white;
+        /* ESTILOS DE IMPRESSÃO - O SEGREDO ESTÁ AQUI */
+        @media print {
+            @page {
+                size: A4;
+                margin: 0mm !important; /* Mata as margens do navegador */
+            }
+            body { background: white !important; }
+            #ui-controls { display: none !important; } /* Esconde o site na hora de salvar */
+            
+            iframe {
+                width: 210mm !important; /* Largura exata do A4 */
+                height: 1782mm !important; /* 297mm * 6 páginas = 1782mm */
+                border: none !important;
+                display: block !important;
+            }
+        }
+
+        #preview-frame {
+            width: 800px; /* Mantém a proporção do Mailchimp para não desconfigurar */
+            height: 0;
+            border: none;
+            visibility: hidden;
         }
     </style>
 </head>
-<body class="text-slate-800">
+<body>
 
-    <div class="max-w-2xl mx-auto py-12 px-6">
+    <div id="ui-controls" class="max-w-2xl mx-auto py-12 px-6">
         <div class="text-center mb-10">
             <h1 class="text-5xl font-black tracking-tighter">
                 <span class="brand-orange">in</span><span class="brand-grey">.pacto</span>
             </h1>
-            <p class="text-slate-500 mt-2 font-bold uppercase tracking-widest text-[10px]">Gerador de Relatórios em Página Única</p>
+            <p class="text-slate-500 mt-2 font-bold uppercase tracking-widest text-[10px]">Ajustado para 6 páginas A4</p>
         </div>
 
         <div class="bg-white rounded-3xl shadow-2xl p-8 border border-slate-200">
@@ -38,81 +49,79 @@
                 class="w-full h-64 p-4 border-2 border-slate-100 rounded-2xl font-mono text-[10px] focus:border-orange-500 outline-none mb-6 bg-slate-50"
                 placeholder="Cole o código fonte (CTRL+U) aqui..."></textarea>
 
-            <button onclick="gerarPdfContinuo()" id="btnAction"
-                class="w-full bg-[#F15A24] hover:bg-orange-600 text-white font-black py-5 rounded-2xl transition-all shadow-xl text-lg uppercase">
-                Gerar PDF Sem Quebras
+            <button onclick="gerarRelatorio()" 
+                class="w-full bg-[#F15A24] hover:bg-orange-600 text-white font-black py-5 rounded-2xl transition-all shadow-lg text-lg">
+                GERAR PDF (6 PÁGINAS)
             </button>
             
-            <div id="status" class="hidden mt-4 text-center text-sm font-bold brand-grey animate-pulse">
-                Processando layout contínuo... aguarde.
+            <div class="mt-6 p-4 bg-orange-50 rounded-xl border border-orange-100">
+                <p class="text-orange-800 text-[11px] font-bold uppercase mb-2 text-center">Configuração Obrigatória:</p>
+                <ul class="text-orange-700 text-[10px] space-y-1">
+                    <li>• Destino: <strong>Salvar como PDF</strong></li>
+                    <li>• Margens: <strong>Nenhuma</strong> (Isso remove o topo/baixo)</li>
+                    <li>• Gráficos de segundo plano: <strong>Marcado</strong></li>
+                </ul>
             </div>
         </div>
     </div>
 
-    <div id="render-area"></div>
+    <iframe id="preview-frame"></iframe>
 
     <script>
-        async function gerarPdfContinuo() {
+        function gerarRelatorio() {
             const code = document.getElementById('htmlInput').value;
-            const btn = document.getElementById('btnAction');
-            const status = document.getElementById('status');
-            const renderArea = document.getElementById('render-area');
-
             if (!code) return alert("Cole o código!");
 
-            btn.disabled = true;
-            status.classList.remove('hidden');
+            const iframe = document.getElementById('preview-frame');
+            const doc = iframe.contentDocument || iframe.contentWindow.document;
 
-            try {
-                // 1. Limpa e insere o HTML
-                let cleanCode = code.replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, "");
-                cleanCode = cleanCode.replace(/id="awesomewrap"|id="awesomebar"|class="archive_header"/gi, 'style="display:none !important;"');
-                renderArea.innerHTML = cleanCode;
+            // Limpeza de barras do Mailchimp
+            let cleanCode = code.replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, "");
+            cleanCode = cleanCode.replace(/id="awesomewrap"|id="awesomebar"|class="archive_header"/gi, 'style="display:none !important;"');
 
-                // 2. Aguarda carregamento de imagens
-                await new Promise(resolve => setTimeout(resolve, 2500));
+            doc.open();
+            doc.write(cleanCode);
+            doc.close();
 
-                // 3. Captura o conteúdo como Canvas
-                const canvas = await html2canvas(renderArea, {
-                    scale: 2,
-                    useCORS: true,
-                    allowTaint: true,
-                    logging: false,
-                    width: 800
-                });
+            // Injeta CSS para forçar o texto selecionável e as quebras
+            const style = doc.createElement('style');
+            style.textContent = `
+                body { 
+                    margin: 0 !important; 
+                    padding: 0 !important; 
+                    -webkit-print-color-adjust: exact !important;
+                }
+                /* Força o Mailchimp a se comportar em A4 */
+                center, table, .templateContainer { 
+                    width: 100% !important; 
+                    max-width: 800px !important; 
+                    margin: 0 auto !important; 
+                }
+                /* Tenta distribuir o conteúdo em 6 fatias */
+                img, p, h1, tr { page-break-inside: avoid !important; }
+            `;
+            doc.head.appendChild(style);
 
-                const imgData = canvas.toDataURL('image/jpeg', 1.0);
+            setTimeout(() => {
+                // Ativa o modo de impressão focado no Iframe
+                window.print(); 
+                // Nota: Usamos o print geral, mas as regras @media print lá de cima 
+                // vão isolar apenas o que importa.
                 
-                // 4. Cria o PDF com a ALTURA EXATA do conteúdo (Página Única)
-                const { jsPDF } = window.jspdf;
-                const pdfWidth = 800;
-                const pdfHeight = (canvas.height * pdfWidth) / canvas.width;
-
-                const pdf = new jsPDF({
-                    orientation: 'portrait',
-                    unit: 'px',
-                    format: [pdfWidth, pdfHeight]
-                });
-
-                // Adiciona a imagem cobrindo toda a página única
-                pdf.addImage(imgData, 'JPEG', 0, 0, pdfWidth, pdfHeight);
-
-                // 5. Injeta o texto invisível por cima para permitir seleção
-                // Nota: O html2canvas nativo não mantém texto selecionável. 
-                // Para ter texto 100% selecionável em página única real, 
-                // o melhor caminho é o salvamento nativo que fizemos antes, 
-                // ajustando apenas o tamanho da página no driver de impressão.
+                // Para garantir que o iframe apareça na impressão, mudamos a visibilidade
+                iframe.style.visibility = "visible";
+                iframe.style.height = "auto";
+                iframe.style.position = "relative";
+                iframe.style.left = "0";
                 
-                pdf.save("Relatorio_inPacto_PaginaUnica.pdf");
+                window.print();
 
-            } catch (err) {
-                console.error(err);
-                alert("Erro ao processar.");
-            } finally {
-                btn.disabled = false;
-                status.classList.add('hidden');
-                renderArea.innerHTML = "";
-            }
+                // Volta ao normal após imprimir
+                iframe.style.visibility = "hidden";
+                iframe.style.height = "0";
+                iframe.style.position = "absolute";
+                iframe.style.left = "-9999px";
+            }, 1000);
         }
     </script>
 </body>
