@@ -4,459 +4,144 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Conversor de Relatórios | in.pacto</title>
-    <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
     <style>
-        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
-        :root {
-            --orange: #F15A24;
-            --dark: #1a1a1a;
-            --mid: #4D4D4D;
-            --light: #f4f1ee;
-            --white: #ffffff;
-            --border: #e8e4df;
-        }
-
-        body {
-            font-family: 'DM Sans', sans-serif;
-            background-color: var(--light);
-            min-height: 100vh;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            padding: 40px 20px;
-            position: relative;
-            overflow-x: hidden;
-        }
-
-        body::before {
-            content: '';
-            position: fixed;
-            inset: 0;
-            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
-            pointer-events: none;
-            z-index: 0;
-        }
-
-        body::after {
-            content: '';
-            position: fixed;
-            top: -200px;
-            right: -200px;
-            width: 600px;
-            height: 600px;
-            border-radius: 50%;
-            background: radial-gradient(circle, rgba(241,90,36,0.07) 0%, transparent 70%);
-            pointer-events: none;
-            z-index: 0;
-        }
-
-        .card {
-            position: relative;
-            z-index: 1;
-            background: var(--white);
-            border: 1px solid var(--border);
-            border-radius: 24px;
-            width: 100%;
-            max-width: 560px;
-            overflow: hidden;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.04), 0 20px 60px rgba(0,0,0,0.08);
-        }
-
-        .card-header {
-            background: var(--dark);
-            padding: 32px 40px 28px;
-            position: relative;
-            overflow: hidden;
-        }
-
-        .card-header::after {
-            content: '';
+        body { font-family: 'Inter', sans-serif; background-color: #f8f9fa; }
+        .color-in { color: #F15A24; }
+        .color-pacto { color: #4D4D4D; }
+        .bg-in { background-color: #F15A24; }
+        
+        #preview-frame {
             position: absolute;
-            bottom: -1px;
-            left: 40px;
-            width: 48px;
-            height: 3px;
-            background: var(--orange);
-        }
-
-        .logo {
-            font-family: 'Syne', sans-serif;
-            font-weight: 800;
-            font-size: 36px;
-            letter-spacing: -1px;
-            line-height: 1;
-            color: var(--white);
-        }
-
-        .logo span { color: var(--orange); }
-
-        .logo-sub {
-            font-family: 'DM Sans', sans-serif;
-            font-size: 10px;
-            font-weight: 400;
-            letter-spacing: 0.18em;
-            text-transform: uppercase;
-            color: rgba(255,255,255,0.35);
-            margin-top: 6px;
-        }
-
-        .card-body { padding: 36px 40px 40px; }
-
-        .steps {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 16px;
-            margin-bottom: 28px;
-        }
-
-        .step {
-            background: var(--light);
-            border-radius: 12px;
-            padding: 14px 16px;
-            border: 1px solid var(--border);
-        }
-
-        .step-num {
-            font-family: 'Syne', sans-serif;
-            font-size: 11px;
-            font-weight: 700;
-            color: var(--orange);
-            letter-spacing: 0.1em;
-            margin-bottom: 4px;
-        }
-
-        .step p { font-size: 11px; color: var(--mid); line-height: 1.6; }
-
-        .step kbd {
-            display: inline-block;
-            background: var(--white);
-            border: 1px solid var(--border);
-            border-radius: 4px;
-            padding: 1px 5px;
-            font-family: monospace;
-            font-size: 10px;
-            color: var(--dark);
-        }
-
-        .divider { height: 1px; background: var(--border); margin-bottom: 28px; }
-
-        .textarea-label {
-            font-family: 'Syne', sans-serif;
-            font-size: 11px;
-            font-weight: 700;
-            letter-spacing: 0.12em;
-            text-transform: uppercase;
-            color: var(--mid);
-            margin-bottom: 10px;
-            display: block;
-        }
-
-        textarea {
-            width: 100%;
-            height: 180px;
-            background: var(--light);
-            border: 1.5px solid var(--border);
-            border-radius: 12px;
-            padding: 16px;
-            font-family: monospace;
-            font-size: 11px;
-            color: var(--mid);
-            resize: none;
-            transition: border-color 0.2s, box-shadow 0.2s;
-            outline: none;
-            line-height: 1.6;
-        }
-
-        textarea:focus {
-            border-color: var(--orange);
-            box-shadow: 0 0 0 3px rgba(241,90,36,0.1);
-        }
-
-        textarea::placeholder { color: #b0a899; }
-
-        .btn {
-            width: 100%;
-            margin-top: 16px;
-            background: var(--orange);
-            color: var(--white);
+            left: -9999px;
+            top: 0;
+            width: 800px; /* Largura idêntica ao MDA de referência */
+            height: 100vh;
             border: none;
-            border-radius: 12px;
-            padding: 18px 24px;
-            font-family: 'Syne', sans-serif;
-            font-size: 14px;
-            font-weight: 800;
-            letter-spacing: 0.08em;
-            text-transform: uppercase;
-            cursor: pointer;
-            transition: background 0.2s, transform 0.15s, box-shadow 0.2s;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 10px;
-            box-shadow: 0 8px 24px rgba(241,90,36,0.28);
-        }
-
-        .btn:hover {
-            background: #d94f1e;
-            transform: translateY(-1px);
-            box-shadow: 0 12px 32px rgba(241,90,36,0.35);
-        }
-
-        .btn:active { transform: translateY(0); }
-
-        .tip {
-            display: flex;
-            align-items: flex-start;
-            gap: 8px;
-            margin-top: 20px;
-            padding: 12px 14px;
-            background: rgba(241,90,36,0.06);
-            border-left: 3px solid var(--orange);
-            border-radius: 0 8px 8px 0;
-        }
-
-        .tip p { font-size: 11px; color: var(--mid); line-height: 1.6; }
-        .tip strong { color: var(--dark); }
-
-        #loading-overlay {
-            display: none;
-            position: fixed;
-            inset: 0;
-            background: var(--light);
-            z-index: 9999;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            gap: 16px;
-        }
-
-        .loading-logo {
-            font-family: 'Syne', sans-serif;
-            font-weight: 800;
-            font-size: 42px;
-            letter-spacing: -1px;
-            color: var(--dark);
-        }
-
-        .loading-logo span { color: var(--orange); }
-
-        .loading-bar-wrap {
-            width: 200px;
-            height: 3px;
-            background: var(--border);
-            border-radius: 99px;
-            overflow: hidden;
-        }
-
-        .loading-bar {
-            height: 100%;
-            width: 0%;
-            background: var(--orange);
-            border-radius: 99px;
-            animation: loadfill 4s ease forwards;
-        }
-
-        @keyframes loadfill {
-            0%   { width: 0%; }
-            50%  { width: 60%; }
-            80%  { width: 85%; }
-            100% { width: 95%; }
-        }
-
-        .loading-text {
-            font-family: 'DM Sans', sans-serif;
-            font-size: 13px;
-            color: var(--mid);
-            font-weight: 500;
-        }
-
-        .loading-hint { font-size: 11px; color: #b0a899; }
-
-        #print-frame {
-            position: fixed;
-            top: -99999px;
-            left: -99999px;
-            width: 794px;
-            height: 1px;
-            border: none;
-            visibility: hidden;
         }
     </style>
 </head>
-<body>
+<body class="text-slate-800">
 
-    <div id="loading-overlay">
-        <div class="loading-logo"><span>in</span>.pacto</div>
-        <div class="loading-bar-wrap"><div class="loading-bar" id="loadbar"></div></div>
-        <p class="loading-text" id="loading-text">Carregando imagens do relatório…</p>
-        <p class="loading-hint">Aguarde, isso leva alguns segundos.</p>
-    </div>
-
-    <div id="ui-main" class="card">
-        <div class="card-header">
-            <div class="logo"><span>in</span>.pacto</div>
-            <div class="logo-sub">Inteligência em Comunicação &nbsp;·&nbsp; Conversor de Relatórios</div>
+    <div class="max-w-3xl mx-auto py-12 px-6">
+        <div class="text-center mb-10">
+            <h1 class="text-5xl font-black tracking-tighter">
+                <span class="color-in">in</span><span class="color-pacto">.pacto</span>
+            </h1>
+            <p class="text-slate-500 mt-2 font-bold uppercase tracking-widest text-[10px]">Relatórios de Monitoramento Diário</p>
         </div>
-        <div class="card-body">
-            <div class="steps">
-                <div class="step">
-                    <div class="step-num">PASSO 01</div>
-                    <p>No Mailchimp, clique em <strong>View in Browser</strong>. Na página que abrir, copie o código-fonte: <kbd>CTRL+U</kbd> → <kbd>CTRL+A</kbd> → <kbd>CTRL+C</kbd>.</p>
+
+        <div class="bg-white rounded-3xl shadow-2xl border border-slate-200 overflow-hidden mb-8">
+            <div class="bg-[#4D4D4D] px-8 py-5 flex justify-between items-center">
+                <h2 class="text-white text-xs font-bold uppercase tracking-widest">Tutorial de Uso</h2>
+                <div class="flex gap-1">
+                    <div class="w-2 h-2 bg-red-400 rounded-full"></div>
+                    <div class="w-2 h-2 bg-yellow-400 rounded-full"></div>
+                    <div class="w-2 h-2 bg-green-400 rounded-full"></div>
                 </div>
-                <div class="step">
-                    <div class="step-num">PASSO 02</div>
-                    <p>Cole o código abaixo e clique em <strong>Gerar PDF</strong>. Uma janela de impressão abrirá — selecione <strong>Salvar como PDF</strong>.</p>
+            </div>
+            
+            <div class="p-8 grid md:grid-cols-3 gap-6 border-b border-slate-100">
+                <div class="space-y-2">
+                    <p class="color-in font-bold text-xs uppercase">Passo 01</p>
+                    <p class="text-xs text-slate-600 leading-relaxed">No Mailchimp, abra o relatório e clique em <strong>View in Browser</strong>.</p>
+                </div>
+                <div class="space-y-2 border-x border-slate-100 px-6">
+                    <p class="color-in font-bold text-xs uppercase">Passo 02</p>
+                    <p class="text-xs text-slate-600 leading-relaxed">Pressione <kbd class="bg-slate-100 px-1 rounded text-slate-900 font-mono">CTRL+U</kbd>, selecione tudo e cole no campo abaixo.</p>
+                </div>
+                <div class="space-y-2">
+                    <p class="color-in font-bold text-xs uppercase">Passo 03</p>
+                    <p class="text-xs text-slate-600 leading-relaxed">Clique em gerar. Na janela que abrir, use o destino <strong>Salvar como PDF</strong>.</p>
                 </div>
             </div>
 
-            <div class="divider"></div>
+            <div class="p-8 bg-slate-50/50">
+                <textarea id="htmlInput" 
+                    class="w-full h-56 bg-white border-2 border-slate-200 rounded-2xl p-4 text-slate-400 font-mono text-[10px] focus:border-[#F15A24] focus:outline-none transition-all resize-none mb-6 shadow-inner"
+                    placeholder="Cole aqui o código fonte..."></textarea>
 
-            <label class="textarea-label" for="htmlInput">Código-fonte do Mailchimp</label>
-            <textarea id="htmlInput" placeholder="Cole aqui o código-fonte (CTRL+V)…"></textarea>
+                <button onclick="processarRelatorio()"
+                    class="w-full bg-[#F15A24] hover:bg-orange-600 text-white font-black py-5 rounded-2xl transition-all shadow-xl shadow-orange-100 flex items-center justify-center gap-3 text-lg uppercase tracking-tight">
+                    Gerar PDF Selecionável
+                </button>
+            </div>
+        </div>
 
-            <button class="btn" onclick="generatePDF()">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
-                    <polyline points="14 2 14 8 20 8"/>
-                    <line x1="12" y1="18" x2="12" y2="12"/>
-                    <polyline points="9 15 12 18 15 15"/>
-                </svg>
-                Gerar PDF Agora
-            </button>
-
-            <div class="tip">
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#F15A24" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;margin-top:1px"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
-                <p><strong>Na janela de impressão:</strong> destino → <strong>Salvar como PDF</strong> · Margens → <strong>Nenhuma</strong> · Desmarque <strong>Cabeçalhos e rodapés</strong>.</p>
+        <div class="bg-blue-50 border border-blue-100 rounded-2xl p-6 flex gap-4 items-start">
+            <div class="bg-blue-500 text-white p-2 rounded-lg">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+            </div>
+            <div>
+                <p class="text-blue-800 text-xs font-bold uppercase mb-1">Ajuste de Impressão Obrigatório:</p>
+                <p class="text-blue-700 text-[11px] leading-relaxed">
+                    Para o layout não quebrar: No painel de impressão, clique em <strong>Mais definições</strong> e marque a caixa <strong>"Gráficos de segundo plano"</strong>. Em <strong>Margens</strong>, selecione <strong>"Nenhuma"</strong>.
+                </p>
             </div>
         </div>
     </div>
 
-    <iframe id="print-frame"></iframe>
+    <iframe id="preview-frame"></iframe>
 
     <script>
-    const PRINT_CSS = `
-        @page {
-            margin: 0 !important;
-            padding: 0 !important;
-            size: 794px 99999px !important;
-        }
-        html, body {
-            margin: 0 !important;
-            padding: 0 !important;
-            width: 794px !important;
-            height: auto !important;
-            overflow: visible !important;
-            background: white !important;
-        }
-        * {
-            page-break-before: avoid !important;
-            page-break-after:  avoid !important;
-            page-break-inside: avoid !important;
-            break-before: avoid !important;
-            break-after:  avoid !important;
-            break-inside: avoid !important;
-        }
-        #awesomewrap, #awesomebar, .archive_header,
-        [id="awesomebar"], [class="archive_header"] {
-            display: none !important;
-        }
-        img {
-            max-width: 100% !important;
-            page-break-inside: avoid !important;
-            break-inside: avoid !important;
-        }
-        [style*="position: fixed"], [style*="position:fixed"] {
-            position: absolute !important;
-        }
-    `;
+        function processarRelatorio() {
+            const code = document.getElementById('htmlInput').value;
+            if (!code.trim()) return alert("Por favor, cole o código fonte.");
 
-    async function generatePDF() {
-        const code = document.getElementById('htmlInput').value.trim();
-        if (!code) {
-            alert('O campo está vazio. Cole o código do Mailchimp primeiro.');
-            return;
-        }
+            const iframe = document.getElementById('preview-frame');
+            const doc = iframe.contentDocument || iframe.contentWindow.document;
 
-        const overlay     = document.getElementById('loading-overlay');
-        const uiMain      = document.getElementById('ui-main');
-        const loadingText = document.getElementById('loading-text');
-        const loadbar     = document.getElementById('loadbar');
+            // 1. Limpeza de scripts e elementos de interface do Mailchimp
+            let cleanCode = code.replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, "");
+            cleanCode = cleanCode.replace(/id="awesomewrap"|id="awesomebar"|class="archive_header"|#awesomewrap|#awesomebar/gi, 'style="display:none !important;"');
 
-        uiMain.style.display = 'none';
-        overlay.style.display = 'flex';
+            // 2. Injeção no Iframe
+            doc.open();
+            doc.write(cleanCode);
+            doc.close();
 
-        // Reseta animação da barra
-        loadbar.style.animation = 'none';
-        void loadbar.offsetHeight;
-        loadbar.style.animation = 'loadfill 4s ease forwards';
-
-        // Cria iframe limpo
-        const oldFrame = document.getElementById('print-frame');
-        const frame = document.createElement('iframe');
-        frame.id = 'print-frame';
-        frame.style.cssText = 'position:fixed;top:-99999px;left:-99999px;width:794px;height:1px;border:none;visibility:hidden;';
-        oldFrame.replaceWith(frame);
-
-        // Injeta CSS antes de </head>
-        const printStyleTag = `<style id="inpacto-print">${PRINT_CSS}</style>`;
-        let finalCode = code;
-        if (/<\/head>/i.test(finalCode)) {
-            finalCode = finalCode.replace(/<\/head>/i, printStyleTag + '\n</head>');
-        } else {
-            finalCode = printStyleTag + finalCode;
-        }
-
-        // Escreve no iframe
-        frame.contentDocument.open();
-        frame.contentDocument.write(finalCode);
-        frame.contentDocument.close();
-
-        // Aguarda onload do iframe
-        await new Promise((resolve) => {
-            let done = false;
-            const finish = () => { if (!done) { done = true; resolve(); } };
-            frame.onload = finish;
-            setTimeout(finish, 7000); // fallback 7s
-        });
-
-        // Aguarda imagens externas
-        loadingText.textContent = 'Aguardando imagens externas…';
-        await waitForImages(frame.contentDocument);
-
-        loadingText.textContent = 'Abrindo janela de impressão…';
-        await sleep(300);
-
-        overlay.style.display = 'none';
-        uiMain.style.display = 'block';
-
-        try {
-            frame.contentWindow.focus();
-            frame.contentWindow.print();
-        } catch(e) {
-            console.error('Erro ao imprimir:', e);
-            alert('Não foi possível abrir o diálogo de impressão. Tente novamente.');
-        }
-    }
-
-    function waitForImages(doc) {
-        return new Promise((resolve) => {
-            const imgs = Array.from(doc.querySelectorAll('img'));
-            if (!imgs.length) return resolve();
-            let remaining = imgs.length;
-            const done = () => { if (--remaining <= 0) resolve(); };
-            imgs.forEach(img => {
-                if (img.complete) { done(); }
-                else {
-                    img.addEventListener('load',  done, { once: true });
-                    img.addEventListener('error', done, { once: true });
+            // 3. Injeção de CSS Corretor de Layout (O Pulo do Gato)
+            const style = doc.createElement('style');
+            style.textContent = `
+                /* Força a largura do MDA de referência */
+                body, html { 
+                    margin: 0 !important; 
+                    padding: 0 !important; 
+                    width: 800px !important; 
+                    background-color: white !important;
+                    -webkit-print-color-adjust: exact !important;
+                    print-color-adjust: exact !important;
                 }
-            });
-            setTimeout(resolve, 5000);
-        });
-    }
+                
+                /* Garante que o container principal do Mailchimp ocupe os 800px */
+                table.bodyTable, .templateContainer, .mcnTextContentContainer {
+                    width: 800px !important;
+                    max-width: 800px !important;
+                    min-width: 800px !important;
+                }
 
-    function sleep(ms) { return new Promise(r => setTimeout(r, ms)); }
+                /* Impede que o PDF corte gráficos e tabelas ao meio */
+                table, tr, td, img, p, h1, h2 {
+                    page-break-inside: avoid !important;
+                    break-inside: avoid !important;
+                }
+
+                @media print {
+                    @page { 
+                        size: 800px auto; /* Tenta forçar página única longa */
+                        margin: 0; 
+                    }
+                }
+            `;
+            doc.head.appendChild(style);
+
+            // 4. Dispara a impressão do navegador (Gera PDF selecionável)
+            setTimeout(() => {
+                iframe.contentWindow.focus();
+                iframe.contentWindow.print();
+            }, 1000);
+        }
     </script>
 </body>
 </html>
