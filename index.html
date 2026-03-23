@@ -8,71 +8,69 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
     <style>
-        body { font-family: 'Inter', sans-serif; background-color: #f8f9fa; }
-        .brand-orange { color: #F15A24; }
-        .bg-brand-orange { background-color: #F15A24; }
-        .brand-grey { color: #4D4D4D; }
-        .bg-brand-grey { background-color: #4D4D4D; }
+        body { font-family: 'Inter', sans-serif; background-color: #f8f9fa; margin: 0; padding: 0; }
         
-        /* Container de renderização: Visível apenas para o motor do PDF */
+        /* Cores in.pacto */
+        .color-in { color: #F15A24; }
+        .color-pacto { color: #4D4D4D; }
+        .bg-in { background-color: #F15A24; }
+        
+        /* Container de renderização real */
         #render-container {
-            position: absolute;
-            left: -9999px;
-            top: 0;
-            width: 800px; /* Largura padrão Mailchimp */
+            width: 800px;
+            margin: 0 auto;
             background: white;
+            /* Fica oculto até a hora de renderizar */
+            display: none; 
         }
     </style>
 </head>
-<body class="text-slate-800 min-h-screen">
+<body>
+
+    <div id="loading-overlay" style="display: none; position: fixed; inset: 0; background: #f8f9fa; z-index: 9999; flex-direction: column; align-items: center; justify-content: center;">
+        <h2 style="color: #4D4D4D; font-family: 'Inter', sans-serif; font-weight: 800; font-size: 28px; margin: 0;">
+            <span style="color: #F15A24;">in</span>.pacto
+        </h2>
+        <p style="color: #4D4D4D; font-family: 'Inter', sans-serif; font-size: 14px; margin-top: 16px; font-weight: 600;">
+            Processando design e baixando gráficos...
+        </p>
+        <p style="color: #a0aec0; font-family: 'Inter', sans-serif; font-size: 12px; margin-top: 4px;">
+            Isso leva cerca de 3 a 5 segundos.
+        </p>
+    </div>
 
     <div id="ui-main" class="max-w-3xl mx-auto py-12 px-6">
+        
         <div class="text-center mb-10">
             <h1 class="text-5xl font-black tracking-tighter">
-                <span class="brand-orange">in</span><span class="brand-grey">.pacto</span>
+                <span class="color-in">in</span><span class="color-pacto">.pacto</span>
             </h1>
             <p class="text-slate-500 mt-2 font-bold uppercase tracking-widest text-[10px]">Inteligência em Comunicação | Conversor de Relatórios</p>
         </div>
 
         <div class="bg-white rounded-3xl shadow-2xl border border-slate-200 overflow-hidden">
-            <div class="bg-brand-grey p-6 flex justify-between items-center">
-                <h2 class="text-white text-xs font-bold uppercase tracking-widest">Painel de Conversão</h2>
-                <span class="text-slate-400 text-[10px]">v3.0 - Estável</span>
-            </div>
-
             <div class="p-8">
                 <div class="grid grid-cols-2 gap-4 mb-8 text-[11px] border-b border-slate-100 pb-6">
                     <div class="flex gap-2">
-                        <span class="brand-orange font-bold text-lg">01.</span>
-                        <p class="text-slate-600 italic">No Mailchimp, use o <strong>View in Browser</strong> e copie o código fonte (<kbd class="bg-slate-100 px-1">CTRL+U</kbd>).</p>
+                        <span class="color-in font-bold text-lg">01.</span>
+                        <p class="text-slate-600">No Mailchimp, use o <strong>View in Browser</strong> e copie o código fonte (<kbd class="bg-slate-100 px-1 font-mono">CTRL+U</kbd>).</p>
                     </div>
                     <div class="flex gap-2">
-                        <span class="brand-orange font-bold text-lg">02.</span>
-                        <p class="text-slate-600 italic">Cole abaixo e clique no botão. O processo pode levar alguns segundos.</p>
+                        <span class="color-in font-bold text-lg">02.</span>
+                        <p class="text-slate-600">Cole abaixo. O sistema fará a leitura e gerará um PDF em página única contínua.</p>
                     </div>
                 </div>
 
                 <textarea id="htmlInput" 
-                    class="w-full h-56 bg-slate-50 border-2 border-slate-200 rounded-2xl p-4 text-slate-500 font-mono text-[10px] focus:border-brand-orange focus:outline-none transition-all resize-none mb-6 shadow-inner"
-                    placeholder="Cole aqui o código fonte que começa com <!DOCTYPE html>..."></textarea>
+                    class="w-full h-56 bg-slate-50 border-2 border-slate-200 rounded-2xl p-4 text-slate-500 font-mono text-[10px] focus:border-orange-500 focus:outline-none transition-all resize-none mb-6 shadow-inner"
+                    placeholder="Cole aqui o código fonte (CTRL+V)..."></textarea>
 
-                <button onclick="generatePDF()" id="btnAction"
-                    class="w-full bg-brand-orange hover:bg-orange-600 text-white font-black py-5 rounded-2xl transition-all shadow-xl shadow-orange-200 flex items-center justify-center gap-3 text-lg">
+                <button onclick="generatePDF()"
+                    class="w-full bg-in hover:bg-orange-600 text-white font-black py-5 rounded-2xl transition-all shadow-xl shadow-orange-200 flex items-center justify-center gap-3 text-lg">
                     GERAR PDF AGORA
                 </button>
-
-                <div id="statusMsg" class="hidden mt-6 text-center">
-                    <div class="inline-flex items-center gap-2 px-4 py-2 bg-blue-50 text-blue-700 rounded-full text-xs font-bold animate-pulse">
-                        <svg class="animate-spin h-4 w-4" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" fill="none"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
-                        PROCESSANDO DESIGN... (NÃO FECHE A PÁGINA)
-                    </div>
-                </div>
             </div>
         </div>
-        
-        <p class="text-center text-slate-400 text-[9px] mt-8 font-bold uppercase tracking-[0.2em]">
-            Tecnologia Interna in.pacto - 2026
-        </p>
     </div>
 
     <div id="render-container"></div>
@@ -80,58 +78,84 @@
     <script>
         async function generatePDF() {
             const code = document.getElementById('htmlInput').value;
-            const btn = document.getElementById('btnAction');
-            const status = document.getElementById('statusMsg');
-            const container = document.getElementById('render-container');
-
             if (!code.trim()) {
-                alert("O campo está vazio. Por favor, cole o código HTML.");
+                alert("O campo está vazio. Cole o código do Mailchimp primeiro.");
                 return;
             }
 
-            // Iniciar Processamento
-            btn.disabled = true;
-            btn.innerText = "CONVERTENDO...";
-            status.classList.remove('hidden');
+            const uiMain = document.getElementById('ui-main');
+            const overlay = document.getElementById('loading-overlay');
+            const container = document.getElementById('render-container');
+
+            // 1. Troca a interface para a tela de carregamento
+            uiMain.style.display = 'none';
+            overlay.style.display = 'flex';
+            container.style.display = 'block'; // Mostra o container na DOM real
 
             try {
-                // 1. Limpeza do HTML
-                let cleanCode = code.replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, "");
-                // Remove barras do Mailchimp
-                cleanCode = cleanCode.replace(/id="awesomewrap"|id="awesomebar"|class="archive_header"|#awesomewrap|#awesomebar/gi, 'style="display:none !important;"');
+                // 2. Extrai o CSS e o Body do código colado
+                const parser = new DOMParser();
+                const doc = parser.parseFromString(code, 'text/html');
 
-                // 2. Inserir no container de renderização
-                container.innerHTML = cleanCode;
+                // Pega todo o CSS que o Mailchimp usa
+                let styleContent = '';
+                doc.querySelectorAll('style').forEach(s => styleContent += s.innerHTML + '\n');
+                
+                // Remove as barras do sistema Mailchimp do Body
+                let bodyContent = doc.body.innerHTML;
+                bodyContent = bodyContent.replace(/id="awesomewrap"|id="awesomebar"|class="archive_header"/gi, 'style="display:none !important;"');
 
-                // 3. Aguardar renderização de imagens (Essencial para não sair em branco)
-                await new Promise(resolve => setTimeout(resolve, 2000));
+                // 3. Aplica o CSS no navegador (temporariamente)
+                const styleTag = document.createElement('style');
+                styleTag.id = 'in-pacto-temp-style';
+                styleTag.innerHTML = styleContent;
+                document.head.appendChild(styleTag);
 
-                // 4. Configurações de Alta Fidelidade (Baseado no seu MDA)
+                // 4. Injeta o HTML no container
+                container.innerHTML = bodyContent;
+
+                // 5. ESPERA CRÍTICA: Aguarda 3 segundos para o navegador carregar as imagens e tabelas
+                await new Promise(resolve => setTimeout(resolve, 3000));
+
+                // 6. Configuração para "Página Única Infinita"
+                const width = 800; 
+                // Mede a altura exata que o relatório ocupou na tela
+                const height = Math.max(container.offsetHeight, 800); 
+
                 const opt = {
-                    margin: [0.2, 0, 0.2, 0], // Pequena margem topo/fundo
-                    filename: 'Relatorio_MDA_InPacto.pdf',
+                    margin: 0,
+                    filename: 'Relatorio_MDA_in_pacto.pdf',
                     image: { type: 'jpeg', quality: 1 },
                     html2canvas: { 
-                        scale: 2, // Aumenta a resolução
-                        useCORS: true, // Tenta carregar imagens externas do Mailchimp
-                        logging: false,
-                        letterRendering: true
+                        scale: 2, // Resolução alta
+                        useCORS: true, // Autoriza leitura das imagens originais
+                        width: width,
+                        windowWidth: width 
                     },
-                    jsPDF: { unit: 'in', format: 'a4', orientation: 'portrait' },
-                    pagebreak: { mode: ['avoid-all', 'css', 'legacy'] }
+                    // O segredo do arquivo contínuo: definimos a altura da folha igual à altura do conteúdo
+                    jsPDF: { 
+                        unit: 'px', 
+                        format: [width, height], 
+                        orientation: 'portrait' 
+                    }
                 };
 
-                // 5. Gerar PDF
+                // 7. Dispara a criação do PDF
                 await html2pdf().set(opt).from(container).save();
 
             } catch (err) {
-                console.error(err);
-                alert("Erro ao gerar PDF. Certifique-se de que copiou o código completo.");
+                console.error("Erro no processamento:", err);
+                alert("Ops! Houve um erro. Verifique se copiou todo o código fonte (CTRL+A).");
             } finally {
-                btn.disabled = false;
-                btn.innerText = "GERAR PDF AGORA";
-                status.classList.add('hidden');
-                container.innerHTML = ""; // Limpa memória
+                // 8. Limpa tudo e volta a tela inicial
+                container.innerHTML = '';
+                container.style.display = 'none';
+                
+                const tempStyle = document.getElementById('in-pacto-temp-style');
+                if (tempStyle) tempStyle.remove();
+
+                overlay.style.display = 'none';
+                uiMain.style.display = 'block';
             }
         }
     </script>
