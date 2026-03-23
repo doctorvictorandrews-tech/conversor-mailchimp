@@ -4,464 +4,152 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Conversor de Relatórios | in.pacto</title>
-    <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
     <style>
-        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
-        :root {
-            --orange: #F15A24;
-            --dark: #1a1a1a;
-            --mid: #4D4D4D;
-            --light: #f4f1ee;
-            --white: #ffffff;
-            --border: #e8e4df;
-        }
-
-        body {
-            font-family: 'DM Sans', sans-serif;
-            background-color: var(--light);
-            min-height: 100vh;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            padding: 40px 20px;
-            position: relative;
-            overflow-x: hidden;
-        }
-
-        /* Grain texture overlay */
-        body::before {
-            content: '';
-            position: fixed;
-            inset: 0;
-            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
-            pointer-events: none;
-            z-index: 0;
-        }
-
-        /* Background geometric accent */
-        body::after {
-            content: '';
-            position: fixed;
-            top: -200px;
-            right: -200px;
-            width: 600px;
-            height: 600px;
-            border-radius: 50%;
-            background: radial-gradient(circle, rgba(241,90,36,0.07) 0%, transparent 70%);
-            pointer-events: none;
-            z-index: 0;
-        }
-
-        .card {
-            position: relative;
-            z-index: 1;
-            background: var(--white);
-            border: 1px solid var(--border);
-            border-radius: 24px;
-            width: 100%;
-            max-width: 560px;
-            overflow: hidden;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.04), 0 20px 60px rgba(0,0,0,0.08);
-        }
-
-        /* Header strip */
-        .card-header {
-            background: var(--dark);
-            padding: 32px 40px 28px;
-            position: relative;
-            overflow: hidden;
-        }
-
-        .card-header::after {
-            content: '';
+        body { font-family: 'Inter', sans-serif; background-color: #f8f9fa; }
+        .color-in { color: #F15A24; }
+        .color-pacto { color: #4D4D4D; }
+        .bg-in { background-color: #F15A24; }
+        
+        /* Iframe invisível para o usuário, mas legível para o script */
+        #email-frame {
             position: absolute;
-            bottom: -1px;
-            left: 40px;
-            width: 48px;
-            height: 3px;
-            background: var(--orange);
-        }
-
-        .logo {
-            font-family: 'Syne', sans-serif;
-            font-weight: 800;
-            font-size: 36px;
-            letter-spacing: -1px;
-            line-height: 1;
-            color: var(--white);
-        }
-
-        .logo span {
-            color: var(--orange);
-        }
-
-        .logo-sub {
-            font-family: 'DM Sans', sans-serif;
-            font-size: 10px;
-            font-weight: 400;
-            letter-spacing: 0.18em;
-            text-transform: uppercase;
-            color: rgba(255,255,255,0.35);
-            margin-top: 6px;
-        }
-
-        /* Body */
-        .card-body {
-            padding: 36px 40px 40px;
-        }
-
-        /* Steps */
-        .steps {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 16px;
-            margin-bottom: 28px;
-        }
-
-        .step {
-            background: var(--light);
-            border-radius: 12px;
-            padding: 14px 16px;
-            border: 1px solid var(--border);
-        }
-
-        .step-num {
-            font-family: 'Syne', sans-serif;
-            font-size: 11px;
-            font-weight: 700;
-            color: var(--orange);
-            letter-spacing: 0.1em;
-            margin-bottom: 4px;
-        }
-
-        .step p {
-            font-size: 11px;
-            color: var(--mid);
-            line-height: 1.6;
-        }
-
-        .step kbd {
-            display: inline-block;
-            background: var(--white);
-            border: 1px solid var(--border);
-            border-radius: 4px;
-            padding: 1px 5px;
-            font-family: 'DM Sans', monospace;
-            font-size: 10px;
-            color: var(--dark);
-        }
-
-        /* Divider */
-        .divider {
-            height: 1px;
-            background: var(--border);
-            margin-bottom: 28px;
-        }
-
-        /* Textarea */
-        .textarea-label {
-            font-family: 'Syne', sans-serif;
-            font-size: 11px;
-            font-weight: 700;
-            letter-spacing: 0.12em;
-            text-transform: uppercase;
-            color: var(--mid);
-            margin-bottom: 10px;
-            display: block;
-        }
-
-        textarea {
-            width: 100%;
-            height: 180px;
-            background: var(--light);
-            border: 1.5px solid var(--border);
-            border-radius: 12px;
-            padding: 16px;
-            font-family: 'DM Sans', monospace;
-            font-size: 11px;
-            color: var(--mid);
-            resize: none;
-            transition: border-color 0.2s, box-shadow 0.2s;
-            outline: none;
-            line-height: 1.6;
-        }
-
-        textarea:focus {
-            border-color: var(--orange);
-            box-shadow: 0 0 0 3px rgba(241,90,36,0.1);
-        }
-
-        textarea::placeholder {
-            color: #b0a899;
-        }
-
-        /* Button */
-        .btn {
-            width: 100%;
-            margin-top: 16px;
-            background: var(--orange);
-            color: var(--white);
-            border: none;
-            border-radius: 12px;
-            padding: 18px 24px;
-            font-family: 'Syne', sans-serif;
-            font-size: 14px;
-            font-weight: 800;
-            letter-spacing: 0.08em;
-            text-transform: uppercase;
-            cursor: pointer;
-            transition: background 0.2s, transform 0.15s, box-shadow 0.2s;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 10px;
-            box-shadow: 0 8px 24px rgba(241,90,36,0.28);
-        }
-
-        .btn:hover {
-            background: #d94f1e;
-            transform: translateY(-1px);
-            box-shadow: 0 12px 32px rgba(241,90,36,0.35);
-        }
-
-        .btn:active {
-            transform: translateY(0);
-        }
-
-        .btn-icon {
-            width: 18px;
-            height: 18px;
-            opacity: 0.9;
-        }
-
-        /* Tip */
-        .tip {
-            display: flex;
-            align-items: flex-start;
-            gap: 8px;
-            margin-top: 20px;
-            padding: 12px 14px;
-            background: rgba(241,90,36,0.06);
-            border-left: 3px solid var(--orange);
-            border-radius: 0 8px 8px 0;
-        }
-
-        .tip p {
-            font-size: 11px;
-            color: var(--mid);
-            line-height: 1.6;
-        }
-
-        .tip strong {
-            color: var(--dark);
-        }
-
-        /* Loading overlay */
-        #loading-overlay {
-            display: none;
-            position: fixed;
-            inset: 0;
-            background: var(--light);
-            z-index: 9999;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            gap: 16px;
-        }
-
-        .loading-logo {
-            font-family: 'Syne', sans-serif;
-            font-weight: 800;
-            font-size: 42px;
-            letter-spacing: -1px;
-            color: var(--dark);
-        }
-
-        .loading-logo span { color: var(--orange); }
-
-        .loading-bar-wrap {
-            width: 200px;
-            height: 3px;
-            background: var(--border);
-            border-radius: 99px;
-            overflow: hidden;
-        }
-
-        .loading-bar {
-            height: 100%;
-            width: 0%;
-            background: var(--orange);
-            border-radius: 99px;
-            animation: loadfill 3s ease forwards;
-        }
-
-        @keyframes loadfill {
-            0%   { width: 0%; }
-            60%  { width: 70%; }
-            90%  { width: 88%; }
-            100% { width: 95%; }
-        }
-
-        .loading-text {
-            font-family: 'DM Sans', sans-serif;
-            font-size: 13px;
-            color: var(--mid);
-            font-weight: 500;
-        }
-
-        .loading-hint {
-            font-size: 11px;
-            color: #b0a899;
-        }
-
-        /* Hidden iframe */
-        #print-frame {
-            position: fixed;
-            top: -9999px;
             left: -9999px;
-            width: 800px;
-            height: 1px;
+            top: 0;
+            width: 800px; /* Largura padrão para forçar o layout correto do Mailchimp */
+            height: 100vh;
             border: none;
-            visibility: hidden;
         }
     </style>
 </head>
-<body>
+<body class="text-slate-800 min-h-screen">
 
-    <!-- Loading overlay -->
-    <div id="loading-overlay">
-        <div class="loading-logo"><span>in</span>.pacto</div>
-        <div class="loading-bar-wrap">
-            <div class="loading-bar"></div>
-        </div>
-        <p class="loading-text">Preparando relatório para impressão…</p>
-        <p class="loading-hint">Aguarde enquanto carregamos todos os elementos.</p>
+    <div id="loading-overlay" class="hidden fixed inset-0 bg-[#f8f9fa] z-50 flex-col items-center justify-center">
+        <h2 class="text-3xl font-black mb-4">
+            <span class="color-in">in</span><span class="color-pacto">.pacto</span>
+        </h2>
+        <div class="animate-spin rounded-full h-10 w-10 border-b-2 border-[#F15A24] mb-4"></div>
+        <p class="text-[#4D4D4D] font-bold">Lendo tabelas e processando imagens...</p>
+        <p class="text-slate-400 text-xs mt-2">Isso pode levar até 5 segundos.</p>
     </div>
 
-    <!-- Main UI -->
-    <div id="ui-main" class="card">
-        <div class="card-header">
-            <div class="logo"><span>in</span>.pacto</div>
-            <div class="logo-sub">Inteligência em Comunicação &nbsp;·&nbsp; Conversor de Relatórios</div>
+    <div id="ui-main" class="max-w-3xl mx-auto py-12 px-6">
+        <div class="text-center mb-10">
+            <h1 class="text-5xl font-black tracking-tighter">
+                <span class="color-in">in</span><span class="color-pacto">.pacto</span>
+            </h1>
+            <p class="text-slate-500 mt-2 font-bold uppercase tracking-widest text-[10px]">Inteligência em Comunicação | Conversor de Relatórios</p>
         </div>
 
-        <div class="card-body">
-            <div class="steps">
-                <div class="step">
-                    <div class="step-num">PASSO 01</div>
-                    <p>No Mailchimp, clique em <strong>View in Browser</strong> e copie o código-fonte com <kbd>CTRL+U</kbd> → <kbd>CTRL+A</kbd> → <kbd>CTRL+C</kbd>.</p>
+        <div class="bg-white rounded-3xl shadow-2xl border border-slate-200 overflow-hidden">
+            <div class="p-8">
+                <div class="grid grid-cols-2 gap-4 mb-8 text-[11px] border-b border-slate-100 pb-6">
+                    <div class="flex gap-2">
+                        <span class="color-in font-bold text-lg">01.</span>
+                        <p class="text-slate-600">No Mailchimp, use o <strong>View in Browser</strong> e copie o código fonte (<kbd class="bg-slate-100 px-1 font-mono">CTRL+U</kbd>).</p>
+                    </div>
+                    <div class="flex gap-2">
+                        <span class="color-in font-bold text-lg">02.</span>
+                        <p class="text-slate-600">Cole abaixo. O sistema isolará o código para evitar quebras de layout.</p>
+                    </div>
                 </div>
-                <div class="step">
-                    <div class="step-num">PASSO 02</div>
-                    <p>Cole o código abaixo e clique em <strong>Gerar PDF</strong>. Uma janela de impressão será aberta — salve como PDF.</p>
-                </div>
-            </div>
 
-            <div class="divider"></div>
+                <textarea id="htmlInput" 
+                    class="w-full h-56 bg-slate-50 border-2 border-slate-200 rounded-2xl p-4 text-slate-500 font-mono text-[10px] focus:border-orange-500 focus:outline-none transition-all resize-none mb-6 shadow-inner"
+                    placeholder="Cole aqui o código fonte (CTRL+V)..."></textarea>
 
-            <label class="textarea-label" for="htmlInput">Código-fonte do Mailchimp</label>
-            <textarea id="htmlInput" placeholder="Cole aqui o código-fonte (CTRL+V)…"></textarea>
-
-            <button class="btn" onclick="generatePDF()">
-                <svg class="btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
-                    <polyline points="14 2 14 8 20 8"/>
-                    <line x1="12" y1="18" x2="12" y2="12"/>
-                    <polyline points="9 15 12 18 15 15"/>
-                </svg>
-                Gerar PDF Agora
-            </button>
-
-            <div class="tip">
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#F15A24" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;margin-top:1px"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
-                <p><strong>Na janela de impressão:</strong> selecione <strong>Salvar como PDF</strong>, desmarque cabeçalho/rodapé e ajuste as margens para <strong>Nenhuma</strong> para melhor resultado.</p>
+                <button onclick="generatePDF()"
+                    class="w-full bg-in hover:bg-orange-600 text-white font-black py-5 rounded-2xl transition-all shadow-xl shadow-orange-200 flex items-center justify-center gap-3 text-lg">
+                    GERAR PDF AGORA
+                </button>
             </div>
         </div>
     </div>
 
-    <!-- Hidden iframe for printing -->
-    <iframe id="print-frame"></iframe>
+    <iframe id="email-frame"></iframe>
 
     <script>
-        function generatePDF() {
-            const code = document.getElementById('htmlInput').value.trim();
-            if (!code) {
-                alert('O campo está vazio. Cole o código do Mailchimp primeiro.');
+        async function generatePDF() {
+            const code = document.getElementById('htmlInput').value;
+            if (!code.trim()) {
+                alert("Cole o código do Mailchimp primeiro.");
                 return;
             }
 
-            const overlay  = document.getElementById('loading-overlay');
-            const uiMain   = document.getElementById('ui-main');
-            const frame    = document.getElementById('print-frame');
+            const overlay = document.getElementById('loading-overlay');
+            const iframe = document.getElementById('email-frame');
+            
+            overlay.classList.remove('hidden');
+            overlay.classList.add('flex');
 
-            // Show loading
-            uiMain.style.display = 'none';
-            overlay.style.display = 'flex';
+            try {
+                // 1. Acessa o documento dentro do Iframe
+                const doc = iframe.contentDocument || iframe.contentWindow.document;
 
-            // Rebuild iframe to avoid stale state
-            const newFrame = document.createElement('iframe');
-            newFrame.id = 'print-frame';
-            newFrame.style.cssText = 'position:fixed;top:-9999px;left:-9999px;width:800px;height:1px;border:none;visibility:hidden;';
-            frame.replaceWith(newFrame);
+                // 2. Limpeza básica para não sair o cabeçalho cinza do Mailchimp
+                let cleanCode = code.replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, "");
+                cleanCode = cleanCode.replace(/id="awesomewrap"|id="awesomebar"|class="archive_header"/gi, 'style="display:none !important;"');
 
-            // Inject print CSS into the Mailchimp code before writing to iframe
-            const printCSS = `
-                <style>
-                    @page { margin: 0; size: auto; }
-                    body { margin: 0 !important; padding: 0 !important; }
-                    /* Hide Mailchimp chrome bars */
-                    #awesomewrap, #awesomebar, .archive_header,
-                    [id*="awesomebar"], [class*="archive_header"] {
-                        display: none !important;
+                // 3. Escreve o código DENTRO do iframe (isolamento total)
+                doc.open();
+                doc.write(cleanCode);
+                doc.close();
+
+                // Adiciona um estilo extra dentro do iframe para garantir fundo branco e resetar margens
+                const style = doc.createElement('style');
+                style.textContent = `
+                    body, html { margin: 0 !important; padding: 0 !important; background: white !important; width: 800px !important; }
+                    table { border-collapse: collapse; }
+                `;
+                doc.head.appendChild(style);
+
+                // 4. Aguarda as imagens carregarem dentro do iframe
+                await new Promise(resolve => setTimeout(resolve, 3000));
+
+                // 5. Pega a altura real que o e-mail ocupou dentro do iframe
+                const body = doc.body;
+                const html = doc.documentElement;
+                const height = Math.max(
+                    body.scrollHeight, body.offsetHeight,
+                    html.clientHeight, html.scrollHeight, html.offsetHeight
+                );
+
+                // 6. Configura a foto (html2pdf)
+                const opt = {
+                    margin: 0,
+                    filename: 'Relatorio_MDA_in_pacto.pdf',
+                    image: { type: 'jpeg', quality: 1 },
+                    html2canvas: { 
+                        scale: 2, 
+                        useCORS: true, 
+                        width: 800, // Trava a largura
+                        windowWidth: 800 
+                    },
+                    jsPDF: { 
+                        unit: 'px', 
+                        format: [800, height], // Formato contínuo com a altura calculada
+                        orientation: 'portrait' 
                     }
-                </style>
-            `;
+                };
 
-            // Insert print CSS just before </head> (or at the start if no head tag)
-            let finalCode = code;
-            if (/<\/head>/i.test(finalCode)) {
-                finalCode = finalCode.replace(/<\/head>/i, printCSS + '</head>');
-            } else {
-                finalCode = printCSS + finalCode;
+                // 7. Manda o html2pdf capturar o body DENTRO do Iframe
+                await html2pdf().set(opt).from(doc.body).save();
+
+            } catch (err) {
+                console.error("Erro:", err);
+                alert("Ocorreu um erro. Tente recarregar a página e colar novamente.");
+            } finally {
+                // 8. Tira a tela de carregamento e limpa o iframe
+                overlay.classList.remove('flex');
+                overlay.classList.add('hidden');
+                
+                const doc = iframe.contentDocument || iframe.contentWindow.document;
+                doc.open();
+                doc.write('');
+                doc.close();
             }
-
-            // Write to iframe
-            newFrame.contentDocument.open();
-            newFrame.contentDocument.write(finalCode);
-            newFrame.contentDocument.close();
-
-            // Wait for images and resources to load
-            newFrame.onload = function () {
-                // Extra buffer for lazy-loaded images
-                setTimeout(() => {
-                    overlay.style.display = 'none';
-                    uiMain.style.display = 'block';
-
-                    // Trigger print dialog
-                    try {
-                        newFrame.contentWindow.focus();
-                        newFrame.contentWindow.print();
-                    } catch (e) {
-                        console.error('Erro ao abrir impressão:', e);
-                        alert('Não foi possível abrir o diálogo de impressão automaticamente. Tente novamente.');
-                    }
-                }, 2500);
-            };
-
-            // Fallback: if onload takes too long
-            setTimeout(() => {
-                if (overlay.style.display !== 'none') {
-                    overlay.style.display = 'none';
-                    uiMain.style.display = 'block';
-                    try {
-                        newFrame.contentWindow.focus();
-                        newFrame.contentWindow.print();
-                    } catch (e) {
-                        console.error('Fallback print error:', e);
-                    }
-                }
-            }, 8000);
         }
     </script>
 </body>
