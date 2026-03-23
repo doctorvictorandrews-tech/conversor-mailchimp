@@ -3,120 +3,143 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Mailchimp to PPT-PDF | Internal Tool</title>
+    <title>Gerador de Relatórios | Mailchimp para PDF</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <style>
-        /* Estilos que só aparecem no PDF */
-        @media print {
-            @page { 
-                size: A4 landscape; 
-                margin: 0; 
-            }
-            body { margin: 0; padding: 0; background: white !important; }
-            
-            /* Remove elementos desnecessários do Mailchimp */
-            #awesomewrap, #awesomebar, .mceFooterSection, #canspamBarWrapper { 
-                display: none !important; 
-            }
-            
-            /* Força cada bloco principal do Mailchimp a ser um novo slide */
-            .mceWrapper { 
-                page-break-after: always !important;
-                height: 100vh !important;
-                display: flex !important;
-                flex-direction: column !important;
-                justify-content: center !important;
-                align-items: center !important;
-                background: white !important;
-            }
-
-            /* Garante que imagens não quebrem entre páginas */
-            img { max-height: 90vh !important; width: auto !important; object-fit: contain; }
-        }
-    </style>
 </head>
-<body class="bg-slate-900 text-white font-sans min-h-screen">
+<body class="bg-slate-900 text-slate-100 font-sans min-h-screen flex flex-col items-center justify-center p-6">
 
-    <div class="max-w-4xl mx-auto py-12 px-6" id="ui-container">
-        <header class="text-center mb-12">
-            <h1 class="text-4xl font-extrabold text-blue-400 mb-2">Mailchimp ➔ PDF Slide</h1>
-            <p class="text-slate-400">Transforme rascunhos em apresentações perfeitas.</p>
-        </header>
-
-        <div class="bg-slate-800 rounded-xl p-6 mb-8 border border-slate-700">
-            <h2 class="text-xl font-bold mb-4 flex items-center">
-                <span class="bg-blue-500 text-white w-6 h-6 rounded-full inline-flex items-center justify-center text-sm mr-2">?</span>
-                Como extrair o código:
-            </h2>
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
-                <div class="bg-slate-700/50 p-4 rounded-lg">
-                    <p class="font-bold text-blue-300 mb-1">1. No Mailchimp</p>
-                    No editor do rascunho, vá em <span class="text-orange-300 italic">Preview > View in Browser</span>.
-                </div>
-                <div class="bg-slate-700/50 p-4 rounded-lg">
-                    <p class="font-bold text-blue-300 mb-1">2. Na Nova Aba</p>
-                    Aperte <kbd class="bg-slate-600 px-1 rounded">Ctrl + U</kbd> para abrir o código fonte.
-                </div>
-                <div class="bg-slate-700/50 p-4 rounded-lg">
-                    <p class="font-bold text-blue-300 mb-1">3. Copie e Cole</p>
-                    Selecione tudo (<kbd class="bg-slate-600 px-1 rounded">Ctrl + A</kbd>), copie e cole no campo abaixo.
-                </div>
-            </div>
+    <div class="max-w-3xl w-full bg-slate-800 rounded-2xl shadow-2xl overflow-hidden border border-slate-700">
+        
+        <div class="bg-blue-600 p-6 text-center">
+            <h1 class="text-3xl font-extrabold text-white tracking-tight">Gerador de Relatório PDF</h1>
+            <p class="text-blue-200 mt-2 text-sm">Transforme seu rascunho em uma apresentação formatada</p>
         </div>
 
-        <div class="space-y-4">
-            <textarea id="htmlInput" 
-                class="w-full h-80 bg-slate-800 border border-slate-700 rounded-xl p-4 text-slate-300 font-mono text-xs focus:ring-2 focus:ring-blue-500 focus:outline-none"
-                placeholder=""></textarea>
-            
-            <button onclick="processAndPrint()" 
-                class="w-full bg-blue-600 hover:bg-blue-500 text-white font-bold py-4 rounded-xl transition-all transform hover:scale-[1.01] active:scale-95 flex items-center justify-center gap-2 text-lg">
-                GERAR PDF EM FORMATO SLIDE
-            </button>
+        <div class="p-8">
+            <div class="mb-8">
+                <h2 class="text-lg font-bold text-blue-400 mb-3 uppercase tracking-wider text-sm">Como gerar seu PDF:</h2>
+                <ol class="space-y-3 text-slate-300 text-sm leading-relaxed list-decimal list-inside marker:text-blue-500 marker:font-bold">
+                    <li>No Mailchimp, clique em <strong>CAMPAIGNS</strong> e procure pelo relatório que você editou, que ainda deverá estar como <strong>DRAFT (RASCUNHO)</strong>.</li>
+                    <li>Ao encontrá-lo, do lado direito da tela clique sobre os 3 pontinhos e selecione a opção <strong>VIEW IN BROWSER</strong>. Uma nova guia será aberta.</li>
+                    <li>Aproveite para conferir mais uma vez todo o seu relatório. Caso haja algum erro, edite o que for preciso e recomece esse processo.</li>
+                    <li>Uma vez que o relatório estiver ok e você tiver voltado pra aba do view in browser, tecle <kbd class="bg-slate-700 text-white px-2 py-1 rounded text-xs font-mono">CTRL + U</kbd>. Uma nova aba com um código enorme será aberta.</li>
+                    <li>Tecle <kbd class="bg-slate-700 text-white px-2 py-1 rounded text-xs font-mono">CTRL + A</kbd> para copiar todo o texto e cole no espaço abaixo.</li>
+                    <li>Uma vez feito isso, <strong>apenas aguarde</strong> para que seu PDF seja gerado.</li>
+                </ol>
+            </div>
+
+            <div class="relative">
+                <textarea id="htmlInput" 
+                    class="w-full h-40 bg-slate-900 border border-slate-600 rounded-xl p-4 text-emerald-400 font-mono text-xs focus:ring-2 focus:ring-blue-500 focus:outline-none placeholder-slate-500 transition-all resize-none"
+                    placeholder="Cole o código HTML aqui e aguarde..."></textarea>
+                
+                <div id="loadingStatus" class="hidden absolute inset-0 bg-slate-900/90 rounded-xl flex items-center justify-center backdrop-blur-sm">
+                    <div class="text-center">
+                        <svg class="animate-spin h-10 w-10 text-blue-500 mx-auto mb-3" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                        </svg>
+                        <p class="text-blue-400 font-bold animate-pulse">Processando Layout dos Slides...</p>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 
     <script>
-        function processAndPrint() {
-            const rawHtml = document.getElementById('htmlInput').value;
-            
-            if(!rawHtml) {
-                alert("Por favor, cole o código HTML primeiro.");
-                return;
-            }
+        const inputArea = document.getElementById('htmlInput');
+        const loadingScreen = document.getElementById('loadingStatus');
 
-            // Cria um iframe invisível para processar o conteúdo
-            const printWindow = window.open('', '_blank');
-            printWindow.document.write(rawHtml);
+        // Escuta qualquer alteração no campo de texto
+        inputArea.addEventListener('input', function() {
+            const rawHtml = this.value;
             
-            // Injeta o CSS de impressão novamente na nova janela
+            // Verifica se o que foi colado parece ser um HTML
+            if(rawHtml.length > 500 && (rawHtml.includes('<html') || rawHtml.includes('<body'))) {
+                
+                // Mostra a tela de carregamento
+                loadingScreen.classList.remove('hidden');
+                
+                // Dá um pequeno atraso para a interface respirar antes de travar processando
+                setTimeout(() => {
+                    generateSlidePDF(rawHtml);
+                }, 800);
+            }
+        });
+
+        function generateSlidePDF(htmlContent) {
+            const printWindow = window.open('', '_blank');
+            printWindow.document.write(htmlContent);
+            
+            // CSS Agressivo para forçar formato de PPT/Slide
             const styleTag = printWindow.document.createElement('style');
             styleTag.innerHTML = `
                 @media print {
-                    @page { size: A4 landscape; margin: 0; }
-                    body { margin: 0; padding: 0; }
-                    #awesomewrap, #awesomebar, .archive_header, #canspamBarWrapper { display: none !important; }
+                    /* Força o tamanho A4 Paisagem (Slide) e zera margens do navegador */
+                    @page { 
+                        size: 297mm 210mm landscape; 
+                        margin: 0 !important; 
+                    }
+                    
+                    body, html { 
+                        width: 297mm !important; 
+                        height: 210mm !important; 
+                        margin: 0 !important; 
+                        padding: 0 !important; 
+                        background-color: #f4f4f4 !important; 
+                        -webkit-print-color-adjust: exact !important; 
+                        print-color-adjust: exact !important;
+                    }
+                    
+                    /* Remove lixo do Mailchimp (barras de topo, footer) */
+                    #awesomewrap, #awesomebar, .archive_header, #canspamBarWrapper, .mceFooterSection { 
+                        display: none !important; 
+                    }
+
+                    /* Quebra a trava de 660px do Mailchimp para usar toda a largura do slide */
+                    table { max-width: 100% !important; }
+                    table[style*="max-width:660px"], table[style*="max-width: 660px"] {
+                        width: 100% !important;
+                        max-width: 280mm !important; /* Deixa uma margem de respiro lateral */
+                        margin: 0 auto !important;
+                    }
+
+                    /* Força cada bloco do Mailchimp a ser um slide individual */
                     .mceWrapper { 
                         page-break-after: always !important; 
-                        height: 100vh !important; 
+                        break-after: page !important;
+                        height: 210mm !important; 
+                        width: 100% !important;
                         display: flex !important;
                         flex-direction: column !important;
                         justify-content: center !important;
-                        background: white !important;
+                        align-items: center !important;
+                        overflow: hidden !important;
+                        box-sizing: border-box !important;
+                        padding: 10mm 0 !important;
                     }
-                    img { max-height: 85vh !important; width: auto !important; margin: 0 auto; display: block; }
-                    center { background: white !important; }
+
+                    /* Ajuste de imagens para não vazarem do slide */
+                    img { 
+                        max-width: 100% !important; 
+                        max-height: 180mm !important; 
+                        width: auto !important; 
+                        object-fit: contain !important; 
+                        margin: 0 auto !important;
+                    }
                 }
             `;
             printWindow.document.head.appendChild(styleTag);
-            
-            // Aguarda o carregamento das imagens antes de abrir o diálogo de impressão
             printWindow.document.close();
             
-            // Truque de dev: esperar as imagens carregarem
+            // Aguarda imagens externas carregarem e abre o prompt de impressão/PDF
             setTimeout(() => {
                 printWindow.print();
-            }, 1000);
+                
+                // Reseta a tela original para o próximo uso
+                inputArea.value = '';
+                loadingScreen.classList.add('hidden');
+            }, 1500);
         }
     </script>
 </body>
