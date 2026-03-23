@@ -8,30 +8,12 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
     <style>
         body { font-family: 'Inter', sans-serif; }
-        
-        /* CSS DE LIMPEZA PARA O PDF */
-        @media print {
-            /* Remove o que não é o relatório */
-            #ui-container, .archive_header, #awesomewrap, #awesomebar, .mceFooterSection, #canspamBarWrapper { 
-                display: none !important; 
-            }
-            
-            /* Remove especificamente o rodapé da Holding InPacto mencionado */
-            td:has(p:contains("Holding InPacto")), 
-            tr:has(td:contains("Copyright (C) 2026 Holding InPacto")) {
-                display: none !important;
-            }
-
-            body, html { 
-                background: white !important; 
-                margin: 0 !important; 
-                padding: 0 !important;
-                width: 100%;
-            }
-
-            /* Garante página única e sem cortes estranhos */
-            .mceWrapperInner { width: 100% !important; max-width: 100% !important; }
-            table { width: 100% !important; border-collapse: collapse; }
+        /* Esconde o iframe da tela, mas permite que ele seja impresso */
+        #print-frame {
+            position: absolute;
+            width: 0;
+            height: 0;
+            border: none;
         }
     </style>
 </head>
@@ -43,86 +25,77 @@
                 <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
             </div>
             <h1 class="text-3xl font-extrabold text-slate-900 tracking-tight">Conversor de Relatórios</h1>
-            <p class="text-slate-500 mt-2 font-medium">Edição Final</p>
+            <p class="text-slate-500 mt-2 font-medium">Edição InPacto v2.0</p>
         </div>
 
         <div class="bg-white rounded-3xl shadow-sm border border-slate-200 p-8 mb-6">
-            <h2 class="text-sm font-bold text-blue-600 uppercase tracking-widest mb-6">Passo a Passo</h2>
+            <h2 class="text-sm font-bold text-blue-600 uppercase tracking-widest mb-6">Como usar</h2>
             
-            <div class="space-y-6">
-                <div class="flex gap-4">
-                    <span class="flex-none w-8 h-8 bg-slate-100 text-slate-500 rounded-full flex items-center justify-center font-bold text-sm">1</span>
-                    <p class="text-slate-600 leading-relaxed">No Mailchimp, localize seu rascunho em <strong class="text-slate-900">Campaigns</strong>, clique nos 3 pontinhos e escolha <strong class="text-slate-900">View in Browser</strong>.</p>
+            <div class="space-y-4 mb-8">
+                <div class="flex gap-3 items-start">
+                    <span class="bg-blue-50 text-blue-600 rounded-lg px-2 py-1 text-xs font-bold">1</span>
+                    <p class="text-sm text-slate-600">No Mailchimp, use o <strong>View in Browser</strong> e pressione <strong>CTRL + U</strong>.</p>
                 </div>
-                
-                <div class="flex gap-4">
-                    <span class="flex-none w-8 h-8 bg-slate-100 text-slate-500 rounded-full flex items-center justify-center font-bold text-sm">2</span>
-                    <p class="text-slate-600 leading-relaxed">Na página que abrir, pressione <kbd class="bg-slate-800 text-white px-1.5 py-0.5 rounded shadow-sm text-[11px] font-mono">CTRL + U</kbd> para ver o código fonte.</p>
-                </div>
-
-                <div class="flex gap-4">
-                    <span class="flex-none w-8 h-8 bg-slate-100 text-slate-500 rounded-full flex items-center justify-center font-bold text-sm">3</span>
-                    <p class="text-slate-600 leading-relaxed">Selecione tudo (<kbd class="bg-slate-800 text-white px-1.5 py-0.5 rounded shadow-sm text-[11px] font-mono">CTRL + A</kbd>), copie e cole no campo abaixo.</p>
+                <div class="flex gap-3 items-start">
+                    <span class="bg-blue-50 text-blue-600 rounded-lg px-2 py-1 text-xs font-bold">2</span>
+                    <p class="text-sm text-slate-600">Copie tudo, cole abaixo e clique no botão preto.</p>
                 </div>
             </div>
 
-            <div class="mt-10">
-                <textarea id="htmlInput" 
-                    class="w-full h-32 bg-slate-50 border-2 border-dashed border-slate-200 rounded-2xl p-4 text-slate-400 font-mono text-xs focus:border-blue-500 focus:bg-white focus:outline-none transition-all resize-none"
-                    placeholder="Cole o código fonte aqui..."></textarea>
-            </div>
+            <textarea id="htmlInput" 
+                class="w-full h-40 bg-slate-50 border-2 border-dashed border-slate-200 rounded-2xl p-4 text-slate-600 font-mono text-xs focus:border-blue-500 focus:bg-white focus:outline-none transition-all resize-none"
+                placeholder="Cole o código-fonte (HTML) aqui..."></textarea>
 
             <button onclick="generatePDF()" 
                 class="mt-6 w-full bg-slate-900 hover:bg-black text-white font-bold py-4 rounded-2xl transition-all shadow-xl shadow-slate-200 flex items-center justify-center gap-3">
-                <svg class="w-5 h-5 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"></path></svg>
-                GERAR PDF AGORA
+                GERAR PDF
             </button>
         </div>
         
-        <p class="text-center text-slate-400 text-xs">A conversão é feita localmente. Nenhum dado é enviado ao servidor.</p>
+        <p class="text-center text-slate-400 text-xs">A conversão ocorre no seu navegador. Privacidade garantida.</p>
     </div>
 
-    <div id="print-area" class="hidden"></div>
+    <iframe id="print-frame"></iframe>
 
     <script>
-        async function generatePDF() {
+        function generatePDF() {
             const code = document.getElementById('htmlInput').value;
             if (!code) {
-                alert("Por favor, cole o código primeiro.");
+                alert("Por favor, cole o código HTML primeiro.");
                 return;
             }
 
-            const printArea = document.getElementById('print-area');
-            
-            // 1. Limpeza pesada via Regex (Remove scripts e o rodapé da Holding)
-            let cleanCode = code.replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, ""); // Remove scripts
-            cleanCode = cleanCode.replace(/Copyright \(C\) 2026 Holding InPacto.*/gi, ""); // Remove o copyright do texto
-            
-            // 2. Injeta o código na div de impressão
-            printArea.innerHTML = cleanCode;
+            const iframe = document.getElementById('print-frame');
+            const doc = iframe.contentDocument || iframe.contentWindow.document;
 
-            // 3. Remove elementos de ID conhecidos do Mailchimp via DOM
-            const selectorsToRemove = ['#awesomewrap', '#awesomebar', '.mceFooterSection', '#canspamBarWrapper'];
-            selectorsToRemove.forEach(selector => {
-                const el = printArea.querySelector(selector);
-                if (el) el.remove();
-            });
-
-            // 4. Inicia a impressão
-            // O segredo para funcionar: não abrimos nova aba (que o Chrome bloqueia),
-            // apenas escondemos a UI e mostramos o conteúdo.
-            document.getElementById('ui-container').classList.add('hidden');
-            printArea.classList.remove('hidden');
+            // 1. Limpeza do código (remover scripts e barras do Mailchimp)
+            let cleanCode = code.replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, "");
             
-            // Pequeno delay para garantir que o navegador renderizou as imagens
+            // Remove a barra de arquivo do Mailchimp (o topo cinza)
+            cleanCode = cleanCode.replace(/id="awesomewrap"|id="awesomebar"|class="archive_header"/gi, 'style="display:none;"');
+
+            // 2. Escreve o conteúdo no iframe
+            doc.open();
+            doc.write(cleanCode);
+            doc.close();
+
+            // 3. Adiciona um CSS extra dentro do iframe para garantir que o PDF fique bonito
+            const style = doc.createElement('style');
+            style.textContent = `
+                @media print {
+                    @page { margin: 0; size: auto; }
+                    body { margin: 0; padding: 0; }
+                    /* Força a remoção de itens indesejados caso o ID mude */
+                    #awesomewrap, #awesomebar, .mceFooterSection, #canspamBarWrapper { display: none !important; }
+                }
+            `;
+            doc.head.appendChild(style);
+
+            // 4. Aguarda as imagens carregarem e dispara a impressão
             setTimeout(() => {
-                window.print();
-                
-                // Volta ao normal após imprimir/cancelar
-                document.getElementById('ui-container').classList.remove('hidden');
-                printArea.classList.add('hidden');
-                printArea.innerHTML = ''; 
-            }, 500);
+                iframe.contentWindow.focus();
+                iframe.contentWindow.print();
+            }, 800);
         }
     </script>
 </body>
