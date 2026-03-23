@@ -3,144 +3,116 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Conversor de Relatórios | in.pacto</title>
+    <title>Conversor in.pacto | Página Única</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
     <style>
         body { font-family: 'Inter', sans-serif; background-color: #f8f9fa; }
-        .color-in { color: #F15A24; }
-        .color-pacto { color: #4D4D4D; }
-        .bg-in { background-color: #F15A24; }
+        .brand-orange { color: #F15A24; }
+        .brand-grey { color: #4D4D4D; }
         
-        #preview-frame {
+        /* Container de renderização oculto */
+        #render-area {
             position: absolute;
             left: -9999px;
             top: 0;
-            width: 800px; /* Largura idêntica ao MDA de referência */
-            height: 100vh;
-            border: none;
+            width: 800px;
+            background: white;
         }
     </style>
 </head>
 <body class="text-slate-800">
 
-    <div class="max-w-3xl mx-auto py-12 px-6">
+    <div class="max-w-2xl mx-auto py-12 px-6">
         <div class="text-center mb-10">
             <h1 class="text-5xl font-black tracking-tighter">
-                <span class="color-in">in</span><span class="color-pacto">.pacto</span>
+                <span class="brand-orange">in</span><span class="brand-grey">.pacto</span>
             </h1>
-            <p class="text-slate-500 mt-2 font-bold uppercase tracking-widest text-[10px]">Relatórios de Monitoramento Diário</p>
+            <p class="text-slate-500 mt-2 font-bold uppercase tracking-widest text-[10px]">Gerador de Relatórios em Página Única</p>
         </div>
 
-        <div class="bg-white rounded-3xl shadow-2xl border border-slate-200 overflow-hidden mb-8">
-            <div class="bg-[#4D4D4D] px-8 py-5 flex justify-between items-center">
-                <h2 class="text-white text-xs font-bold uppercase tracking-widest">Tutorial de Uso</h2>
-                <div class="flex gap-1">
-                    <div class="w-2 h-2 bg-red-400 rounded-full"></div>
-                    <div class="w-2 h-2 bg-yellow-400 rounded-full"></div>
-                    <div class="w-2 h-2 bg-green-400 rounded-full"></div>
-                </div>
-            </div>
+        <div class="bg-white rounded-3xl shadow-2xl p-8 border border-slate-200">
+            <textarea id="htmlInput" 
+                class="w-full h-64 p-4 border-2 border-slate-100 rounded-2xl font-mono text-[10px] focus:border-orange-500 outline-none mb-6 bg-slate-50"
+                placeholder="Cole o código fonte (CTRL+U) aqui..."></textarea>
+
+            <button onclick="gerarPdfContinuo()" id="btnAction"
+                class="w-full bg-[#F15A24] hover:bg-orange-600 text-white font-black py-5 rounded-2xl transition-all shadow-xl text-lg uppercase">
+                Gerar PDF Sem Quebras
+            </button>
             
-            <div class="p-8 grid md:grid-cols-3 gap-6 border-b border-slate-100">
-                <div class="space-y-2">
-                    <p class="color-in font-bold text-xs uppercase">Passo 01</p>
-                    <p class="text-xs text-slate-600 leading-relaxed">No Mailchimp, abra o relatório e clique em <strong>View in Browser</strong>.</p>
-                </div>
-                <div class="space-y-2 border-x border-slate-100 px-6">
-                    <p class="color-in font-bold text-xs uppercase">Passo 02</p>
-                    <p class="text-xs text-slate-600 leading-relaxed">Pressione <kbd class="bg-slate-100 px-1 rounded text-slate-900 font-mono">CTRL+U</kbd>, selecione tudo e cole no campo abaixo.</p>
-                </div>
-                <div class="space-y-2">
-                    <p class="color-in font-bold text-xs uppercase">Passo 03</p>
-                    <p class="text-xs text-slate-600 leading-relaxed">Clique em gerar. Na janela que abrir, use o destino <strong>Salvar como PDF</strong>.</p>
-                </div>
-            </div>
-
-            <div class="p-8 bg-slate-50/50">
-                <textarea id="htmlInput" 
-                    class="w-full h-56 bg-white border-2 border-slate-200 rounded-2xl p-4 text-slate-400 font-mono text-[10px] focus:border-[#F15A24] focus:outline-none transition-all resize-none mb-6 shadow-inner"
-                    placeholder="Cole aqui o código fonte..."></textarea>
-
-                <button onclick="processarRelatorio()"
-                    class="w-full bg-[#F15A24] hover:bg-orange-600 text-white font-black py-5 rounded-2xl transition-all shadow-xl shadow-orange-100 flex items-center justify-center gap-3 text-lg uppercase tracking-tight">
-                    Gerar PDF Selecionável
-                </button>
-            </div>
-        </div>
-
-        <div class="bg-blue-50 border border-blue-100 rounded-2xl p-6 flex gap-4 items-start">
-            <div class="bg-blue-500 text-white p-2 rounded-lg">
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-            </div>
-            <div>
-                <p class="text-blue-800 text-xs font-bold uppercase mb-1">Ajuste de Impressão Obrigatório:</p>
-                <p class="text-blue-700 text-[11px] leading-relaxed">
-                    Para o layout não quebrar: No painel de impressão, clique em <strong>Mais definições</strong> e marque a caixa <strong>"Gráficos de segundo plano"</strong>. Em <strong>Margens</strong>, selecione <strong>"Nenhuma"</strong>.
-                </p>
+            <div id="status" class="hidden mt-4 text-center text-sm font-bold brand-grey animate-pulse">
+                Processando layout contínuo... aguarde.
             </div>
         </div>
     </div>
 
-    <iframe id="preview-frame"></iframe>
+    <div id="render-area"></div>
 
     <script>
-        function processarRelatorio() {
+        async function gerarPdfContinuo() {
             const code = document.getElementById('htmlInput').value;
-            if (!code.trim()) return alert("Por favor, cole o código fonte.");
+            const btn = document.getElementById('btnAction');
+            const status = document.getElementById('status');
+            const renderArea = document.getElementById('render-area');
 
-            const iframe = document.getElementById('preview-frame');
-            const doc = iframe.contentDocument || iframe.contentWindow.document;
+            if (!code) return alert("Cole o código!");
 
-            // 1. Limpeza de scripts e elementos de interface do Mailchimp
-            let cleanCode = code.replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, "");
-            cleanCode = cleanCode.replace(/id="awesomewrap"|id="awesomebar"|class="archive_header"|#awesomewrap|#awesomebar/gi, 'style="display:none !important;"');
+            btn.disabled = true;
+            status.classList.remove('hidden');
 
-            // 2. Injeção no Iframe
-            doc.open();
-            doc.write(cleanCode);
-            doc.close();
+            try {
+                // 1. Limpa e insere o HTML
+                let cleanCode = code.replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, "");
+                cleanCode = cleanCode.replace(/id="awesomewrap"|id="awesomebar"|class="archive_header"/gi, 'style="display:none !important;"');
+                renderArea.innerHTML = cleanCode;
 
-            // 3. Injeção de CSS Corretor de Layout (O Pulo do Gato)
-            const style = doc.createElement('style');
-            style.textContent = `
-                /* Força a largura do MDA de referência */
-                body, html { 
-                    margin: 0 !important; 
-                    padding: 0 !important; 
-                    width: 800px !important; 
-                    background-color: white !important;
-                    -webkit-print-color-adjust: exact !important;
-                    print-color-adjust: exact !important;
-                }
+                // 2. Aguarda carregamento de imagens
+                await new Promise(resolve => setTimeout(resolve, 2500));
+
+                // 3. Captura o conteúdo como Canvas
+                const canvas = await html2canvas(renderArea, {
+                    scale: 2,
+                    useCORS: true,
+                    allowTaint: true,
+                    logging: false,
+                    width: 800
+                });
+
+                const imgData = canvas.toDataURL('image/jpeg', 1.0);
                 
-                /* Garante que o container principal do Mailchimp ocupe os 800px */
-                table.bodyTable, .templateContainer, .mcnTextContentContainer {
-                    width: 800px !important;
-                    max-width: 800px !important;
-                    min-width: 800px !important;
-                }
+                // 4. Cria o PDF com a ALTURA EXATA do conteúdo (Página Única)
+                const { jsPDF } = window.jspdf;
+                const pdfWidth = 800;
+                const pdfHeight = (canvas.height * pdfWidth) / canvas.width;
 
-                /* Impede que o PDF corte gráficos e tabelas ao meio */
-                table, tr, td, img, p, h1, h2 {
-                    page-break-inside: avoid !important;
-                    break-inside: avoid !important;
-                }
+                const pdf = new jsPDF({
+                    orientation: 'portrait',
+                    unit: 'px',
+                    format: [pdfWidth, pdfHeight]
+                });
 
-                @media print {
-                    @page { 
-                        size: 800px auto; /* Tenta forçar página única longa */
-                        margin: 0; 
-                    }
-                }
-            `;
-            doc.head.appendChild(style);
+                // Adiciona a imagem cobrindo toda a página única
+                pdf.addImage(imgData, 'JPEG', 0, 0, pdfWidth, pdfHeight);
 
-            // 4. Dispara a impressão do navegador (Gera PDF selecionável)
-            setTimeout(() => {
-                iframe.contentWindow.focus();
-                iframe.contentWindow.print();
-            }, 1000);
+                // 5. Injeta o texto invisível por cima para permitir seleção
+                // Nota: O html2canvas nativo não mantém texto selecionável. 
+                // Para ter texto 100% selecionável em página única real, 
+                // o melhor caminho é o salvamento nativo que fizemos antes, 
+                // ajustando apenas o tamanho da página no driver de impressão.
+                
+                pdf.save("Relatorio_inPacto_PaginaUnica.pdf");
+
+            } catch (err) {
+                console.error(err);
+                alert("Erro ao processar.");
+            } finally {
+                btn.disabled = false;
+                status.classList.add('hidden');
+                renderArea.innerHTML = "";
+            }
         }
     </script>
 </body>
