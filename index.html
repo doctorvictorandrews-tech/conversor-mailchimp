@@ -3,99 +3,147 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Conversor InPacto | Mailchimp para PDF</title>
+    <title>Conversor InPacto v2.5</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
     <style>
         body { font-family: 'Inter', sans-serif; }
-        /* Esconde o iframe da tela, mas permite que ele seja impresso */
-        #print-frame {
-            position: absolute;
-            width: 0;
-            height: 0;
-            border: none;
-        }
+        #print-frame { position: absolute; width: 0; height: 0; border: none; }
+        
+        /* Custom Toggle Style */
+        .toggle-checkbox:checked { right: 0; border-color: #2563eb; }
+        .toggle-checkbox:checked + .toggle-label { background-color: #2563eb; }
     </style>
 </head>
 <body class="bg-slate-50 text-slate-800 min-h-screen">
 
-    <div id="ui-container" class="max-w-2xl mx-auto py-16 px-6">
+    <div id="ui-container" class="max-w-3xl mx-auto py-12 px-6">
         <div class="text-center mb-10">
-            <div class="bg-blue-600 w-16 h-16 rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-lg shadow-blue-200">
-                <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
+            <div class="bg-blue-600 w-16 h-16 rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-xl shadow-blue-200">
+                <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"></path></svg>
             </div>
-            <h1 class="text-3xl font-extrabold text-slate-900 tracking-tight">Conversor de Relatórios</h1>
-            <p class="text-slate-500 mt-2 font-medium">Edição InPacto v2.0</p>
+            <h1 class="text-3xl font-extrabold text-slate-900 tracking-tight">Conversor InPacto</h1>
+            <p class="text-slate-500 mt-2 font-medium">Relatórios Mailchimp para PDF</p>
         </div>
 
-        <div class="bg-white rounded-3xl shadow-sm border border-slate-200 p-8 mb-6">
-            <h2 class="text-sm font-bold text-blue-600 uppercase tracking-widest mb-6">Como usar</h2>
-            
-            <div class="space-y-4 mb-8">
-                <div class="flex gap-3 items-start">
-                    <span class="bg-blue-50 text-blue-600 rounded-lg px-2 py-1 text-xs font-bold">1</span>
-                    <p class="text-sm text-slate-600">No Mailchimp, use o <strong>View in Browser</strong> e pressione <strong>CTRL + U</strong>.</p>
+        <div class="bg-white rounded-3xl shadow-sm border border-slate-200 overflow-hidden mb-8">
+            <div class="bg-slate-900 px-8 py-4">
+                <h2 class="text-white text-sm font-bold uppercase tracking-widest flex items-center gap-2">
+                    <span class="w-2 h-2 bg-blue-400 rounded-full animate-pulse"></span>
+                    Tutorial Rápido
+                </h2>
+            </div>
+            <div class="p-8 grid md:grid-cols-3 gap-6 border-b border-slate-100">
+                <div class="space-y-2">
+                    <p class="text-blue-600 font-bold text-xs uppercase">Passo 01</p>
+                    <p class="text-sm text-slate-600 leading-snug">No Mailchimp, vá em <strong>Campaigns</strong>. No seu relatório, clique na seta ao lado de 'Edit' e escolha <span class="bg-slate-100 px-1 rounded text-slate-900 font-semibold">View in Browser</span>.</p>
                 </div>
-                <div class="flex gap-3 items-start">
-                    <span class="bg-blue-50 text-blue-600 rounded-lg px-2 py-1 text-xs font-bold">2</span>
-                    <p class="text-sm text-slate-600">Copie tudo, cole abaixo e clique no botão preto.</p>
+                <div class="space-y-2">
+                    <p class="text-blue-600 font-bold text-xs uppercase">Passo 02</p>
+                    <p class="text-sm text-slate-600 leading-snug">Na página que abriu, aperte <kbd class="bg-slate-800 text-white px-1 py-0.5 rounded text-[10px]">CTRL + U</kbd>. Isso abrirá o "Código Fonte". Selecione tudo (<kbd class="bg-slate-800 text-white px-1 py-0.5 rounded text-[10px]">CTRL + A</kbd>) e copie.</p>
+                </div>
+                <div class="space-y-2">
+                    <p class="text-blue-600 font-bold text-xs uppercase">Passo 03</p>
+                    <p class="text-sm text-slate-600 leading-snug">Cole o código no campo abaixo, escolha o formato e clique em <strong>Gerar PDF</strong>.</p>
                 </div>
             </div>
 
-            <textarea id="htmlInput" 
-                class="w-full h-40 bg-slate-50 border-2 border-dashed border-slate-200 rounded-2xl p-4 text-slate-600 font-mono text-xs focus:border-blue-500 focus:bg-white focus:outline-none transition-all resize-none"
-                placeholder="Cole o código-fonte (HTML) aqui..."></textarea>
+            <div class="p-8">
+                <textarea id="htmlInput" 
+                    class="w-full h-44 bg-slate-50 border-2 border-dashed border-slate-200 rounded-2xl p-4 text-slate-500 font-mono text-xs focus:border-blue-500 focus:bg-white focus:outline-none transition-all resize-none mb-6"
+                    placeholder="Cole aqui o código fonte (começa com <!DOCTYPE html... )"></textarea>
 
-            <button onclick="generatePDF()" 
-                class="mt-6 w-full bg-slate-900 hover:bg-black text-white font-bold py-4 rounded-2xl transition-all shadow-xl shadow-slate-200 flex items-center justify-center gap-3">
-                GERAR PDF
-            </button>
+                <div class="flex items-center justify-between p-4 bg-slate-50 rounded-2xl border border-slate-100 mb-6">
+                    <div>
+                        <span class="block font-bold text-slate-900">Formato de Saída</span>
+                        <span class="text-xs text-slate-500">Escolha como o PDF lidará com as quebras de página.</span>
+                    </div>
+                    <div class="flex bg-white p-1 rounded-xl border border-slate-200 shadow-sm">
+                        <button id="btnA4" onclick="setFormat('A4')" class="px-4 py-2 text-xs font-bold rounded-lg transition-all bg-blue-600 text-white">Páginas A4</button>
+                        <button id="btnSingle" onclick="setFormat('SINGLE')" class="px-4 py-2 text-xs font-bold rounded-lg transition-all text-slate-400">Página Única</button>
+                    </div>
+                </div>
+
+                <button onclick="generatePDF()" 
+                    class="w-full bg-slate-900 hover:bg-black text-white font-extrabold py-5 rounded-2xl transition-all shadow-xl shadow-slate-200 flex items-center justify-center gap-3 text-lg">
+                    GERAR PDF AGORA
+                </button>
+            </div>
         </div>
         
-        <p class="text-center text-slate-400 text-xs">A conversão ocorre no seu navegador. Privacidade garantida.</p>
+        <p class="text-center text-slate-400 text-[10px] uppercase tracking-widest">Tecnologia Local | InPacto 2026</p>
     </div>
 
     <iframe id="print-frame"></iframe>
 
     <script>
+        let currentFormat = 'A4';
+
+        function setFormat(format) {
+            currentFormat = format;
+            const btnA4 = document.getElementById('btnA4');
+            const btnSingle = document.getElementById('btnSingle');
+
+            if(format === 'A4') {
+                btnA4.className = 'px-4 py-2 text-xs font-bold rounded-lg transition-all bg-blue-600 text-white';
+                btnSingle.className = 'px-4 py-2 text-xs font-bold rounded-lg transition-all text-slate-400';
+            } else {
+                btnSingle.className = 'px-4 py-2 text-xs font-bold rounded-lg transition-all bg-blue-600 text-white';
+                btnA4.className = 'px-4 py-2 text-xs font-bold rounded-lg transition-all text-slate-400';
+            }
+        }
+
         function generatePDF() {
             const code = document.getElementById('htmlInput').value;
             if (!code) {
-                alert("Por favor, cole o código HTML primeiro.");
+                alert("Opa! Você esqueceu de colar o código fonte.");
                 return;
             }
 
             const iframe = document.getElementById('print-frame');
             const doc = iframe.contentDocument || iframe.contentWindow.document;
 
-            // 1. Limpeza do código (remover scripts e barras do Mailchimp)
+            // Limpeza e Injeção
             let cleanCode = code.replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, "");
-            
-            // Remove a barra de arquivo do Mailchimp (o topo cinza)
             cleanCode = cleanCode.replace(/id="awesomewrap"|id="awesomebar"|class="archive_header"/gi, 'style="display:none;"');
 
-            // 2. Escreve o conteúdo no iframe
             doc.open();
             doc.write(cleanCode);
             doc.close();
 
-            // 3. Adiciona um CSS extra dentro do iframe para garantir que o PDF fique bonito
+            // CSS Customizado para Impressão
             const style = doc.createElement('style');
-            style.textContent = `
+            let printStyles = `
                 @media print {
-                    @page { margin: 0; size: auto; }
-                    body { margin: 0; padding: 0; }
-                    /* Força a remoção de itens indesejados caso o ID mude */
+                    body { margin: 0; padding: 0 !important; background: white; }
+                    table { border-collapse: collapse; width: 100% !important; }
+                    img { max-width: 100% !important; height: auto !important; }
                     #awesomewrap, #awesomebar, .mceFooterSection, #canspamBarWrapper { display: none !important; }
-                }
+                    
+                    /* Evita cortar textos e tabelas no meio */
+                    p, h1, h2, h3, tr, td { page-break-inside: avoid; break-inside: avoid; }
             `;
+
+            if (currentFormat === 'SINGLE') {
+                // Truque para tentar manter tudo em uma "página infinita"
+                printStyles += `
+                    @page { size: auto; margin: 0; }
+                    html, body { height: auto; }
+                `;
+            } else {
+                printStyles += `
+                    @page { size: A4; margin: 1cm; }
+                `;
+            }
+
+            printStyles += `}`;
+            style.textContent = printStyles;
             doc.head.appendChild(style);
 
-            // 4. Aguarda as imagens carregarem e dispara a impressão
             setTimeout(() => {
                 iframe.contentWindow.focus();
                 iframe.contentWindow.print();
-            }, 800);
+            }, 1000);
         }
     </script>
 </body>
