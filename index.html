@@ -4,151 +4,454 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Conversor de Relatórios | in.pacto</title>
-    <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
-        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
         :root {
-            --orange: #F15A24;
-            --dark: #1a1a1a;
-            --mid: #4D4D4D;
-            --light: #f4f1ee;
+            --accent: #F15A24;
+            --accent-glow: rgba(241, 90, 36, 0.35);
+            --accent-soft: rgba(241, 90, 36, 0.12);
             --white: #ffffff;
-            --border: #e8e4df;
+            --glass-bg: rgba(255, 255, 255, 0.07);
+            --glass-border: rgba(255, 255, 255, 0.14);
+            --glass-hover: rgba(255, 255, 255, 0.11);
+            --text-primary: rgba(255, 255, 255, 0.95);
+            --text-secondary: rgba(255, 255, 255, 0.5);
+            --text-muted: rgba(255, 255, 255, 0.28);
         }
+
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
         body {
-            font-family: 'DM Sans', sans-serif;
-            background-color: var(--light);
+            font-family: 'Outfit', sans-serif;
             min-height: 100vh;
-            display: flex; align-items: center; justify-content: center;
+            display: flex;
+            align-items: center;
+            justify-content: center;
             padding: 40px 20px;
-            position: relative; overflow-x: hidden;
-        }
-        body::before {
-            content: ''; position: fixed; inset: 0;
-            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
-            pointer-events: none; z-index: 0;
-        }
-        body::after {
-            content: ''; position: fixed; top: -200px; right: -200px;
-            width: 600px; height: 600px; border-radius: 50%;
-            background: radial-gradient(circle, rgba(241,90,36,0.07) 0%, transparent 70%);
-            pointer-events: none; z-index: 0;
-        }
-        .card {
-            position: relative; z-index: 1;
-            background: var(--white); border: 1px solid var(--border);
-            border-radius: 24px; width: 100%; max-width: 560px;
             overflow: hidden;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.04), 0 20px 60px rgba(0,0,0,0.08);
+            position: relative;
+            background: #080c14;
         }
+
+        /* ── Fundo animado ── */
+        .bg {
+            position: fixed;
+            inset: 0;
+            z-index: 0;
+            overflow: hidden;
+        }
+
+        .bg-gradient {
+            position: absolute;
+            inset: 0;
+            background:
+                radial-gradient(ellipse 80% 60% at 20% 20%, rgba(241,90,36,0.18) 0%, transparent 60%),
+                radial-gradient(ellipse 60% 80% at 80% 80%, rgba(100,60,200,0.12) 0%, transparent 55%),
+                radial-gradient(ellipse 70% 50% at 50% 50%, rgba(20,80,180,0.08) 0%, transparent 60%);
+        }
+
+        .bg-grid {
+            position: absolute;
+            inset: 0;
+            background-image:
+                linear-gradient(rgba(255,255,255,0.025) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(255,255,255,0.025) 1px, transparent 1px);
+            background-size: 60px 60px;
+            mask-image: radial-gradient(ellipse 80% 80% at 50% 50%, black 40%, transparent 100%);
+        }
+
+        /* Orbs flutuantes */
+        .orb {
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(80px);
+            opacity: 0.5;
+            animation: drift 12s ease-in-out infinite alternate;
+        }
+        .orb-1 {
+            width: 400px; height: 400px;
+            background: radial-gradient(circle, rgba(241,90,36,0.3), transparent 70%);
+            top: -100px; left: -100px;
+            animation-delay: 0s;
+        }
+        .orb-2 {
+            width: 300px; height: 300px;
+            background: radial-gradient(circle, rgba(100,60,220,0.2), transparent 70%);
+            bottom: -80px; right: -60px;
+            animation-delay: -4s;
+        }
+        .orb-3 {
+            width: 200px; height: 200px;
+            background: radial-gradient(circle, rgba(20,140,255,0.15), transparent 70%);
+            top: 50%; left: 60%;
+            animation-delay: -8s;
+        }
+        @keyframes drift {
+            from { transform: translate(0, 0) scale(1); }
+            to   { transform: translate(30px, 20px) scale(1.08); }
+        }
+
+        /* Noise overlay */
+        .bg::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.035'/%3E%3C/svg%3E");
+            pointer-events: none;
+        }
+
+        /* ── Card principal ── */
+        .card {
+            position: relative;
+            z-index: 10;
+            width: 100%;
+            max-width: 520px;
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            border-radius: 28px;
+            backdrop-filter: blur(40px) saturate(180%);
+            -webkit-backdrop-filter: blur(40px) saturate(180%);
+            box-shadow:
+                0 0 0 1px rgba(255,255,255,0.04) inset,
+                0 32px 80px rgba(0,0,0,0.5),
+                0 0 120px rgba(241,90,36,0.06);
+            animation: fadeUp 0.6s cubic-bezier(0.16, 1, 0.3, 1) both;
+        }
+
+        @keyframes fadeUp {
+            from { opacity: 0; transform: translateY(24px); }
+            to   { opacity: 1; transform: translateY(0); }
+        }
+
+        /* ── Header ── */
         .card-header {
-            background: var(--dark); padding: 32px 40px 28px;
-            position: relative; overflow: hidden;
+            padding: 36px 40px 32px;
+            border-bottom: 1px solid var(--glass-border);
+            display: flex;
+            align-items: center;
+            gap: 18px;
+            position: relative;
         }
-        .card-header::after {
-            content: ''; position: absolute; bottom: -1px; left: 40px;
-            width: 48px; height: 3px; background: var(--orange);
+
+        .card-header::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 40px;
+            width: 60px; height: 2px;
+            background: linear-gradient(90deg, var(--accent), transparent);
+            border-radius: 0 0 2px 2px;
         }
-        .logo {
-            font-family: 'Syne', sans-serif; font-weight: 800;
-            font-size: 36px; letter-spacing: -1px; line-height: 1; color: var(--white);
+
+        .logo-wrap {
+            flex-shrink: 0;
+            width: 52px; height: 52px;
+            border-radius: 14px;
+            background: rgba(255,255,255,0.06);
+            border: 1px solid rgba(255,255,255,0.1);
+            display: flex; align-items: center; justify-content: center;
+            overflow: hidden;
+            backdrop-filter: blur(10px);
         }
-        .logo span { color: var(--orange); }
-        .logo-sub {
-            font-size: 10px; font-weight: 400; letter-spacing: 0.18em;
-            text-transform: uppercase; color: rgba(255,255,255,0.35); margin-top: 6px;
+
+        .logo-wrap img {
+            width: 36px;
+            height: 36px;
+            object-fit: contain;
         }
-        .card-body { padding: 36px 40px 40px; }
-        .steps { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 28px; }
+
+        .header-text {}
+
+        .brand-name {
+            font-size: 20px;
+            font-weight: 700;
+            color: var(--text-primary);
+            letter-spacing: -0.3px;
+            line-height: 1.2;
+        }
+
+        .brand-name span { color: var(--accent); }
+
+        .brand-tagline {
+            font-size: 10.5px;
+            font-weight: 400;
+            color: var(--text-muted);
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+            margin-top: 3px;
+        }
+
+        /* ── Body ── */
+        .card-body { padding: 32px 40px 36px; }
+
+        /* Steps */
+        .steps {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            margin-bottom: 28px;
+        }
+
         .step {
-            background: var(--light); border-radius: 12px;
-            padding: 14px 16px; border: 1px solid var(--border);
+            background: rgba(255,255,255,0.04);
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 14px;
+            padding: 14px 16px;
+            transition: background 0.2s;
         }
+
+        .step:hover { background: var(--glass-hover); }
+
         .step-num {
-            font-family: 'Syne', sans-serif; font-size: 11px; font-weight: 700;
-            color: var(--orange); letter-spacing: 0.1em; margin-bottom: 4px;
+            font-size: 10px;
+            font-weight: 600;
+            color: var(--accent);
+            letter-spacing: 0.14em;
+            text-transform: uppercase;
+            margin-bottom: 6px;
         }
-        .step p { font-size: 11px; color: var(--mid); line-height: 1.6; }
+
+        .step p {
+            font-size: 11.5px;
+            color: var(--text-secondary);
+            line-height: 1.65;
+            font-weight: 300;
+        }
+
+        .step strong { color: var(--text-primary); font-weight: 500; }
+
         .step kbd {
-            display: inline-block; background: var(--white);
-            border: 1px solid var(--border); border-radius: 4px;
-            padding: 1px 5px; font-family: monospace; font-size: 10px; color: var(--dark);
+            display: inline-block;
+            background: rgba(255,255,255,0.08);
+            border: 1px solid rgba(255,255,255,0.12);
+            border-radius: 5px;
+            padding: 1px 6px;
+            font-family: monospace;
+            font-size: 10px;
+            color: var(--text-primary);
         }
-        .divider { height: 1px; background: var(--border); margin-bottom: 28px; }
-        .textarea-label {
-            font-family: 'Syne', sans-serif; font-size: 11px; font-weight: 700;
-            letter-spacing: 0.12em; text-transform: uppercase;
-            color: var(--mid); margin-bottom: 10px; display: block;
+
+        /* Divider */
+        .divider {
+            height: 1px;
+            background: linear-gradient(90deg, transparent, var(--glass-border), transparent);
+            margin-bottom: 24px;
         }
+
+        /* Label */
+        .label {
+            font-size: 10.5px;
+            font-weight: 600;
+            letter-spacing: 0.14em;
+            text-transform: uppercase;
+            color: var(--text-muted);
+            margin-bottom: 10px;
+            display: block;
+        }
+
+        /* Textarea */
         textarea {
-            width: 100%; height: 180px;
-            background: var(--light); border: 1.5px solid var(--border);
-            border-radius: 12px; padding: 16px;
-            font-family: monospace; font-size: 11px; color: var(--mid);
-            resize: none; outline: none; line-height: 1.6;
-            transition: border-color 0.2s, box-shadow 0.2s;
+            width: 100%;
+            height: 160px;
+            background: rgba(0,0,0,0.25);
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 14px;
+            padding: 16px;
+            font-family: 'Outfit', monospace;
+            font-size: 11px;
+            color: var(--text-secondary);
+            resize: none;
+            outline: none;
+            line-height: 1.7;
+            transition: border-color 0.2s, box-shadow 0.2s, background 0.2s;
         }
-        textarea:focus { border-color: var(--orange); box-shadow: 0 0 0 3px rgba(241,90,36,0.1); }
-        textarea::placeholder { color: #b0a899; }
+
+        textarea:focus {
+            border-color: rgba(241,90,36,0.5);
+            background: rgba(0,0,0,0.35);
+            box-shadow: 0 0 0 3px rgba(241,90,36,0.08), 0 0 20px rgba(241,90,36,0.05);
+        }
+
+        textarea::placeholder { color: rgba(255,255,255,0.18); }
+
+        /* Button */
         .btn {
-            width: 100%; margin-top: 16px;
-            background: var(--orange); color: var(--white);
-            border: none; border-radius: 12px; padding: 18px 24px;
-            font-family: 'Syne', sans-serif; font-size: 14px; font-weight: 800;
-            letter-spacing: 0.08em; text-transform: uppercase; cursor: pointer;
-            transition: background 0.2s, transform 0.15s, box-shadow 0.2s;
-            display: flex; align-items: center; justify-content: center; gap: 10px;
-            box-shadow: 0 8px 24px rgba(241,90,36,0.28);
+            width: 100%;
+            margin-top: 14px;
+            background: linear-gradient(135deg, #F15A24 0%, #e04915 100%);
+            color: white;
+            border: none;
+            border-radius: 14px;
+            padding: 17px 24px;
+            font-family: 'Outfit', sans-serif;
+            font-size: 14px;
+            font-weight: 600;
+            letter-spacing: 0.04em;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 8px 32px rgba(241,90,36,0.3), 0 0 0 1px rgba(255,255,255,0.08) inset;
         }
-        .btn:hover { background: #d94f1e; transform: translateY(-1px); box-shadow: 0 12px 32px rgba(241,90,36,0.35); }
+
+        .btn::before {
+            content: '';
+            position: absolute;
+            top: 0; left: -100%;
+            width: 100%; height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.1), transparent);
+            transition: left 0.5s;
+        }
+
+        .btn:hover::before { left: 100%; }
+
+        .btn:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 12px 40px rgba(241,90,36,0.4), 0 0 0 1px rgba(255,255,255,0.12) inset;
+        }
+
         .btn:active { transform: translateY(0); }
-        .btn:disabled { background: #ccc; box-shadow: none; cursor: not-allowed; transform: none; }
-        .tip {
-            display: flex; align-items: flex-start; gap: 8px;
-            margin-top: 20px; padding: 12px 14px;
-            background: rgba(241,90,36,0.06);
-            border-left: 3px solid var(--orange); border-radius: 0 8px 8px 0;
+
+        .btn:disabled {
+            background: rgba(255,255,255,0.08);
+            box-shadow: none;
+            cursor: not-allowed;
+            transform: none;
+            color: var(--text-muted);
         }
-        .tip p { font-size: 11px; color: var(--mid); line-height: 1.6; }
-        .tip strong { color: var(--dark); }
+
+        /* Status */
         #status {
-            display: none; margin-top: 16px; padding: 12px 16px;
-            border-radius: 10px; font-size: 12px; font-weight: 500;
-            text-align: center; background: var(--light);
-            border: 1px solid var(--border); color: var(--mid);
+            display: none;
+            margin-top: 14px;
+            padding: 12px 16px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 400;
+            text-align: center;
+            background: rgba(255,255,255,0.04);
+            border: 1px solid rgba(255,255,255,0.08);
+            color: var(--text-secondary);
         }
-        #status.error { background: #fff0ed; border-color: #f5c0b0; color: #c0392b; }
+
+        #status.success {
+            background: rgba(34,197,94,0.08);
+            border-color: rgba(34,197,94,0.2);
+            color: #4ade80;
+        }
+
+        #status.error {
+            background: rgba(239,68,68,0.08);
+            border-color: rgba(239,68,68,0.2);
+            color: #f87171;
+        }
+
+        /* Tip */
+        .tip {
+            display: flex;
+            align-items: flex-start;
+            gap: 10px;
+            margin-top: 18px;
+            padding: 13px 16px;
+            background: var(--accent-soft);
+            border: 1px solid rgba(241,90,36,0.2);
+            border-radius: 12px;
+        }
+
+        .tip-icon { flex-shrink: 0; margin-top: 1px; opacity: 0.8; }
+
+        .tip p {
+            font-size: 11.5px;
+            color: rgba(255,255,255,0.5);
+            line-height: 1.6;
+            font-weight: 300;
+        }
+
+        .tip strong { color: rgba(255,255,255,0.8); font-weight: 500; }
+
+        /* Spinner */
         .spinner {
-            display: inline-block; width: 14px; height: 14px;
-            border: 2px solid rgba(255,255,255,0.3);
-            border-top-color: white; border-radius: 50%;
-            animation: spin 0.7s linear infinite; vertical-align: middle; margin-right: 6px;
+            display: inline-block;
+            width: 15px; height: 15px;
+            border: 2px solid rgba(255,255,255,0.2);
+            border-top-color: white;
+            border-radius: 50%;
+            animation: spin 0.65s linear infinite;
+            vertical-align: middle;
         }
         @keyframes spin { to { transform: rotate(360deg); } }
+
+        /* Footer */
+        .card-footer {
+            padding: 16px 40px 24px;
+            border-top: 1px solid var(--glass-border);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+        }
+
+        .footer-dot {
+            width: 4px; height: 4px;
+            border-radius: 50%;
+            background: var(--accent);
+            opacity: 0.5;
+        }
+
+        .footer-text {
+            font-size: 10px;
+            color: var(--text-muted);
+            letter-spacing: 0.08em;
+        }
     </style>
 </head>
 <body>
-    <div id="ui-main" class="card">
+
+    <!-- Background -->
+    <div class="bg">
+        <div class="bg-gradient"></div>
+        <div class="bg-grid"></div>
+        <div class="orb orb-1"></div>
+        <div class="orb orb-2"></div>
+        <div class="orb orb-3"></div>
+    </div>
+
+    <!-- Card -->
+    <div class="card">
+
         <div class="card-header">
-            <div class="logo"><span>in</span>.pacto</div>
-            <div class="logo-sub">Inteligência em Comunicação &nbsp;·&nbsp; Conversor de Relatórios</div>
+            <div class="logo-wrap">
+                <img src="./logo.png" alt="in.pacto" onerror="this.parentElement.innerHTML='<span style=\'font-family:Outfit,sans-serif;font-weight:700;font-size:16px;color:#F15A24;\'>in</span>'">
+            </div>
+            <div class="header-text">
+                <div class="brand-name"><span>in</span>.pacto</div>
+                <div class="brand-tagline">Inteligência em Comunicação · Relatórios</div>
+            </div>
         </div>
+
         <div class="card-body">
+
             <div class="steps">
                 <div class="step">
-                    <div class="step-num">PASSO 01</div>
-                    <p>No Mailchimp, clique em <strong>View in Browser</strong>. Na página que abrir, copie o código-fonte: <kbd>CTRL+U</kbd> → <kbd>CTRL+A</kbd> → <kbd>CTRL+C</kbd>.</p>
+                    <div class="step-num">Passo 01</div>
+                    <p>No Mailchimp, clique em <strong>View in Browser</strong>. Copie o código-fonte: <kbd>CTRL+U</kbd> → <kbd>CTRL+A</kbd> → <kbd>CTRL+C</kbd>.</p>
                 </div>
                 <div class="step">
-                    <div class="step-num">PASSO 02</div>
-                    <p>Cole o código abaixo e clique em <strong>Gerar PDF</strong>. O download começa automaticamente — sem janela de impressão.</p>
+                    <div class="step-num">Passo 02</div>
+                    <p>Cole abaixo e clique em <strong>Gerar PDF</strong>. O download inicia automaticamente — sem janela de impressão.</p>
                 </div>
             </div>
+
             <div class="divider"></div>
-            <label class="textarea-label" for="htmlInput">Código-fonte do Mailchimp</label>
+
+            <label class="label" for="htmlInput">Código-fonte do Mailchimp</label>
             <textarea id="htmlInput" placeholder="Cole aqui o código-fonte (CTRL+V)…"></textarea>
+
             <button class="btn" id="btn" onclick="generatePDF()">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
                     <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
                     <polyline points="14 2 14 8 20 8"/>
                     <line x1="12" y1="18" x2="12" y2="12"/>
@@ -156,33 +459,46 @@
                 </svg>
                 Gerar PDF Agora
             </button>
+
             <div id="status"></div>
+
             <div class="tip">
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#F15A24" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;margin-top:1px"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
-                <p>O PDF é gerado automaticamente no servidor e baixado direto. <strong>Nenhuma configuração de impressão necessária.</strong></p>
+                <svg class="tip-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#F15A24" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="12" cy="12" r="10"/>
+                    <line x1="12" y1="8" x2="12" y2="12"/>
+                    <line x1="12" y1="16" x2="12.01" y2="16"/>
+                </svg>
+                <p>O PDF é gerado no servidor com fidelidade total ao design original. <strong>Nenhuma configuração manual necessária.</strong></p>
             </div>
+
         </div>
+
+        <div class="card-footer">
+            <div class="footer-dot"></div>
+            <span class="footer-text">Powered by Browserless · Cloudflare Workers</span>
+            <div class="footer-dot"></div>
+        </div>
+
     </div>
 
     <script>
-        // ═══════════════════════════════════════════════════════════
-        // ATENÇÃO: Substitua a URL abaixo pela URL do seu Worker
-        // após seguir o guia de configuração.
+        // ═══════════════════════════════════════════════════
+        // Substitua pela URL real do seu Cloudflare Worker
         // Exemplo: https://inpacto-pdf.SEU-USUARIO.workers.dev/pdf
-        // ═══════════════════════════════════════════════════════════
-        const WORKER_URL = 'https://inpacto-pdf.doctorvictorandrews.workers.dev';
+        // ═══════════════════════════════════════════════════
+        const WORKER_URL = 'https://SEU-WORKER.workers.dev/pdf';
 
         async function generatePDF() {
-            const code = document.getElementById('htmlInput').value.trim();
-            if (!code) { alert('O campo está vazio. Cole o código do Mailchimp primeiro.'); return; }
-
+            const code   = document.getElementById('htmlInput').value.trim();
             const btn    = document.getElementById('btn');
             const status = document.getElementById('status');
 
+            if (!code) { alert('O campo está vazio. Cole o código do Mailchimp primeiro.'); return; }
+
             btn.disabled = true;
             btn.innerHTML = '<span class="spinner"></span> Gerando PDF…';
-            status.style.display = 'block';
             status.className = '';
+            status.style.display = 'block';
             status.textContent = 'Enviando para o servidor… isso leva cerca de 10 segundos.';
 
             try {
@@ -197,7 +513,6 @@
                     throw new Error(err || `Erro ${response.status}`);
                 }
 
-                // Baixa o PDF recebido
                 const blob = await response.blob();
                 const url  = URL.createObjectURL(blob);
                 const a    = document.createElement('a');
@@ -208,19 +523,17 @@
                 a.remove();
                 URL.revokeObjectURL(url);
 
-                status.textContent = '✓ PDF baixado com sucesso!';
-                status.style.background = '#f0fdf4';
-                status.style.borderColor = '#86efac';
-                status.style.color = '#166534';
+                status.className = 'success';
+                status.textContent = '✓ PDF gerado e baixado com sucesso!';
 
             } catch (err) {
                 console.error(err);
                 status.className = 'error';
-                status.textContent = `Erro: ${err.message}. Verifique se o Worker está configurado corretamente.`;
+                status.textContent = `Erro: ${err.message}`;
             } finally {
                 btn.disabled = false;
                 btn.innerHTML = `
-                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                    <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
                         <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
                         <polyline points="14 2 14 8 20 8"/>
                         <line x1="12" y1="18" x2="12" y2="12"/>
