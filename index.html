@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🧠</text></svg>">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Conversor de Relatórios | in.pacto</title>
+  <title>Ferramentas | in.pacto</title>
   <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
   <style>
     :root {
@@ -30,21 +30,11 @@
       overflow-x: hidden;
     }
 
-    #bg-canvas {
-      position: fixed;
-      inset: 0;
-      z-index: 0;
-      pointer-events: none;
-    }
+    #bg-canvas { position: fixed; inset: 0; z-index: 0; pointer-events: none; }
 
     .meme-float {
-      position: fixed;
-      font-size: 26px;
-      pointer-events: none;
-      z-index: 1;
-      animation: floatUp linear infinite;
-      opacity: 0;
-      user-select: none;
+      position: fixed; font-size: 26px; pointer-events: none;
+      z-index: 1; animation: floatUp linear infinite; opacity: 0; user-select: none;
     }
     @keyframes floatUp {
       0%   { transform: translateY(110vh) rotate(0deg);   opacity: 0; }
@@ -54,18 +44,19 @@
     }
 
     .page {
-      position: relative;
-      z-index: 10;
+      position: relative; z-index: 10;
       min-height: 100vh;
       display: flex;
+      flex-direction: column;
       align-items: center;
       justify-content: center;
       padding: 48px 20px;
+      gap: 16px;
     }
 
+    /* ─── CARD BASE ─── */
     .card {
-      width: 100%;
-      max-width: 620px;
+      width: 100%; max-width: 620px;
       background: rgba(255,255,255,0.035);
       border: 1px solid var(--border);
       border-radius: 28px;
@@ -76,14 +67,16 @@
         0 32px 80px rgba(0,0,0,0.55),
         0 0 120px rgba(241,90,36,0.06);
       overflow: hidden;
-      animation: fadeUp 0.7s cubic-bezier(0.16,1,0.3,1) both;
     }
+    .card:first-child { animation: fadeUp 0.7s cubic-bezier(0.16,1,0.3,1) both; }
+    .card:last-child  { animation: fadeUp 0.7s 0.12s cubic-bezier(0.16,1,0.3,1) both; }
+
     @keyframes fadeUp {
       from { opacity: 0; transform: translateY(24px); }
       to   { opacity: 1; transform: translateY(0); }
     }
 
-    /* Header */
+    /* ─── CARD HEADER ─── */
     .card-header {
       padding: 36px 44px 30px;
       border-bottom: 1px solid var(--border);
@@ -91,61 +84,58 @@
     }
     .card-header::before {
       content: '';
-      position: absolute;
-      top: 0; left: 0; right: 0;
-      height: 2px;
+      position: absolute; top: 0; left: 0; right: 0; height: 2px;
       background: linear-gradient(90deg, var(--orange) 0%, rgba(241,90,36,0.25) 50%, transparent 100%);
       border-radius: 28px 28px 0 0;
     }
-    .logo-img {
-      height: 42px; width: auto; display: block;
-    }
+    .logo-img { height: 42px; width: auto; display: block; }
     .logo-fallback {
       display: none;
       font-family: 'Space Grotesk', sans-serif;
-      font-weight: 700;
-      font-size: 36px;
-      letter-spacing: -1.5px;
-      line-height: 1;
+      font-weight: 700; font-size: 36px; letter-spacing: -1.5px; line-height: 1;
     }
     .logo-fallback em { color: var(--orange); font-style: normal; }
     .logo-sub {
-      margin-top: 8px;
-      font-size: 10px;
-      letter-spacing: 0.18em;
-      text-transform: uppercase;
-      color: var(--text-dim);
+      margin-top: 8px; font-size: 10px;
+      letter-spacing: 0.18em; text-transform: uppercase; color: var(--text-dim);
     }
 
-    /* Body */
+    /* Card header simples (segundo card) */
+    .card-header-simple {
+      padding: 28px 44px 22px;
+      border-bottom: 1px solid var(--border);
+      position: relative;
+    }
+    .card-header-simple::before {
+      content: '';
+      position: absolute; top: 0; left: 0; right: 0; height: 2px;
+      background: linear-gradient(90deg, var(--orange) 0%, rgba(241,90,36,0.25) 50%, transparent 100%);
+      border-radius: 28px 28px 0 0;
+    }
+    .card-title {
+      font-family: 'Space Grotesk', sans-serif;
+      font-weight: 700; font-size: 16px; color: var(--text);
+    }
+
+    /* ─── CARD BODY ─── */
     .card-body { padding: 32px 44px 36px; }
 
     /* Meme box */
     .meme-box {
-      display: flex;
-      align-items: center;
-      gap: 16px;
+      display: flex; align-items: center; gap: 16px;
       padding: 16px 20px;
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: 16px;
-      margin-bottom: 28px;
-      position: relative;
-      overflow: hidden;
+      background: var(--surface); border: 1px solid var(--border); border-radius: 16px;
+      margin-bottom: 28px; position: relative; overflow: hidden;
       animation: fadeUp 0.7s 0.08s cubic-bezier(0.16,1,0.3,1) both;
     }
     .meme-box::after {
-      content: '';
-      position: absolute; inset: 0;
+      content: ''; position: absolute; inset: 0;
       background: linear-gradient(120deg, rgba(241,90,36,0.05), transparent 60%);
       pointer-events: none;
     }
     .meme-emoji-big {
-      font-size: 36px;
-      line-height: 1;
-      flex-shrink: 0;
-      animation: wiggle 3s ease-in-out infinite;
-      transition: transform 0.2s ease;
+      font-size: 36px; line-height: 1; flex-shrink: 0;
+      animation: wiggle 3s ease-in-out infinite; transition: transform 0.2s ease;
     }
     @keyframes wiggle {
       0%,100% { transform: rotate(-5deg) scale(1); }
@@ -155,91 +145,50 @@
     }
     .meme-text {
       font-family: 'Space Grotesk', sans-serif;
-      font-weight: 600;
-      font-size: 14px;
-      line-height: 1.4;
-      color: var(--text);
+      font-weight: 600; font-size: 14px; line-height: 1.4; color: var(--text);
     }
     .meme-text small {
-      display: block;
-      font-family: 'DM Sans', sans-serif;
-      font-weight: 300;
-      font-size: 12px;
-      color: var(--text-mid);
-      margin-top: 3px;
+      display: block; font-family: 'DM Sans', sans-serif;
+      font-weight: 300; font-size: 12px; color: var(--text-mid); margin-top: 3px;
     }
 
     /* Steps */
     .steps-label {
-      font-size: 10px;
-      font-weight: 600;
-      letter-spacing: 0.16em;
-      text-transform: uppercase;
-      color: var(--text-dim);
-      margin-bottom: 12px;
-      display: block;
+      font-size: 10px; font-weight: 600; letter-spacing: 0.16em;
+      text-transform: uppercase; color: var(--text-dim);
+      margin-bottom: 12px; display: block;
       animation: fadeUp 0.7s 0.14s cubic-bezier(0.16,1,0.3,1) both;
     }
     .steps {
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
+      display: flex; flex-direction: column; gap: 10px;
       margin-bottom: 28px;
       animation: fadeUp 0.7s 0.18s cubic-bezier(0.16,1,0.3,1) both;
     }
     .step {
-      display: flex;
-      gap: 16px;
-      align-items: flex-start;
+      display: flex; gap: 16px; align-items: flex-start;
       padding: 15px 18px;
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: 14px;
-      transition: border-color 0.22s, background 0.22s, transform 0.22s;
-      cursor: default;
+      background: var(--surface); border: 1px solid var(--border); border-radius: 14px;
+      transition: border-color 0.22s, background 0.22s, transform 0.22s; cursor: default;
     }
-    .step:hover {
-      border-color: var(--border-hover);
-      background: rgba(241,90,36,0.05);
-      transform: translateX(5px);
-    }
+    .step:hover { border-color: var(--border-hover); background: rgba(241,90,36,0.05); transform: translateX(5px); }
     .step-num {
-      flex-shrink: 0;
-      width: 26px; height: 26px;
-      background: var(--orange-dim);
-      border: 1px solid rgba(241,90,36,0.28);
-      border-radius: 8px;
+      flex-shrink: 0; width: 26px; height: 26px;
+      background: var(--orange-dim); border: 1px solid rgba(241,90,36,0.28); border-radius: 8px;
       display: flex; align-items: center; justify-content: center;
-      font-family: 'Space Grotesk', sans-serif;
-      font-weight: 700;
-      font-size: 11px;
-      color: var(--orange);
+      font-family: 'Space Grotesk', sans-serif; font-weight: 700; font-size: 11px; color: var(--orange);
       margin-top: 1px;
     }
     .step-body { flex: 1; }
     .step-title {
       font-family: 'Space Grotesk', sans-serif;
-      font-weight: 600;
-      font-size: 13.5px;
-      color: var(--text);
-      margin-bottom: 3px;
+      font-weight: 600; font-size: 13.5px; color: var(--text); margin-bottom: 3px;
     }
-    .step-desc {
-      font-size: 12.5px;
-      color: var(--text-mid);
-      line-height: 1.65;
-      font-weight: 300;
-    }
+    .step-desc { font-size: 12.5px; color: var(--text-mid); line-height: 1.65; font-weight: 300; }
     .step-desc strong { color: var(--text); font-weight: 500; }
     .step-desc kbd {
-      display: inline-block;
-      background: rgba(255,255,255,0.07);
-      border: 1px solid rgba(255,255,255,0.12);
-      border-radius: 5px;
-      padding: 1px 6px;
-      font-family: monospace;
-      font-size: 10.5px;
-      color: var(--text);
+      display: inline-block; background: rgba(255,255,255,0.07);
+      border: 1px solid rgba(255,255,255,0.12); border-radius: 5px;
+      padding: 1px 6px; font-family: monospace; font-size: 10.5px; color: var(--text);
     }
 
     .divider {
@@ -250,13 +199,9 @@
     }
 
     .input-label {
-      font-size: 10px;
-      font-weight: 600;
-      letter-spacing: 0.16em;
-      text-transform: uppercase;
-      color: var(--text-dim);
-      margin-bottom: 10px;
-      display: block;
+      font-size: 10px; font-weight: 600; letter-spacing: 0.16em;
+      text-transform: uppercase; color: var(--text-dim);
+      margin-bottom: 10px; display: block;
       animation: fadeUp 0.7s 0.24s cubic-bezier(0.16,1,0.3,1) both;
     }
 
@@ -265,19 +210,11 @@
       animation: fadeUp 0.7s 0.26s cubic-bezier(0.16,1,0.3,1) both;
     }
     textarea {
-      width: 100%;
-      height: 160px;
-      background: rgba(0,0,0,0.28);
-      border: 1px solid var(--border);
-      border-radius: 14px;
+      width: 100%; height: 160px;
+      background: rgba(0,0,0,0.28); border: 1px solid var(--border); border-radius: 14px;
       padding: 15px 15px 28px;
-      font-family: 'DM Sans', monospace;
-      font-size: 12px;
-      color: var(--text-mid);
-      resize: none;
-      outline: none;
-      line-height: 1.7;
-      display: block;
+      font-family: 'DM Sans', monospace; font-size: 12px; color: var(--text-mid);
+      resize: none; outline: none; line-height: 1.7; display: block;
       transition: border-color 0.2s, box-shadow 0.2s;
     }
     textarea:focus {
@@ -287,132 +224,121 @@
     textarea::placeholder { color: rgba(255,255,255,0.14); }
 
     .char-count {
-      position: absolute;
-      bottom: 10px; right: 13px;
-      font-size: 10px;
-      color: var(--text-dim);
-      pointer-events: none;
-      transition: color 0.2s;
+      position: absolute; bottom: 10px; right: 13px;
+      font-size: 10px; color: var(--text-dim); pointer-events: none; transition: color 0.2s;
     }
     .char-count.has-content { color: rgba(241,90,36,0.55); }
 
-    .btn {
-      width: 100%;
-      margin-top: 14px;
-      padding: 17px 24px;
-      background: linear-gradient(135deg, #F15A24, #c94718);
-      border: none;
-      border-radius: 15px;
+    /* ─── UPLOAD ZONE ─── */
+    .upload-zone {
+      width: 100%; min-height: 130px;
+      background: rgba(0,0,0,0.28); border: 1.5px dashed var(--border); border-radius: 14px;
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      gap: 10px; cursor: pointer; transition: border-color 0.22s, background 0.22s;
+      position: relative; padding: 24px;
+    }
+    .upload-zone:hover, .upload-zone.drag-over {
+      border-color: rgba(241,90,36,0.5);
+      background: rgba(241,90,36,0.04);
+    }
+    .upload-zone input[type="file"] {
+      position: absolute; inset: 0; opacity: 0; cursor: pointer; width: 100%; height: 100%;
+    }
+    .upload-icon { font-size: 28px; line-height: 1; }
+    .upload-text {
       font-family: 'Space Grotesk', sans-serif;
-      font-weight: 700;
-      font-size: 15px;
-      letter-spacing: 0.02em;
-      color: white;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 10px;
-      position: relative;
-      overflow: hidden;
+      font-weight: 600; font-size: 13px; color: var(--text); text-align: center;
+    }
+    .upload-text small {
+      display: block; font-family: 'DM Sans', sans-serif;
+      font-weight: 300; font-size: 11px; color: var(--text-mid); margin-top: 3px;
+    }
+    .upload-filename {
+      font-size: 11px; color: var(--orange); font-weight: 500; text-align: center;
+      display: none; margin-top: 4px;
+    }
+
+    /* ─── BOTÕES DE CONVERSÃO ─── */
+    .convert-btns {
+      display: grid; grid-template-columns: 1fr 1fr; gap: 10px;
+      margin-top: 14px;
+    }
+
+    /* ─── BOTÃO BASE ─── */
+    .btn {
+      padding: 16px 20px;
+      background: linear-gradient(135deg, #F15A24, #c94718);
+      border: none; border-radius: 15px;
+      font-family: 'Space Grotesk', sans-serif;
+      font-weight: 700; font-size: 14px; letter-spacing: 0.02em;
+      color: white; cursor: pointer;
+      display: flex; align-items: center; justify-content: center; gap: 9px;
+      position: relative; overflow: hidden;
       box-shadow: 0 8px 32px rgba(241,90,36,0.28), inset 0 1px 0 rgba(255,255,255,0.1);
       transition: transform 0.2s, box-shadow 0.2s;
-      animation: fadeUp 0.7s 0.3s cubic-bezier(0.16,1,0.3,1) both;
+      width: 100%;
     }
+    .btn-full { margin-top: 14px; font-size: 15px; padding: 17px 24px; }
     .btn-shimmer {
-      position: absolute;
-      top: 0; left: -120%; width: 70%; height: 100%;
+      position: absolute; top: 0; left: -120%; width: 70%; height: 100%;
       background: linear-gradient(90deg, transparent, rgba(255,255,255,0.13), transparent);
-      transform: skewX(-18deg);
-      transition: left 0.55s;
+      transform: skewX(-18deg); transition: left 0.55s;
     }
     .btn:not(:disabled):hover .btn-shimmer { left: 160%; }
     .btn:not(:disabled):hover { transform: translateY(-2px); box-shadow: 0 16px 44px rgba(241,90,36,0.4); }
     .btn:active { transform: translateY(0); }
     .btn:disabled {
-      background: rgba(255,255,255,0.06);
-      box-shadow: none;
-      cursor: not-allowed;
-      transform: none;
-      color: var(--text-dim);
+      background: rgba(255,255,255,0.06); box-shadow: none;
+      cursor: not-allowed; transform: none; color: var(--text-dim);
     }
 
-    #status {
-      display: none;
-      margin-top: 12px;
-      padding: 12px 16px;
-      border-radius: 12px;
-      font-size: 13px;
-      text-align: center;
-      background: var(--surface);
-      border: 1px solid var(--border);
-      color: var(--text-mid);
+    /* Status */
+    .status-box {
+      display: none; margin-top: 12px; padding: 12px 16px;
+      border-radius: 12px; font-size: 13px; text-align: center;
+      background: var(--surface); border: 1px solid var(--border); color: var(--text-mid);
     }
-    #status.success { background: rgba(34,197,94,0.07);  border-color: rgba(34,197,94,0.2);  color: #4ade80; }
-    #status.error   { background: rgba(239,68,68,0.07);  border-color: rgba(239,68,68,0.2);  color: #f87171; }
-    #status.loading { background: rgba(241,90,36,0.06);  border-color: rgba(241,90,36,0.2);  color: rgba(241,90,36,0.85); }
+    .status-box.success { background: rgba(34,197,94,0.07);  border-color: rgba(34,197,94,0.2);  color: #4ade80; }
+    .status-box.error   { background: rgba(239,68,68,0.07);  border-color: rgba(239,68,68,0.2);  color: #f87171; }
+    .status-box.loading { background: rgba(241,90,36,0.06);  border-color: rgba(241,90,36,0.2);  color: rgba(241,90,36,0.85); }
 
-    .progress-bar {
-      height: 2px;
-      background: var(--border);
-      border-radius: 2px;
-      margin-top: 10px;
-      overflow: hidden;
-      display: none;
-    }
+    .progress-bar { height: 2px; background: var(--border); border-radius: 2px; margin-top: 10px; overflow: hidden; display: none; }
     .progress-bar.active { display: block; }
     .progress-fill {
       height: 100%;
       background: linear-gradient(90deg, var(--orange), #ff8c5a);
-      border-radius: 2px;
-      animation: progressAnim 12s linear forwards;
+      border-radius: 2px; animation: progressAnim 12s linear forwards;
     }
-    @keyframes progressAnim {
-      0%  { width: 0%; }
-      40% { width: 55%; }
-      80% { width: 82%; }
-      100%{ width: 95%; }
-    }
+    @keyframes progressAnim { 0%{width:0%} 40%{width:55%} 80%{width:82%} 100%{width:95%} }
 
     .tip {
-      display: flex;
-      gap: 10px;
-      align-items: flex-start;
-      margin-top: 16px;
-      padding: 13px 16px;
-      background: rgba(241,90,36,0.05);
-      border: 1px solid rgba(241,90,36,0.14);
-      border-radius: 13px;
-      animation: fadeUp 0.7s 0.36s cubic-bezier(0.16,1,0.3,1) both;
+      display: flex; gap: 10px; align-items: flex-start;
+      margin-top: 16px; padding: 13px 16px;
+      background: rgba(241,90,36,0.05); border: 1px solid rgba(241,90,36,0.14); border-radius: 13px;
     }
     .tip-icon { flex-shrink: 0; margin-top: 1px; }
     .tip p { font-size: 12.5px; color: var(--text-mid); line-height: 1.6; font-weight: 300; }
     .tip strong { color: var(--text); font-weight: 500; }
 
+    /* Footer */
     .card-footer {
-      padding: 15px 44px 20px;
-      border-top: 1px solid var(--border);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 8px;
+      padding: 15px 44px 20px; border-top: 1px solid var(--border);
+      display: flex; align-items: center; justify-content: center; gap: 8px;
     }
     .footer-dot { width: 3px; height: 3px; border-radius: 50%; background: var(--orange); opacity: 0.35; }
     .footer-text { font-size: 10px; color: var(--text-dim); letter-spacing: 0.06em; }
 
     .spinner {
-      display: inline-block;
-      width: 15px; height: 15px;
-      border: 2px solid rgba(255,255,255,0.2);
-      border-top-color: white;
-      border-radius: 50%;
-      animation: spin 0.6s linear infinite;
+      display: inline-block; width: 15px; height: 15px;
+      border: 2px solid rgba(255,255,255,0.2); border-top-color: white;
+      border-radius: 50%; animation: spin 0.6s linear infinite;
     }
     @keyframes spin { to { transform: rotate(360deg); } }
 
     @media (max-width: 520px) {
       .page { padding: 24px 14px; }
-      .card-header, .card-body, .card-footer { padding-left: 22px; padding-right: 22px; }
+      .card-header, .card-header-simple, .card-body, .card-footer { padding-left: 22px; padding-right: 22px; }
+      .convert-btns { grid-template-columns: 1fr; }
     }
   </style>
 </head>
@@ -431,15 +357,12 @@
   <div class="meme-float" style="left:94%; animation-duration:12s; animation-delay:12s;">✅</div>
 
   <div class="page">
-    <div class="card">
 
+    <!-- ─── CARD 1: Mailchimp → PDF ─── -->
+    <div class="card">
       <div class="card-header">
-        <img
-          class="logo-img"
-          src="./logo.png"
-          alt="in.pacto"
-          onerror="this.style.display='none'; document.querySelector('.logo-fallback').style.display='block';"
-        >
+        <img class="logo-img" src="./logo.png" alt="in.pacto"
+          onerror="this.style.display='none'; document.querySelector('.logo-fallback').style.display='block';">
         <div class="logo-fallback"><em>in</em>.pacto</div>
         <div class="logo-sub">Inteligência em Comunicação &nbsp;·&nbsp; Conversor de Relatórios</div>
       </div>
@@ -485,16 +408,12 @@
         <label class="input-label" for="htmlInput">Código-fonte do Mailchimp</label>
 
         <div class="textarea-wrap">
-          <textarea
-            id="htmlInput"
-            placeholder="Cole aqui o código-fonte (CTRL+V)…"
-            oninput="updateCharCount(this)"
-            spellcheck="false"
-          ></textarea>
+          <textarea id="htmlInput" placeholder="Cole aqui o código-fonte (CTRL+V)…"
+            oninput="updateCharCount(this)" spellcheck="false"></textarea>
           <span class="char-count" id="charCount">0 caracteres</span>
         </div>
 
-        <button class="btn" id="btn" onclick="generatePDF()">
+        <button class="btn btn-full" id="btn-pdf" onclick="generatePDF()">
           <span class="btn-shimmer"></span>
           <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
             <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
@@ -505,8 +424,8 @@
           Gerar PDF Agora
         </button>
 
-        <div id="status"></div>
-        <div class="progress-bar" id="progress"><div class="progress-fill"></div></div>
+        <div id="status-pdf" class="status-box"></div>
+        <div class="progress-bar" id="progress-pdf"><div class="progress-fill"></div></div>
 
         <div class="tip">
           <svg class="tip-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#F15A24" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
@@ -524,11 +443,76 @@
         <span class="footer-text">Powered by Browserless · Cloudflare Workers &nbsp;·&nbsp; Feito com 💛 por Victor Andrews</span>
         <div class="footer-dot"></div>
       </div>
-
     </div>
-  </div>
+
+    <!-- ─── CARD 2: PDF → PPTX / DOCX ─── -->
+    <div class="card">
+      <div class="card-header-simple">
+        <div class="card-title">Converter PDF</div>
+        <div class="logo-sub">Para PowerPoint ou Word · Otimizado para OneDrive</div>
+      </div>
+
+      <div class="card-body">
+
+        <label class="input-label">Selecione o arquivo PDF</label>
+
+        <div class="upload-zone" id="upload-zone">
+          <input type="file" id="pdf-input" accept=".pdf" onchange="onFileSelect(this)">
+          <div class="upload-icon">📂</div>
+          <div class="upload-text">
+            Clique para selecionar ou arraste aqui
+            <small>Apenas arquivos .pdf</small>
+          </div>
+          <div class="upload-filename" id="upload-filename"></div>
+        </div>
+
+        <div class="convert-btns">
+          <button class="btn" id="btn-pptx" onclick="convertFile('pptx')" disabled>
+            <span class="btn-shimmer"></span>
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+              <rect x="2" y="3" width="20" height="14" rx="2"/>
+              <path d="M8 21h8M12 17v4"/>
+            </svg>
+            → PowerPoint
+          </button>
+          <button class="btn" id="btn-docx" onclick="convertFile('docx')" disabled>
+            <span class="btn-shimmer"></span>
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+              <polyline points="14 2 14 8 20 8"/>
+              <line x1="16" y1="13" x2="8" y2="13"/>
+              <line x1="16" y1="17" x2="8" y2="17"/>
+              <polyline points="10 9 9 9 8 9"/>
+            </svg>
+            → Word
+          </button>
+        </div>
+
+        <div id="status-convert" class="status-box"></div>
+        <div class="progress-bar" id="progress-convert"><div class="progress-fill"></div></div>
+
+        <div class="tip" style="margin-top:16px;">
+          <svg class="tip-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#F15A24" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="10"/>
+            <line x1="12" y1="8" x2="12" y2="12"/>
+            <line x1="12" y1="16" x2="12.01" y2="16"/>
+          </svg>
+          <p>Conversão otimizada para <strong>visualização no OneDrive</strong>. Fontes e layout preservados ao máximo.</p>
+        </div>
+
+      </div>
+
+      <div class="card-footer">
+        <div class="footer-dot"></div>
+        <span class="footer-text">Powered by CloudConvert · Cloudflare Workers</span>
+        <div class="footer-dot"></div>
+      </div>
+    </div>
+
+  </div><!-- /page -->
 
   <script>
+    /* ── Meme rotator ── */
     const memes = [
       { emoji: '🧠', line: 'Ctrl+C, Ctrl+V, PDF. Brain too big.',        sub: 'Tecnologia de ponta a serviço da preguiça honesta.' },
       { emoji: '😤', line: 'Mailchimp não te dá PDF. Nós sim.',           sub: 'Justiça para os analistas de comunicação.' },
@@ -543,7 +527,6 @@
     const emojiEl = document.getElementById('meme-emoji');
     const lineEl  = document.getElementById('meme-line');
     const subEl   = document.getElementById('meme-sub');
-
     setInterval(() => {
       memeIdx = (memeIdx + 1) % memes.length;
       const m = memes[memeIdx];
@@ -556,6 +539,7 @@
       }, 180);
     }, 4000);
 
+    /* ── Char counter ── */
     function updateCharCount(el) {
       const n = el.value.length;
       const cc = document.getElementById('charCount');
@@ -563,123 +547,165 @@
       cc.classList.toggle('has-content', n > 0);
     }
 
+    /* ── Upload zone ── */
+    let selectedFile = null;
+    const zone = document.getElementById('upload-zone');
+
+    zone.addEventListener('dragover',  e => { e.preventDefault(); zone.classList.add('drag-over'); });
+    zone.addEventListener('dragleave', () => zone.classList.remove('drag-over'));
+    zone.addEventListener('drop', e => {
+      e.preventDefault();
+      zone.classList.remove('drag-over');
+      const f = e.dataTransfer.files[0];
+      if (f && f.type === 'application/pdf') setFile(f);
+    });
+
+    function onFileSelect(input) {
+      if (input.files[0]) setFile(input.files[0]);
+    }
+    function setFile(f) {
+      selectedFile = f;
+      const fn = document.getElementById('upload-filename');
+      fn.textContent = '📄 ' + f.name;
+      fn.style.display = 'block';
+      document.getElementById('btn-pptx').disabled = false;
+      document.getElementById('btn-docx').disabled = false;
+    }
+
+    /* ── Progress helper ── */
+    function startProgress(id) {
+      const bar = document.getElementById(id);
+      bar.classList.add('active');
+      const fill = bar.querySelector('.progress-fill');
+      fill.style.animation = 'none'; void fill.offsetWidth; fill.style.animation = '';
+    }
+    function stopProgress(id) {
+      document.getElementById(id).classList.remove('active');
+    }
+
+    /* ── Canvas background ── */
     (function () {
       const canvas = document.getElementById('bg-canvas');
       const ctx    = canvas.getContext('2d');
       let W, H, particles = [];
-
-      function resize() {
-        W = canvas.width  = window.innerWidth;
-        H = canvas.height = window.innerHeight;
-      }
+      function resize() { W = canvas.width = window.innerWidth; H = canvas.height = window.innerHeight; }
       function makeParticle() {
-        return {
-          x:  Math.random() * W,
-          y:  Math.random() * H,
-          r:  Math.random() * 1.4 + 0.3,
-          vx: (Math.random() - 0.5) * 0.18,
-          vy: (Math.random() - 0.5) * 0.18,
-          a:  Math.random() * 0.32 + 0.05,
-        };
+        return { x: Math.random()*W, y: Math.random()*H, r: Math.random()*1.4+0.3,
+                 vx: (Math.random()-0.5)*0.18, vy: (Math.random()-0.5)*0.18, a: Math.random()*0.32+0.05 };
       }
-      function init() { resize(); particles = Array.from({ length: 90 }, makeParticle); }
+      function init() { resize(); particles = Array.from({length:90}, makeParticle); }
       function draw() {
-        ctx.clearRect(0, 0, W, H);
-        [
-          { x: W*.12, y: H*.18, r: W*.38, c: 'rgba(241,90,36,0.07)'  },
-          { x: W*.88, y: H*.82, r: W*.30, c: 'rgba(80,50,200,0.05)'  },
-          { x: W*.55, y: H*.45, r: W*.22, c: 'rgba(20,120,255,0.04)' },
-        ].forEach(b => {
-          const g = ctx.createRadialGradient(b.x, b.y, 0, b.x, b.y, b.r);
-          g.addColorStop(0, b.c); g.addColorStop(1, 'transparent');
-          ctx.fillStyle = g;
-          ctx.beginPath(); ctx.arc(b.x, b.y, b.r, 0, Math.PI*2); ctx.fill();
+        ctx.clearRect(0,0,W,H);
+        [{x:W*.12,y:H*.18,r:W*.38,c:'rgba(241,90,36,0.07)'},{x:W*.88,y:H*.82,r:W*.30,c:'rgba(80,50,200,0.05)'},{x:W*.55,y:H*.45,r:W*.22,c:'rgba(20,120,255,0.04)'}]
+        .forEach(b => {
+          const g = ctx.createRadialGradient(b.x,b.y,0,b.x,b.y,b.r);
+          g.addColorStop(0,b.c); g.addColorStop(1,'transparent');
+          ctx.fillStyle=g; ctx.beginPath(); ctx.arc(b.x,b.y,b.r,0,Math.PI*2); ctx.fill();
         });
         particles.forEach(p => {
-          ctx.beginPath(); ctx.arc(p.x, p.y, p.r, 0, Math.PI*2);
-          ctx.fillStyle = `rgba(241,90,36,${p.a})`; ctx.fill();
-          p.x += p.vx; p.y += p.vy;
-          if (p.x < 0 || p.x > W) p.vx *= -1;
-          if (p.y < 0 || p.y > H) p.vy *= -1;
+          ctx.beginPath(); ctx.arc(p.x,p.y,p.r,0,Math.PI*2);
+          ctx.fillStyle=`rgba(241,90,36,${p.a})`; ctx.fill();
+          p.x+=p.vx; p.y+=p.vy;
+          if(p.x<0||p.x>W) p.vx*=-1; if(p.y<0||p.y>H) p.vy*=-1;
         });
-        for (let i = 0; i < particles.length; i++) {
-          for (let j = i+1; j < particles.length; j++) {
-            const dx = particles[i].x - particles[j].x;
-            const dy = particles[i].y - particles[j].y;
-            const d  = Math.sqrt(dx*dx + dy*dy);
-            if (d < 100) {
-              ctx.beginPath();
-              ctx.moveTo(particles[i].x, particles[i].y);
-              ctx.lineTo(particles[j].x, particles[j].y);
-              ctx.strokeStyle = `rgba(241,90,36,${0.055*(1-d/100)})`;
-              ctx.lineWidth = 0.5; ctx.stroke();
-            }
-          }
+        for(let i=0;i<particles.length;i++) for(let j=i+1;j<particles.length;j++) {
+          const dx=particles[i].x-particles[j].x, dy=particles[i].y-particles[j].y;
+          const d=Math.sqrt(dx*dx+dy*dy);
+          if(d<100){ ctx.beginPath(); ctx.moveTo(particles[i].x,particles[i].y); ctx.lineTo(particles[j].x,particles[j].y);
+            ctx.strokeStyle=`rgba(241,90,36,${0.055*(1-d/100)})`; ctx.lineWidth=0.5; ctx.stroke(); }
         }
         requestAnimationFrame(draw);
       }
-      window.addEventListener('resize', resize);
-      init(); draw();
+      window.addEventListener('resize', resize); init(); draw();
     })();
 
-    const WORKER_URL = 'https://inpacto-pdf.doctorvictorandrews.workers.dev/pdf';
+    /* ── PDF generation (card 1) ── */
+    const WORKER_PDF     = 'https://inpacto-pdf.doctorvictorandrews.workers.dev/pdf';
+    const WORKER_CONVERT = 'https://inpacto-convert.doctorvictorandrews.workers.dev';
 
     async function generatePDF() {
-      const code     = document.getElementById('htmlInput').value.trim();
-      const btn      = document.getElementById('btn');
-      const status   = document.getElementById('status');
-      const progress = document.getElementById('progress');
-
+      const code   = document.getElementById('htmlInput').value.trim();
+      const btn    = document.getElementById('btn-pdf');
+      const status = document.getElementById('status-pdf');
       if (!code) {
-        status.className = 'error';
-        status.style.display = 'block';
-        status.textContent = '⚠️ Cole o código-fonte do Mailchimp primeiro.';
-        return;
+        status.className = 'status-box error'; status.style.display = 'block';
+        status.textContent = '⚠️ Cole o código-fonte do Mailchimp primeiro.'; return;
       }
-
       btn.disabled = true;
       btn.innerHTML = '<span class="spinner"></span> Gerando PDF…';
-      status.className = 'loading';
-      status.style.display = 'block';
+      status.className = 'status-box loading'; status.style.display = 'block';
       status.textContent = '⏳ Enviando para o servidor… isso leva cerca de 10 segundos.';
-      progress.classList.add('active');
-      const fill = progress.querySelector('.progress-fill');
-      fill.style.animation = 'none'; void fill.offsetWidth; fill.style.animation = '';
-
+      startProgress('progress-pdf');
       try {
-        const response = await fetch(WORKER_URL, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
+        const response = await fetch(WORKER_PDF, {
+          method: 'POST', headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ html: code })
         });
         if (!response.ok) throw new Error((await response.text()) || `Erro ${response.status}`);
-
         const blob = await response.blob();
         const url  = URL.createObjectURL(blob);
         const a    = document.createElement('a');
-        a.href = url;
-        a.download = `Relatorio_MDA_${new Date().toISOString().slice(0,10)}.pdf`;
-        document.body.appendChild(a); a.click(); a.remove();
-        URL.revokeObjectURL(url);
-
-        status.className = 'success';
-        status.textContent = '✅ PDF gerado e baixado com sucesso!';
-
+        a.href = url; a.download = `Relatorio_MDA_${new Date().toISOString().slice(0,10)}.pdf`;
+        document.body.appendChild(a); a.click(); a.remove(); URL.revokeObjectURL(url);
+        status.className = 'status-box success'; status.textContent = '✅ PDF gerado e baixado com sucesso!';
       } catch (err) {
-        status.className = 'error';
-        status.textContent = `❌ Erro: ${err.message}`;
+        status.className = 'status-box error'; status.textContent = `❌ Erro: ${err.message}`;
       } finally {
-        progress.classList.remove('active');
+        stopProgress('progress-pdf');
         btn.disabled = false;
-        btn.innerHTML = `
-          <span class="btn-shimmer"></span>
+        btn.innerHTML = `<span class="btn-shimmer"></span>
           <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
             <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
             <polyline points="14 2 14 8 20 8"/>
             <line x1="12" y1="18" x2="12" y2="12"/>
             <polyline points="9 15 12 18 15 15"/>
-          </svg>
-          Gerar PDF Agora`;
+          </svg> Gerar PDF Agora`;
+      }
+    }
+
+    /* ── Convert PDF (card 2) ── */
+    async function convertFile(format) {
+      if (!selectedFile) return;
+      const btnId  = format === 'pptx' ? 'btn-pptx' : 'btn-docx';
+      const otherId = format === 'pptx' ? 'btn-docx' : 'btn-pptx';
+      const btn    = document.getElementById(btnId);
+      const status = document.getElementById('status-convert');
+      const label  = format === 'pptx' ? 'PowerPoint' : 'Word';
+
+      btn.disabled = true;
+      document.getElementById(otherId).disabled = true;
+      btn.innerHTML = `<span class="spinner"></span> Convertendo…`;
+      status.className = 'status-box loading'; status.style.display = 'block';
+      status.textContent = `⏳ Convertendo para ${label}… pode levar até 30 segundos.`;
+      startProgress('progress-convert');
+
+      try {
+        const form = new FormData();
+        form.append('file', selectedFile);
+        const response = await fetch(`${WORKER_CONVERT}/to-${format}`, {
+          method: 'POST', body: form
+        });
+        if (!response.ok) throw new Error((await response.text()) || `Erro ${response.status}`);
+        const blob = await response.blob();
+        const url  = URL.createObjectURL(blob);
+        const a    = document.createElement('a');
+        const ext  = format === 'pptx' ? '.pptx' : '.docx';
+        a.href = url;
+        a.download = selectedFile.name.replace('.pdf', ext);
+        document.body.appendChild(a); a.click(); a.remove(); URL.revokeObjectURL(url);
+        status.className = 'status-box success';
+        status.textContent = `✅ ${label} gerado e baixado com sucesso!`;
+      } catch (err) {
+        status.className = 'status-box error'; status.textContent = `❌ Erro: ${err.message}`;
+      } finally {
+        stopProgress('progress-convert');
+        btn.disabled = false;
+        document.getElementById(otherId).disabled = false;
+        const icons = {
+          pptx: `<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/></svg> → PowerPoint`,
+          docx: `<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg> → Word`,
+        };
+        btn.innerHTML = `<span class="btn-shimmer"></span>${icons[format]}`;
       }
     }
   </script>
