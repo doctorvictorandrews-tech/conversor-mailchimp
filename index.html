@@ -82,7 +82,8 @@
       border-bottom: 1px solid var(--border);
       position: relative;
     }
-    .card-header::before {
+    .card-header::before,
+    .card-header-simple::before {
       content: '';
       position: absolute; top: 0; left: 0; right: 0; height: 2px;
       background: linear-gradient(90deg, var(--orange) 0%, rgba(241,90,36,0.25) 50%, transparent 100%);
@@ -100,21 +101,15 @@
       letter-spacing: 0.18em; text-transform: uppercase; color: var(--text-dim);
     }
 
-    /* Card header simples (segundo card) */
+    /* Card header do segundo card — mesma altura visual, linha laranja incluída */
     .card-header-simple {
-      padding: 28px 44px 22px;
+      padding: 28px 44px 24px;
       border-bottom: 1px solid var(--border);
       position: relative;
     }
-    .card-header-simple::before {
-      content: '';
-      position: absolute; top: 0; left: 0; right: 0; height: 2px;
-      background: linear-gradient(90deg, var(--orange) 0%, rgba(241,90,36,0.25) 50%, transparent 100%);
-      border-radius: 28px 28px 0 0;
-    }
     .card-title {
       font-family: 'Space Grotesk', sans-serif;
-      font-weight: 700; font-size: 16px; color: var(--text);
+      font-weight: 700; font-size: 17px; color: var(--text);
     }
 
     /* ─── CARD BODY ─── */
@@ -157,12 +152,10 @@
       font-size: 10px; font-weight: 600; letter-spacing: 0.16em;
       text-transform: uppercase; color: var(--text-dim);
       margin-bottom: 12px; display: block;
-      animation: fadeUp 0.7s 0.14s cubic-bezier(0.16,1,0.3,1) both;
     }
     .steps {
       display: flex; flex-direction: column; gap: 10px;
       margin-bottom: 28px;
-      animation: fadeUp 0.7s 0.18s cubic-bezier(0.16,1,0.3,1) both;
     }
     .step {
       display: flex; gap: 16px; align-items: flex-start;
@@ -195,20 +188,15 @@
       height: 1px;
       background: linear-gradient(90deg, transparent, var(--border), transparent);
       margin-bottom: 24px;
-      animation: fadeUp 0.7s 0.22s cubic-bezier(0.16,1,0.3,1) both;
     }
 
     .input-label {
       font-size: 10px; font-weight: 600; letter-spacing: 0.16em;
       text-transform: uppercase; color: var(--text-dim);
       margin-bottom: 10px; display: block;
-      animation: fadeUp 0.7s 0.24s cubic-bezier(0.16,1,0.3,1) both;
     }
 
-    .textarea-wrap {
-      position: relative;
-      animation: fadeUp 0.7s 0.26s cubic-bezier(0.16,1,0.3,1) both;
-    }
+    .textarea-wrap { position: relative; }
     textarea {
       width: 100%; height: 160px;
       background: rgba(0,0,0,0.28); border: 1px solid var(--border); border-radius: 14px;
@@ -241,6 +229,10 @@
       border-color: rgba(241,90,36,0.5);
       background: rgba(241,90,36,0.04);
     }
+    .upload-zone.has-file {
+      border-color: rgba(241,90,36,0.35);
+      background: rgba(241,90,36,0.03);
+    }
     .upload-zone input[type="file"] {
       position: absolute; inset: 0; opacity: 0; cursor: pointer; width: 100%; height: 100%;
     }
@@ -254,8 +246,9 @@
       font-weight: 300; font-size: 11px; color: var(--text-mid); margin-top: 3px;
     }
     .upload-filename {
-      font-size: 11px; color: var(--orange); font-weight: 500; text-align: center;
-      display: none; margin-top: 4px;
+      font-size: 12px; color: var(--orange); font-weight: 600; text-align: center;
+      display: none; margin-top: 2px;
+      font-family: 'Space Grotesk', sans-serif;
     }
 
     /* ─── BOTÕES DE CONVERSÃO ─── */
@@ -310,6 +303,12 @@
       border-radius: 2px; animation: progressAnim 12s linear forwards;
     }
     @keyframes progressAnim { 0%{width:0%} 40%{width:55%} 80%{width:82%} 100%{width:95%} }
+
+    /* Barra de progresso mais lenta para conversão (pode demorar ~30s) */
+    .progress-bar.slow .progress-fill {
+      animation: progressAnimSlow 30s linear forwards;
+    }
+    @keyframes progressAnimSlow { 0%{width:0%} 30%{width:40%} 70%{width:70%} 95%{width:90%} 100%{width:95%} }
 
     .tip {
       display: flex; gap: 10px; align-items: flex-start;
@@ -454,12 +453,30 @@
 
       <div class="card-body">
 
+        <span class="steps-label">Como usar</span>
+        <div class="steps" style="margin-bottom: 24px;">
+          <div class="step">
+            <div class="step-num">01</div>
+            <div class="step-body">
+              <div class="step-title">Selecione o PDF gerado</div>
+              <div class="step-desc">Clique na área abaixo ou arraste o arquivo <strong>.pdf</strong> para dentro dela.</div>
+            </div>
+          </div>
+          <div class="step">
+            <div class="step-num">02</div>
+            <div class="step-body">
+              <div class="step-title">Escolha o formato de saída</div>
+              <div class="step-desc">Clique em <strong>→ PowerPoint</strong> ou <strong>→ Word</strong>. O download inicia automaticamente. Pode levar até 30 segundos.</div>
+            </div>
+          </div>
+        </div>
+
         <label class="input-label">Selecione o arquivo PDF</label>
 
         <div class="upload-zone" id="upload-zone">
           <input type="file" id="pdf-input" accept=".pdf" onchange="onFileSelect(this)">
-          <div class="upload-icon">📂</div>
-          <div class="upload-text">
+          <div class="upload-icon" id="upload-icon">📂</div>
+          <div class="upload-text" id="upload-text">
             Clique para selecionar ou arraste aqui
             <small>Apenas arquivos .pdf</small>
           </div>
@@ -558,29 +575,57 @@
       zone.classList.remove('drag-over');
       const f = e.dataTransfer.files[0];
       if (f && f.type === 'application/pdf') setFile(f);
+      else showConvertStatus('error', '⚠️ Por favor, selecione apenas arquivos .pdf');
     });
 
     function onFileSelect(input) {
       if (input.files[0]) setFile(input.files[0]);
     }
+
     function setFile(f) {
       selectedFile = f;
+      // Atualiza UI da upload zone
+      document.getElementById('upload-icon').textContent = '✅';
+      document.getElementById('upload-text').innerHTML =
+        `Arquivo selecionado<small>${formatBytes(f.size)}</small>`;
       const fn = document.getElementById('upload-filename');
-      fn.textContent = '📄 ' + f.name;
+      fn.textContent = f.name;
       fn.style.display = 'block';
+      zone.classList.add('has-file');
+      // Libera botões
       document.getElementById('btn-pptx').disabled = false;
       document.getElementById('btn-docx').disabled = false;
+      // Limpa status anterior
+      const s = document.getElementById('status-convert');
+      s.style.display = 'none';
+    }
+
+    function formatBytes(bytes) {
+      if (bytes < 1024)       return bytes + ' B';
+      if (bytes < 1048576)    return (bytes / 1024).toFixed(1) + ' KB';
+      return (bytes / 1048576).toFixed(1) + ' MB';
     }
 
     /* ── Progress helper ── */
-    function startProgress(id) {
+    function startProgress(id, slow = false) {
       const bar = document.getElementById(id);
+      bar.classList.remove('slow');
+      if (slow) bar.classList.add('slow');
       bar.classList.add('active');
       const fill = bar.querySelector('.progress-fill');
-      fill.style.animation = 'none'; void fill.offsetWidth; fill.style.animation = '';
+      fill.style.animation = 'none';
+      void fill.offsetWidth;
+      fill.style.animation = '';
     }
     function stopProgress(id) {
       document.getElementById(id).classList.remove('active');
+    }
+
+    function showConvertStatus(type, msg) {
+      const s = document.getElementById('status-convert');
+      s.className = `status-box ${type}`;
+      s.style.display = 'block';
+      s.textContent = msg;
     }
 
     /* ── Canvas background ── */
@@ -619,37 +664,51 @@
       window.addEventListener('resize', resize); init(); draw();
     })();
 
-    /* ── PDF generation (card 1) ── */
+    /* ── URLs dos Workers ── */
     const WORKER_PDF     = 'https://inpacto-pdf.doctorvictorandrews.workers.dev/pdf';
     const WORKER_CONVERT = 'https://inpacto-convert.doctorvictorandrews.workers.dev';
 
+    /* ── PDF generation (card 1) ── */
     async function generatePDF() {
       const code   = document.getElementById('htmlInput').value.trim();
       const btn    = document.getElementById('btn-pdf');
       const status = document.getElementById('status-pdf');
+
       if (!code) {
-        status.className = 'status-box error'; status.style.display = 'block';
-        status.textContent = '⚠️ Cole o código-fonte do Mailchimp primeiro.'; return;
+        status.className = 'status-box error';
+        status.style.display = 'block';
+        status.textContent = '⚠️ Cole o código-fonte do Mailchimp primeiro.';
+        return;
       }
+
       btn.disabled = true;
       btn.innerHTML = '<span class="spinner"></span> Gerando PDF…';
-      status.className = 'status-box loading'; status.style.display = 'block';
+      status.className = 'status-box loading';
+      status.style.display = 'block';
       status.textContent = '⏳ Enviando para o servidor… isso leva cerca de 10 segundos.';
       startProgress('progress-pdf');
+
       try {
         const response = await fetch(WORKER_PDF, {
-          method: 'POST', headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ html: code })
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ html: code }),
         });
         if (!response.ok) throw new Error((await response.text()) || `Erro ${response.status}`);
+
         const blob = await response.blob();
         const url  = URL.createObjectURL(blob);
         const a    = document.createElement('a');
-        a.href = url; a.download = `Relatorio_MDA_${new Date().toISOString().slice(0,10)}.pdf`;
-        document.body.appendChild(a); a.click(); a.remove(); URL.revokeObjectURL(url);
-        status.className = 'status-box success'; status.textContent = '✅ PDF gerado e baixado com sucesso!';
+        a.href     = url;
+        a.download = `Relatorio_MDA_${new Date().toISOString().slice(0,10)}.pdf`;
+        document.body.appendChild(a); a.click(); a.remove();
+        URL.revokeObjectURL(url);
+
+        status.className = 'status-box success';
+        status.textContent = '✅ PDF gerado e baixado com sucesso!';
       } catch (err) {
-        status.className = 'status-box error'; status.textContent = `❌ Erro: ${err.message}`;
+        status.className = 'status-box error';
+        status.textContent = `❌ Erro: ${err.message}`;
       } finally {
         stopProgress('progress-pdf');
         btn.disabled = false;
@@ -663,50 +722,67 @@
       }
     }
 
-    /* ── Convert PDF (card 2) ── */
+    /* ── Convert PDF → PPTX / DOCX (card 2) ── */
     async function convertFile(format) {
       if (!selectedFile) return;
-      const btnId  = format === 'pptx' ? 'btn-pptx' : 'btn-docx';
-      const otherId = format === 'pptx' ? 'btn-docx' : 'btn-pptx';
-      const btn    = document.getElementById(btnId);
-      const status = document.getElementById('status-convert');
-      const label  = format === 'pptx' ? 'PowerPoint' : 'Word';
+
+      const btnId   = format === 'pptx' ? 'btn-pptx' : 'btn-docx';
+      const otherId = format === 'pptx' ? 'btn-docx'  : 'btn-pptx';
+      const btn     = document.getElementById(btnId);
+      const label   = format === 'pptx' ? 'PowerPoint' : 'Word';
 
       btn.disabled = true;
       document.getElementById(otherId).disabled = true;
       btn.innerHTML = `<span class="spinner"></span> Convertendo…`;
-      status.className = 'status-box loading'; status.style.display = 'block';
-      status.textContent = `⏳ Convertendo para ${label}… pode levar até 30 segundos.`;
-      startProgress('progress-convert');
+
+      showConvertStatus('loading', `⏳ Convertendo para ${label}… pode levar até 30 segundos.`);
+      startProgress('progress-convert', true);
 
       try {
-        const form = new FormData();
-        form.append('file', selectedFile);
+        // Lê o PDF como base64 — o worker espera JSON { pdf: "<base64>" }
+        const base64 = await fileToBase64(selectedFile);
+
         const response = await fetch(`${WORKER_CONVERT}/to-${format}`, {
-          method: 'POST', body: form
+          method:  'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body:    JSON.stringify({ pdf: base64 }),
         });
+
         if (!response.ok) throw new Error((await response.text()) || `Erro ${response.status}`);
+
         const blob = await response.blob();
         const url  = URL.createObjectURL(blob);
         const a    = document.createElement('a');
         const ext  = format === 'pptx' ? '.pptx' : '.docx';
-        a.href = url;
-        a.download = selectedFile.name.replace('.pdf', ext);
-        document.body.appendChild(a); a.click(); a.remove(); URL.revokeObjectURL(url);
-        status.className = 'status-box success';
-        status.textContent = `✅ ${label} gerado e baixado com sucesso!`;
+        a.href     = url;
+        a.download = selectedFile.name.replace(/\.pdf$/i, ext);
+        document.body.appendChild(a); a.click(); a.remove();
+        URL.revokeObjectURL(url);
+
+        showConvertStatus('success', `✅ ${label} gerado e baixado com sucesso!`);
       } catch (err) {
-        status.className = 'status-box error'; status.textContent = `❌ Erro: ${err.message}`;
+        showConvertStatus('error', `❌ Erro: ${err.message}`);
       } finally {
         stopProgress('progress-convert');
         btn.disabled = false;
         document.getElementById(otherId).disabled = false;
+
         const icons = {
           pptx: `<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/></svg> → PowerPoint`,
           docx: `<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg> → Word`,
         };
         btn.innerHTML = `<span class="btn-shimmer"></span>${icons[format]}`;
       }
+    }
+
+    /* Converte File para string base64 */
+    function fileToBase64(file) {
+      return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload  = () => resolve(reader.result.split(',')[1]);
+        reader.onerror = () => reject(new Error('Falha ao ler o arquivo'));
+        reader.readAsDataURL(file);
+      });
     }
   </script>
 </body>
