@@ -4,19 +4,24 @@
   <meta charset="UTF-8">
   <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🧠</text></svg>">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Ferramentas | in.pacto</title>
-  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+  <title>Ferramentas | Listening</title>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto+Mono:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400;1,700&family=Roboto+Slab:wght@400;700;800;900&display=swap" rel="stylesheet">
   <style>
     :root {
-      --orange: #F15A24;
-      --orange-dim: rgba(241,90,36,0.15);
-      --bg: #060810;
-      --surface: rgba(255,255,255,0.04);
-      --border: rgba(255,255,255,0.09);
-      --border-hover: rgba(241,90,36,0.4);
-      --text: rgba(255,255,255,0.92);
-      --text-mid: rgba(255,255,255,0.5);
-      --text-dim: rgba(255,255,255,0.25);
+      --yellow: #D4D432;
+      --yellow-dim: rgba(212,212,50,0.18);
+      --red: #E84500;
+      --red-dim: rgba(232,69,0,0.12);
+      --charcoal: #2A2A2A;
+      --charcoal-mid: #3D3D3D;
+      --bg: #D8D8D8;
+      --surface: rgba(255,255,255,0.55);
+      --surface-solid: #E2E2E2;
+      --border: rgba(0,0,0,0.14);
+      --border-hover: rgba(212,212,50,0.7);
+      --text: #1A1A1A;
+      --text-mid: #3D3D3D;
+      --text-dim: rgba(0,0,0,0.38);
     }
 
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -24,25 +29,28 @@
     html, body {
       width: 100%;
       min-height: 100vh;
-      font-family: 'DM Sans', sans-serif;
+      font-family: 'Roboto Mono', monospace;
       background: var(--bg);
       color: var(--text);
       overflow-x: hidden;
     }
 
+    /* ─── BG CANVAS ─── */
     #bg-canvas { position: fixed; inset: 0; z-index: 0; pointer-events: none; }
 
+    /* ─── FLOATING EMOJI ─── */
     .meme-float {
-      position: fixed; font-size: 26px; pointer-events: none;
+      position: fixed; font-size: 22px; pointer-events: none;
       z-index: 1; animation: floatUp linear infinite; opacity: 0; user-select: none;
     }
     @keyframes floatUp {
       0%   { transform: translateY(110vh) rotate(0deg);   opacity: 0; }
-      5%   { opacity: 0.4; }
-      90%  { opacity: 0.28; }
+      5%   { opacity: 0.3; }
+      90%  { opacity: 0.18; }
       100% { transform: translateY(-10vh) rotate(360deg); opacity: 0; }
     }
 
+    /* ─── PAGE ─── */
     .page {
       position: relative; z-index: 10;
       min-height: 100vh;
@@ -51,86 +59,92 @@
       align-items: center;
       justify-content: center;
       padding: 48px 20px;
-      gap: 16px;
+      gap: 18px;
     }
 
     /* ─── CARD BASE ─── */
     .card {
-      width: 100%; max-width: 620px;
-      background: rgba(255,255,255,0.035);
-      border: 1px solid var(--border);
-      border-radius: 28px;
-      backdrop-filter: blur(48px) saturate(160%);
-      -webkit-backdrop-filter: blur(48px) saturate(160%);
+      width: 100%; max-width: 640px;
+      background: var(--surface);
+      border: 1.5px solid var(--border);
+      border-radius: 4px;
       box-shadow:
-        inset 0 0 0 1px rgba(255,255,255,0.04),
-        0 32px 80px rgba(0,0,0,0.55),
-        0 0 120px rgba(241,90,36,0.06);
+        0 2px 0 rgba(0,0,0,0.08),
+        0 12px 40px rgba(0,0,0,0.12);
       overflow: hidden;
     }
-    .card:first-child { animation: fadeUp 0.7s cubic-bezier(0.16,1,0.3,1) both; }
-    .card:last-child  { animation: fadeUp 0.7s 0.12s cubic-bezier(0.16,1,0.3,1) both; }
+    .card:first-child { animation: fadeUp 0.6s cubic-bezier(0.16,1,0.3,1) both; }
+    .card:last-child  { animation: fadeUp 0.6s 0.1s cubic-bezier(0.16,1,0.3,1) both; }
 
     @keyframes fadeUp {
-      from { opacity: 0; transform: translateY(24px); }
+      from { opacity: 0; transform: translateY(20px); }
       to   { opacity: 1; transform: translateY(0); }
     }
 
-    /* ─── CARD HEADER ─── */
+    /* ─── CARD HEADER (dark — logo branco visível) ─── */
     .card-header {
-      padding: 36px 44px 30px;
-      border-bottom: 1px solid var(--border);
+      padding: 28px 40px 26px;
+      border-bottom: 2px solid var(--yellow);
       position: relative;
+      background: var(--charcoal);
     }
-    .card-header::before,
-    .card-header-simple::before {
+    .card-header::before {
       content: '';
-      position: absolute; top: 0; left: 0; right: 0; height: 2px;
-      background: linear-gradient(90deg, var(--orange) 0%, rgba(241,90,36,0.25) 50%, transparent 100%);
-      border-radius: 28px 28px 0 0;
+      position: absolute; top: 0; left: 0; right: 0; height: 3px;
+      background: var(--yellow);
     }
-    .logo-img { height: 42px; width: auto; display: block; }
+    .logo-img { height: 38px; width: auto; display: block; }
     .logo-fallback {
       display: none;
-      font-family: 'Space Grotesk', sans-serif;
-      font-weight: 700; font-size: 36px; letter-spacing: -1.5px; line-height: 1;
+      font-family: 'Roboto Slab', serif;
+      font-weight: 900; font-size: 28px; letter-spacing: -1px; line-height: 1;
+      color: #fff;
     }
-    .logo-fallback em { color: var(--orange); font-style: normal; }
     .logo-sub {
-      margin-top: 8px; font-size: 10px;
-      letter-spacing: 0.18em; text-transform: uppercase; color: var(--text-dim);
+      margin-top: 8px; font-size: 9px;
+      letter-spacing: 0.2em; text-transform: uppercase; color: rgba(255,255,255,0.38);
+      font-family: 'Roboto Mono', monospace;
     }
 
-    /* Card header do segundo card — mesma altura visual, linha laranja incluída */
+    /* Card header do segundo card */
     .card-header-simple {
-      padding: 28px 44px 24px;
-      border-bottom: 1px solid var(--border);
+      padding: 22px 40px 20px;
+      border-bottom: 2px solid var(--yellow);
       position: relative;
+      background: var(--charcoal);
+    }
+    .card-header-simple::before {
+      content: '';
+      position: absolute; top: 0; left: 0; right: 0; height: 3px;
+      background: var(--yellow);
     }
     .card-title {
-      font-family: 'Space Grotesk', sans-serif;
-      font-weight: 700; font-size: 17px; color: var(--text);
+      font-family: 'Roboto Slab', serif;
+      font-weight: 900; font-size: 16px; color: #fff;
+      letter-spacing: 0.02em;
+    }
+    .card-title-sub {
+      margin-top: 5px; font-size: 9px;
+      letter-spacing: 0.18em; text-transform: uppercase; color: rgba(255,255,255,0.38);
     }
 
     /* ─── CARD BODY ─── */
-    .card-body { padding: 32px 44px 36px; }
+    .card-body { padding: 30px 40px 34px; background: var(--surface); }
 
     /* Meme box */
     .meme-box {
-      display: flex; align-items: center; gap: 16px;
-      padding: 16px 20px;
-      background: var(--surface); border: 1px solid var(--border); border-radius: 16px;
-      margin-bottom: 28px; position: relative; overflow: hidden;
-      animation: fadeUp 0.7s 0.08s cubic-bezier(0.16,1,0.3,1) both;
-    }
-    .meme-box::after {
-      content: ''; position: absolute; inset: 0;
-      background: linear-gradient(120deg, rgba(241,90,36,0.05), transparent 60%);
-      pointer-events: none;
+      display: flex; align-items: center; gap: 14px;
+      padding: 14px 18px;
+      background: var(--charcoal);
+      border-left: 3px solid var(--yellow);
+      border-radius: 2px;
+      margin-bottom: 26px;
+      animation: fadeUp 0.6s 0.06s cubic-bezier(0.16,1,0.3,1) both;
+      position: relative;
     }
     .meme-emoji-big {
-      font-size: 36px; line-height: 1; flex-shrink: 0;
-      animation: wiggle 3s ease-in-out infinite; transition: transform 0.2s ease;
+      font-size: 32px; line-height: 1; flex-shrink: 0;
+      animation: wiggle 3s ease-in-out infinite;
     }
     @keyframes wiggle {
       0%,100% { transform: rotate(-5deg) scale(1); }
@@ -139,116 +153,126 @@
       75%      { transform: rotate(4deg) scale(1.06); }
     }
     .meme-text {
-      font-family: 'Space Grotesk', sans-serif;
-      font-weight: 600; font-size: 14px; line-height: 1.4; color: var(--text);
+      font-family: 'Roboto Mono', monospace;
+      font-weight: 600; font-size: 13px; line-height: 1.4; color: #fff;
     }
     .meme-text small {
-      display: block; font-family: 'DM Sans', sans-serif;
-      font-weight: 300; font-size: 12px; color: var(--text-mid); margin-top: 3px;
+      display: block; font-weight: 300; font-size: 11px;
+      color: rgba(255,255,255,0.45); margin-top: 3px;
     }
 
     /* Steps */
     .steps-label {
-      font-size: 10px; font-weight: 600; letter-spacing: 0.16em;
+      font-size: 9px; font-weight: 700; letter-spacing: 0.22em;
       text-transform: uppercase; color: var(--text-dim);
       margin-bottom: 12px; display: block;
     }
     .steps {
-      display: flex; flex-direction: column; gap: 10px;
-      margin-bottom: 28px;
+      display: flex; flex-direction: column; gap: 8px;
+      margin-bottom: 26px;
     }
     .step {
-      display: flex; gap: 16px; align-items: flex-start;
-      padding: 15px 18px;
-      background: var(--surface); border: 1px solid var(--border); border-radius: 14px;
-      transition: border-color 0.22s, background 0.22s, transform 0.22s; cursor: default;
+      display: flex; gap: 14px; align-items: flex-start;
+      padding: 14px 16px;
+      background: rgba(255,255,255,0.6);
+      border: 1.5px solid var(--border);
+      border-radius: 2px;
+      transition: border-color 0.2s, background 0.2s, transform 0.2s; cursor: default;
     }
-    .step:hover { border-color: var(--border-hover); background: rgba(241,90,36,0.05); transform: translateX(5px); }
+    .step:hover {
+      border-color: var(--yellow);
+      background: rgba(212,212,50,0.07);
+      transform: translateX(4px);
+    }
     .step-num {
-      flex-shrink: 0; width: 26px; height: 26px;
-      background: var(--orange-dim); border: 1px solid rgba(241,90,36,0.28); border-radius: 8px;
+      flex-shrink: 0; width: 24px; height: 24px;
+      background: var(--yellow); border-radius: 2px;
       display: flex; align-items: center; justify-content: center;
-      font-family: 'Space Grotesk', sans-serif; font-weight: 700; font-size: 11px; color: var(--orange);
+      font-family: 'Roboto Slab', serif; font-weight: 900; font-size: 11px; color: var(--charcoal);
       margin-top: 1px;
     }
     .step-body { flex: 1; }
     .step-title {
-      font-family: 'Space Grotesk', sans-serif;
-      font-weight: 600; font-size: 13.5px; color: var(--text); margin-bottom: 3px;
+      font-family: 'Roboto Slab', serif;
+      font-weight: 700; font-size: 13px; color: var(--text); margin-bottom: 3px;
     }
-    .step-desc { font-size: 12.5px; color: var(--text-mid); line-height: 1.65; font-weight: 300; }
-    .step-desc strong { color: var(--text); font-weight: 500; }
+    .step-desc { font-size: 11.5px; color: var(--text-mid); line-height: 1.65; font-weight: 300; }
+    .step-desc strong { color: var(--text); font-weight: 600; }
     .step-desc kbd {
-      display: inline-block; background: rgba(255,255,255,0.07);
-      border: 1px solid rgba(255,255,255,0.12); border-radius: 5px;
-      padding: 1px 6px; font-family: monospace; font-size: 10.5px; color: var(--text);
+      display: inline-block; background: var(--charcoal);
+      border: 1px solid rgba(0,0,0,0.2); border-radius: 2px;
+      padding: 1px 6px; font-family: 'Roboto Mono', monospace; font-size: 10px; color: #fff;
     }
 
     .divider {
-      height: 1px;
-      background: linear-gradient(90deg, transparent, var(--border), transparent);
-      margin-bottom: 24px;
+      height: 1.5px;
+      background: var(--border);
+      margin-bottom: 22px;
     }
 
     .input-label {
-      font-size: 10px; font-weight: 600; letter-spacing: 0.16em;
+      font-size: 9px; font-weight: 700; letter-spacing: 0.22em;
       text-transform: uppercase; color: var(--text-dim);
-      margin-bottom: 10px; display: block;
+      margin-bottom: 9px; display: block;
     }
 
     .textarea-wrap { position: relative; }
     textarea {
-      width: 100%; height: 160px;
-      background: rgba(0,0,0,0.28); border: 1px solid var(--border); border-radius: 14px;
-      padding: 15px 15px 28px;
-      font-family: 'DM Sans', monospace; font-size: 12px; color: var(--text-mid);
+      width: 100%; height: 150px;
+      background: rgba(255,255,255,0.7);
+      border: 1.5px solid var(--border); border-radius: 2px;
+      padding: 13px 13px 26px;
+      font-family: 'Roboto Mono', monospace; font-size: 11.5px; color: var(--text-mid);
       resize: none; outline: none; line-height: 1.7; display: block;
       transition: border-color 0.2s, box-shadow 0.2s;
     }
     textarea:focus {
-      border-color: rgba(241,90,36,0.5);
-      box-shadow: 0 0 0 3px rgba(241,90,36,0.07), 0 0 28px rgba(241,90,36,0.05);
+      border-color: var(--yellow);
+      box-shadow: 0 0 0 3px rgba(212,212,50,0.15);
     }
-    textarea::placeholder { color: rgba(255,255,255,0.14); }
+    textarea::placeholder { color: rgba(0,0,0,0.2); }
 
     .char-count {
-      position: absolute; bottom: 10px; right: 13px;
-      font-size: 10px; color: var(--text-dim); pointer-events: none; transition: color 0.2s;
+      position: absolute; bottom: 9px; right: 11px;
+      font-size: 9px; color: var(--text-dim); pointer-events: none; transition: color 0.2s;
+      font-family: 'Roboto Mono', monospace;
     }
-    .char-count.has-content { color: rgba(241,90,36,0.55); }
+    .char-count.has-content { color: var(--red); }
 
     /* ─── UPLOAD ZONE ─── */
     .upload-zone {
-      width: 100%; min-height: 130px;
-      background: rgba(0,0,0,0.28); border: 1.5px dashed var(--border); border-radius: 14px;
+      width: 100%; min-height: 120px;
+      background: rgba(255,255,255,0.6);
+      border: 1.5px dashed rgba(0,0,0,0.2); border-radius: 2px;
       display: flex; flex-direction: column; align-items: center; justify-content: center;
-      gap: 10px; cursor: pointer; transition: border-color 0.22s, background 0.22s;
-      position: relative; padding: 24px;
+      gap: 8px; cursor: pointer; transition: border-color 0.2s, background 0.2s;
+      position: relative; padding: 22px;
     }
     .upload-zone:hover, .upload-zone.drag-over {
-      border-color: rgba(241,90,36,0.5);
-      background: rgba(241,90,36,0.04);
+      border-color: var(--yellow);
+      background: rgba(212,212,50,0.06);
     }
     .upload-zone.has-file {
-      border-color: rgba(241,90,36,0.35);
-      background: rgba(241,90,36,0.03);
+      border-color: var(--yellow);
+      border-style: solid;
+      background: rgba(212,212,50,0.05);
     }
     .upload-zone input[type="file"] {
       position: absolute; inset: 0; opacity: 0; cursor: pointer; width: 100%; height: 100%;
     }
-    .upload-icon { font-size: 28px; line-height: 1; }
+    .upload-icon { font-size: 26px; line-height: 1; }
     .upload-text {
-      font-family: 'Space Grotesk', sans-serif;
-      font-weight: 600; font-size: 13px; color: var(--text); text-align: center;
+      font-family: 'Roboto Slab', serif;
+      font-weight: 700; font-size: 12px; color: var(--text); text-align: center;
     }
     .upload-text small {
-      display: block; font-family: 'DM Sans', sans-serif;
-      font-weight: 300; font-size: 11px; color: var(--text-mid); margin-top: 3px;
+      display: block; font-family: 'Roboto Mono', monospace;
+      font-weight: 300; font-size: 10px; color: var(--text-dim); margin-top: 3px;
     }
     .upload-filename {
-      font-size: 12px; color: var(--orange); font-weight: 600; text-align: center;
+      font-size: 11px; color: var(--red); font-weight: 600; text-align: center;
       display: none; margin-top: 2px;
-      font-family: 'Space Grotesk', sans-serif;
+      font-family: 'Roboto Mono', monospace;
     }
 
     /* ─── BOTÕES DE CONVERSÃO ─── */
@@ -259,84 +283,102 @@
 
     /* ─── BOTÃO BASE ─── */
     .btn {
-      padding: 16px 20px;
-      background: linear-gradient(135deg, #F15A24, #c94718);
-      border: none; border-radius: 15px;
-      font-family: 'Space Grotesk', sans-serif;
-      font-weight: 700; font-size: 14px; letter-spacing: 0.02em;
-      color: white; cursor: pointer;
-      display: flex; align-items: center; justify-content: center; gap: 9px;
+      padding: 15px 20px;
+      background: var(--charcoal);
+      border: 2px solid var(--charcoal);
+      border-radius: 2px;
+      font-family: 'Roboto Mono', monospace;
+      font-weight: 700; font-size: 13px; letter-spacing: 0.04em;
+      color: #fff; cursor: pointer;
+      display: flex; align-items: center; justify-content: center; gap: 8px;
       position: relative; overflow: hidden;
-      box-shadow: 0 8px 32px rgba(241,90,36,0.28), inset 0 1px 0 rgba(255,255,255,0.1);
-      transition: transform 0.2s, box-shadow 0.2s;
+      transition: background 0.2s, border-color 0.2s, color 0.2s, transform 0.15s;
       width: 100%;
     }
-    .btn-full { margin-top: 14px; font-size: 15px; padding: 17px 24px; }
-    .btn-shimmer {
-      position: absolute; top: 0; left: -120%; width: 70%; height: 100%;
-      background: linear-gradient(90deg, transparent, rgba(255,255,255,0.13), transparent);
-      transform: skewX(-18deg); transition: left 0.55s;
+    .btn-full { margin-top: 14px; font-size: 14px; padding: 16px 24px; }
+    .btn:not(:disabled):hover {
+      background: var(--yellow);
+      border-color: var(--yellow);
+      color: var(--charcoal);
+      transform: translateY(-2px);
     }
-    .btn:not(:disabled):hover .btn-shimmer { left: 160%; }
-    .btn:not(:disabled):hover { transform: translateY(-2px); box-shadow: 0 16px 44px rgba(241,90,36,0.4); }
     .btn:active { transform: translateY(0); }
     .btn:disabled {
-      background: rgba(255,255,255,0.06); box-shadow: none;
+      background: rgba(0,0,0,0.08);
+      border-color: rgba(0,0,0,0.08);
+      box-shadow: none;
       cursor: not-allowed; transform: none; color: var(--text-dim);
     }
 
     /* Status */
     .status-box {
-      display: none; margin-top: 12px; padding: 12px 16px;
-      border-radius: 12px; font-size: 13px; text-align: center;
-      background: var(--surface); border: 1px solid var(--border); color: var(--text-mid);
+      display: none; margin-top: 10px; padding: 11px 15px;
+      border-radius: 2px; font-size: 12px; text-align: center;
+      border-left: 3px solid; color: var(--text-mid);
+      background: rgba(255,255,255,0.6);
+      font-family: 'Roboto Mono', monospace;
     }
-    .status-box.success { background: rgba(34,197,94,0.07);  border-color: rgba(34,197,94,0.2);  color: #4ade80; }
-    .status-box.error   { background: rgba(239,68,68,0.07);  border-color: rgba(239,68,68,0.2);  color: #f87171; }
-    .status-box.loading { background: rgba(241,90,36,0.06);  border-color: rgba(241,90,36,0.2);  color: rgba(241,90,36,0.85); }
+    .status-box.success { border-color: #4caf50; color: #2e7d32; background: rgba(76,175,80,0.07); }
+    .status-box.error   { border-color: var(--red); color: var(--red); background: rgba(232,69,0,0.06); }
+    .status-box.loading { border-color: var(--yellow); color: var(--charcoal); background: rgba(212,212,50,0.08); }
 
-    .progress-bar { height: 2px; background: var(--border); border-radius: 2px; margin-top: 10px; overflow: hidden; display: none; }
+    .progress-bar { height: 2px; background: var(--border); border-radius: 0; margin-top: 8px; overflow: hidden; display: none; }
     .progress-bar.active { display: block; }
     .progress-fill {
       height: 100%;
-      background: linear-gradient(90deg, var(--orange), #ff8c5a);
-      border-radius: 2px; animation: progressAnim 12s linear forwards;
+      background: var(--yellow);
+      border-radius: 0; animation: progressAnim 12s linear forwards;
     }
-    @keyframes progressAnim { 0%{width:0%} 40%{width:55%} 80%{width:82%} 100%{width:95%} }
-
-    /* Barra de progresso mais lenta para conversão (pode demorar ~30s) */
     .progress-bar.slow .progress-fill {
       animation: progressAnimSlow 30s linear forwards;
     }
+    @keyframes progressAnim { 0%{width:0%} 40%{width:55%} 80%{width:82%} 100%{width:95%} }
     @keyframes progressAnimSlow { 0%{width:0%} 30%{width:40%} 70%{width:70%} 95%{width:90%} 100%{width:95%} }
 
     .tip {
       display: flex; gap: 10px; align-items: flex-start;
-      margin-top: 16px; padding: 13px 16px;
-      background: rgba(241,90,36,0.05); border: 1px solid rgba(241,90,36,0.14); border-radius: 13px;
+      margin-top: 14px; padding: 12px 15px;
+      background: rgba(212,212,50,0.09);
+      border: 1.5px solid rgba(212,212,50,0.35);
+      border-radius: 2px;
     }
     .tip-icon { flex-shrink: 0; margin-top: 1px; }
-    .tip p { font-size: 12.5px; color: var(--text-mid); line-height: 1.6; font-weight: 300; }
-    .tip strong { color: var(--text); font-weight: 500; }
+    .tip p { font-size: 11.5px; color: var(--text-mid); line-height: 1.6; font-weight: 300; }
+    .tip strong { color: var(--text); font-weight: 600; }
 
     /* Footer */
     .card-footer {
-      padding: 15px 44px 20px; border-top: 1px solid var(--border);
+      padding: 13px 40px 16px; border-top: 1.5px solid var(--border);
       display: flex; align-items: center; justify-content: center; gap: 8px;
+      background: rgba(255,255,255,0.3);
     }
-    .footer-dot { width: 3px; height: 3px; border-radius: 50%; background: var(--orange); opacity: 0.35; }
-    .footer-text { font-size: 10px; color: var(--text-dim); letter-spacing: 0.06em; }
+    .footer-dot { width: 4px; height: 4px; border-radius: 0; background: var(--yellow); }
+    .footer-text { font-size: 9px; color: var(--text-dim); letter-spacing: 0.08em; font-family: 'Roboto Mono', monospace; }
 
     .spinner {
-      display: inline-block; width: 15px; height: 15px;
-      border: 2px solid rgba(255,255,255,0.2); border-top-color: white;
+      display: inline-block; width: 13px; height: 13px;
+      border: 2px solid rgba(255,255,255,0.25); border-top-color: white;
+      border-radius: 50%; animation: spin 0.6s linear infinite;
+    }
+    .spinner-dark {
+      display: inline-block; width: 13px; height: 13px;
+      border: 2px solid rgba(0,0,0,0.15); border-top-color: var(--charcoal);
       border-radius: 50%; animation: spin 0.6s linear infinite;
     }
     @keyframes spin { to { transform: rotate(360deg); } }
 
+    /* Geo accent squares (decorative, Listening-style) */
+    .geo-accent {
+      position: fixed; pointer-events: none; z-index: 1;
+      opacity: 0.12;
+    }
+    .geo-accent.y { background: var(--yellow); }
+    .geo-accent.r { background: var(--red); }
+    .geo-accent.c { background: var(--charcoal); }
+
     @media (max-width: 520px) {
-      .page { padding: 24px 14px; }
-      .card-header, .card-header-simple, .card-body, .card-footer { padding-left: 22px; padding-right: 22px; }
+      .page { padding: 20px 12px; }
+      .card-header, .card-header-simple, .card-body, .card-footer { padding-left: 20px; padding-right: 20px; }
       .convert-btns { grid-template-columns: 1fr; }
     }
   </style>
@@ -344,6 +386,14 @@
 <body>
 
   <canvas id="bg-canvas"></canvas>
+
+  <!-- Listening-style geometric accent squares -->
+  <div class="geo-accent y" style="width:80px;height:80px;top:8%;left:3%;transform:rotate(5deg);"></div>
+  <div class="geo-accent r" style="width:48px;height:48px;top:12%;left:5%;transform:rotate(-3deg);"></div>
+  <div class="geo-accent c" style="width:60px;height:60px;top:18%;right:4%;transform:rotate(8deg);"></div>
+  <div class="geo-accent y" style="width:36px;height:36px;top:22%;right:7%;transform:rotate(-5deg);"></div>
+  <div class="geo-accent r" style="width:90px;height:90px;bottom:12%;left:2%;transform:rotate(3deg);"></div>
+  <div class="geo-accent y" style="width:50px;height:50px;bottom:18%;right:3%;transform:rotate(-7deg);"></div>
 
   <div class="meme-float" style="left:4%;  animation-duration:15s; animation-delay:0s;">📄</div>
   <div class="meme-float" style="left:14%; animation-duration:19s; animation-delay:4s;">☕</div>
@@ -360,10 +410,10 @@
     <!-- ─── CARD 1: Mailchimp → PDF ─── -->
     <div class="card">
       <div class="card-header">
-        <img class="logo-img" src="./logo.png" alt="in.pacto"
+        <img class="logo-img" src="./logo.png" alt="Listening"
           onerror="this.style.display='none'; document.querySelector('.logo-fallback').style.display='block';">
-        <div class="logo-fallback"><em>in</em>.pacto</div>
-        <div class="logo-sub">Inteligência em Comunicação &nbsp;·&nbsp; Conversor de Relatórios</div>
+        <div class="logo-fallback">Listening</div>
+        <div class="logo-sub">Inteligência de Dados &nbsp;·&nbsp; Conversor de Relatórios</div>
       </div>
 
       <div class="card-body">
@@ -413,8 +463,7 @@
         </div>
 
         <button class="btn btn-full" id="btn-pdf" onclick="generatePDF()">
-          <span class="btn-shimmer"></span>
-          <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
             <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
             <polyline points="14 2 14 8 20 8"/>
             <line x1="12" y1="18" x2="12" y2="12"/>
@@ -427,7 +476,7 @@
         <div class="progress-bar" id="progress-pdf"><div class="progress-fill"></div></div>
 
         <div class="tip">
-          <svg class="tip-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#F15A24" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+          <svg class="tip-icon" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#D4D432" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
             <circle cx="12" cy="12" r="10"/>
             <line x1="12" y1="8" x2="12" y2="12"/>
             <line x1="12" y1="16" x2="12.01" y2="16"/>
@@ -448,13 +497,13 @@
     <div class="card">
       <div class="card-header-simple">
         <div class="card-title">Converter PDF</div>
-        <div class="logo-sub">Para PowerPoint ou Word · Otimizado para OneDrive</div>
+        <div class="card-title-sub">Para PowerPoint ou Word · Otimizado para OneDrive</div>
       </div>
 
       <div class="card-body">
 
         <span class="steps-label">Como usar</span>
-        <div class="steps" style="margin-bottom: 24px;">
+        <div class="steps" style="margin-bottom: 22px;">
           <div class="step">
             <div class="step-num">01</div>
             <div class="step-body">
@@ -485,16 +534,14 @@
 
         <div class="convert-btns">
           <button class="btn" id="btn-pptx" onclick="convertFile('pptx')" disabled>
-            <span class="btn-shimmer"></span>
-            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
               <rect x="2" y="3" width="20" height="14" rx="2"/>
               <path d="M8 21h8M12 17v4"/>
             </svg>
             → PowerPoint
           </button>
           <button class="btn" id="btn-docx" onclick="convertFile('docx')" disabled>
-            <span class="btn-shimmer"></span>
-            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
               <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
               <polyline points="14 2 14 8 20 8"/>
               <line x1="16" y1="13" x2="8" y2="13"/>
@@ -508,8 +555,8 @@
         <div id="status-convert" class="status-box"></div>
         <div class="progress-bar" id="progress-convert"><div class="progress-fill"></div></div>
 
-        <div class="tip" style="margin-top:16px;">
-          <svg class="tip-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#F15A24" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+        <div class="tip" style="margin-top:14px;">
+          <svg class="tip-icon" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#D4D432" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
             <circle cx="12" cy="12" r="10"/>
             <line x1="12" y1="8" x2="12" y2="12"/>
             <line x1="12" y1="16" x2="12.01" y2="16"/>
@@ -584,7 +631,6 @@
 
     function setFile(f) {
       selectedFile = f;
-      // Atualiza UI da upload zone
       document.getElementById('upload-icon').textContent = '✅';
       document.getElementById('upload-text').innerHTML =
         `Arquivo selecionado<small>${formatBytes(f.size)}</small>`;
@@ -592,10 +638,8 @@
       fn.textContent = f.name;
       fn.style.display = 'block';
       zone.classList.add('has-file');
-      // Libera botões
       document.getElementById('btn-pptx').disabled = false;
       document.getElementById('btn-docx').disabled = false;
-      // Limpa status anterior
       const s = document.getElementById('status-convert');
       s.style.display = 'none';
     }
@@ -628,20 +672,29 @@
       s.textContent = msg;
     }
 
-    /* ── Canvas background ── */
+    /* ── Canvas background (light, Listening style) ── */
     (function () {
       const canvas = document.getElementById('bg-canvas');
       const ctx    = canvas.getContext('2d');
       let W, H, particles = [];
       function resize() { W = canvas.width = window.innerWidth; H = canvas.height = window.innerHeight; }
+
       function makeParticle() {
-        return { x: Math.random()*W, y: Math.random()*H, r: Math.random()*1.4+0.3,
-                 vx: (Math.random()-0.5)*0.18, vy: (Math.random()-0.5)*0.18, a: Math.random()*0.32+0.05 };
+        const colors = ['rgba(212,212,50,', 'rgba(232,69,0,', 'rgba(42,42,42,'];
+        const c = colors[Math.floor(Math.random() * colors.length)];
+        return {
+          x: Math.random()*W, y: Math.random()*H,
+          r: Math.random()*1.2+0.3,
+          vx: (Math.random()-0.5)*0.14, vy: (Math.random()-0.5)*0.14,
+          a: Math.random()*0.22+0.04,
+          color: c
+        };
       }
-      function init() { resize(); particles = Array.from({length:90}, makeParticle); }
+      function init() { resize(); particles = Array.from({length:70}, makeParticle); }
       function draw() {
         ctx.clearRect(0,0,W,H);
-        [{x:W*.12,y:H*.18,r:W*.38,c:'rgba(241,90,36,0.07)'},{x:W*.88,y:H*.82,r:W*.30,c:'rgba(80,50,200,0.05)'},{x:W*.55,y:H*.45,r:W*.22,c:'rgba(20,120,255,0.04)'}]
+        // Subtle blobs
+        [{x:W*.15,y:H*.2,r:W*.32,c:'rgba(212,212,50,0.06)'},{x:W*.85,y:H*.8,r:W*.28,c:'rgba(232,69,0,0.05)'},{x:W*.5,y:H*.5,r:W*.2,c:'rgba(42,42,42,0.04)'}]
         .forEach(b => {
           const g = ctx.createRadialGradient(b.x,b.y,0,b.x,b.y,b.r);
           g.addColorStop(0,b.c); g.addColorStop(1,'transparent');
@@ -649,15 +702,15 @@
         });
         particles.forEach(p => {
           ctx.beginPath(); ctx.arc(p.x,p.y,p.r,0,Math.PI*2);
-          ctx.fillStyle=`rgba(241,90,36,${p.a})`; ctx.fill();
+          ctx.fillStyle=`${p.color}${p.a})`; ctx.fill();
           p.x+=p.vx; p.y+=p.vy;
           if(p.x<0||p.x>W) p.vx*=-1; if(p.y<0||p.y>H) p.vy*=-1;
         });
         for(let i=0;i<particles.length;i++) for(let j=i+1;j<particles.length;j++) {
           const dx=particles[i].x-particles[j].x, dy=particles[i].y-particles[j].y;
           const d=Math.sqrt(dx*dx+dy*dy);
-          if(d<100){ ctx.beginPath(); ctx.moveTo(particles[i].x,particles[i].y); ctx.lineTo(particles[j].x,particles[j].y);
-            ctx.strokeStyle=`rgba(241,90,36,${0.055*(1-d/100)})`; ctx.lineWidth=0.5; ctx.stroke(); }
+          if(d<90){ ctx.beginPath(); ctx.moveTo(particles[i].x,particles[i].y); ctx.lineTo(particles[j].x,particles[j].y);
+            ctx.strokeStyle=`rgba(0,0,0,${0.04*(1-d/90)})`; ctx.lineWidth=0.5; ctx.stroke(); }
         }
         requestAnimationFrame(draw);
       }
@@ -712,13 +765,7 @@
       } finally {
         stopProgress('progress-pdf');
         btn.disabled = false;
-        btn.innerHTML = `<span class="btn-shimmer"></span>
-          <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
-            <polyline points="14 2 14 8 20 8"/>
-            <line x1="12" y1="18" x2="12" y2="12"/>
-            <polyline points="9 15 12 18 15 15"/>
-          </svg> Gerar PDF Agora`;
+        btn.innerHTML = `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="12" y1="18" x2="12" y2="12"/><polyline points="9 15 12 18 15 15"/></svg> Gerar PDF Agora`;
       }
     }
 
@@ -739,7 +786,6 @@
       startProgress('progress-convert', true);
 
       try {
-        // Lê o PDF como base64 — o worker espera JSON { pdf: "<base64>" }
         const base64 = await fileToBase64(selectedFile);
 
         const response = await fetch(`${WORKER_CONVERT}/to-${format}`, {
@@ -768,14 +814,13 @@
         document.getElementById(otherId).disabled = false;
 
         const icons = {
-          pptx: `<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/></svg> → PowerPoint`,
-          docx: `<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg> → Word`,
+          pptx: `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/></svg> → PowerPoint`,
+          docx: `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg> → Word`,
         };
-        btn.innerHTML = `<span class="btn-shimmer"></span>${icons[format]}`;
+        btn.innerHTML = icons[format];
       }
     }
 
-    /* Converte File para string base64 */
     function fileToBase64(file) {
       return new Promise((resolve, reject) => {
         const reader = new FileReader();
