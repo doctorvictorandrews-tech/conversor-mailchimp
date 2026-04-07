@@ -1,0 +1,16 @@
+{
+  "name": "inpacto-pdf-server",
+  "version": "1.0.0",
+  "description": "Servidor de geração de PDF via Puppeteer — in.Pacto",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "express": "^4.18.2",
+    "puppeteer": "^22.0.0"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}
