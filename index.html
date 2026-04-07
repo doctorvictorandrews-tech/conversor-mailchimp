@@ -6,6 +6,10 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Ferramentas | Listening</title>
   <link href="https://fonts.googleapis.com/css2?family=Roboto+Mono:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400;1,700&family=Roboto+Slab:wght@400;700;800;900&display=swap" rel="stylesheet">
+
+  <!-- PDF.js (render páginas) + pdf-lib (editar PDF) -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf-lib/1.17.1/pdf-lib.min.js"></script>
   <style>
     :root {
       --yellow: #D4D432;
@@ -223,6 +227,155 @@
       .card-header, .card-header-simple, .card-body, .card-footer { padding-left: 20px; padding-right: 20px; }
       .convert-btns { grid-template-columns: 1fr; }
     }
+
+    /* ═══════════════════════════════════════
+       PDF EDITOR OVERLAY
+       ═══════════════════════════════════════ */
+    #pdf-editor {
+      display: none; position: fixed; inset: 0; z-index: 1000;
+      background: rgba(20,20,20,0.97); flex-direction: column;
+      animation: editorFadeIn 0.25s ease both;
+    }
+    #pdf-editor.active { display: flex; }
+    @keyframes editorFadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+    .ed-topbar {
+      display: flex; align-items: center; gap: 12px; flex-shrink: 0;
+      padding: 0 24px; height: 58px; background: #1A1A1A;
+      border-bottom: 2px solid var(--yellow);
+    }
+    .ed-topbar-title {
+      font-family: 'Roboto Slab', serif; font-weight: 900; font-size: 14px;
+      color: #fff; letter-spacing: 0.02em; flex: 1;
+    }
+    .ed-topbar-title span { color: var(--yellow); }
+    .ed-tool-group { display: flex; gap: 6px; }
+    .ed-tool-btn {
+      padding: 7px 14px; border-radius: 2px;
+      font-family: 'Roboto Mono', monospace; font-weight: 600; font-size: 11px;
+      cursor: pointer; border: 1.5px solid rgba(255,255,255,0.15);
+      color: rgba(255,255,255,0.7); background: transparent;
+      display: flex; align-items: center; gap: 6px; transition: all 0.18s;
+    }
+    .ed-tool-btn:hover { border-color: var(--yellow); color: var(--yellow); }
+    .ed-tool-btn.active { background: var(--yellow); border-color: var(--yellow); color: #1A1A1A; }
+    .ed-btn-download {
+      padding: 9px 20px; background: var(--yellow); border: none; border-radius: 2px;
+      font-family: 'Roboto Mono', monospace; font-weight: 700; font-size: 12px; color: #1A1A1A;
+      cursor: pointer; display: flex; align-items: center; gap: 7px; transition: opacity 0.18s, transform 0.15s;
+    }
+    .ed-btn-download:hover { opacity: 0.88; transform: translateY(-1px); }
+    .ed-btn-download:disabled { opacity: 0.4; cursor: not-allowed; transform: none; }
+    .ed-btn-close {
+      padding: 9px 14px; background: transparent; border: 1.5px solid rgba(255,255,255,0.15);
+      border-radius: 2px; color: rgba(255,255,255,0.5); font-size: 16px; cursor: pointer;
+      transition: all 0.18s; font-family: 'Roboto Mono', monospace;
+    }
+    .ed-btn-close:hover { border-color: var(--red); color: var(--red); }
+    .ed-hintbar {
+      padding: 7px 24px; background: rgba(212,212,50,0.07);
+      border-bottom: 1px solid rgba(212,212,50,0.15);
+      font-size: 10px; color: rgba(255,255,255,0.45); letter-spacing: 0.08em;
+      display: flex; align-items: center; gap: 16px; flex-shrink: 0;
+    }
+    .ed-hintbar strong { color: var(--yellow); font-weight: 600; }
+    .ed-pages-area {
+      flex: 1; overflow-y: auto; padding: 28px 24px;
+      display: flex; flex-wrap: wrap; gap: 16px; align-content: flex-start;
+    }
+    .ed-pages-area::-webkit-scrollbar { width: 6px; }
+    .ed-pages-area::-webkit-scrollbar-track { background: #1a1a1a; }
+    .ed-pages-area::-webkit-scrollbar-thumb { background: #444; border-radius: 3px; }
+    .page-card {
+      position: relative; cursor: grab; user-select: none;
+      border: 2px solid rgba(255,255,255,0.1); border-radius: 3px;
+      transition: border-color 0.18s, transform 0.18s, opacity 0.18s; background: #2a2a2a;
+    }
+    .page-card:hover { border-color: rgba(212,212,50,0.5); transform: translateY(-2px); }
+    .page-card.dragging { opacity: 0.4; transform: scale(0.97); cursor: grabbing; }
+    .page-card.drag-over { border-color: var(--yellow); box-shadow: 0 0 0 2px rgba(212,212,50,0.3); }
+    .page-card.excluded { opacity: 0.3; }
+    .page-card canvas { display: block; border-radius: 1px; }
+    .page-card .crop-indicator {
+      position: absolute; border: 2px dashed var(--yellow); pointer-events: none;
+      box-shadow: 0 0 0 1000px rgba(0,0,0,0.45); display: none;
+    }
+    .page-card.has-crop .crop-indicator { display: block; }
+    .page-card-footer {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 6px 8px; background: #1e1e1e;
+    }
+    .page-num { font-size: 10px; font-weight: 600; color: rgba(255,255,255,0.4); font-family: 'Roboto Mono', monospace; }
+    .page-card-actions { display: flex; gap: 4px; }
+    .page-action-btn {
+      width: 22px; height: 22px; border-radius: 2px; border: none; cursor: pointer;
+      display: flex; align-items: center; justify-content: center; font-size: 11px; transition: background 0.15s, color 0.15s;
+    }
+    .page-action-btn.del-btn { background: rgba(232,69,0,0.15); color: rgba(232,69,0,0.7); }
+    .page-action-btn.del-btn:hover { background: var(--red); color: #fff; }
+    .page-action-btn.crop-btn { background: rgba(212,212,50,0.1); color: rgba(212,212,50,0.7); }
+    .page-action-btn.crop-btn:hover { background: var(--yellow); color: #1a1a1a; }
+    .page-action-btn.restore-btn { background: rgba(76,175,80,0.12); color: rgba(76,175,80,0.7); }
+    .page-action-btn.restore-btn:hover { background: #4caf50; color: #fff; }
+    .ed-pages-count {
+      position: absolute; top: 6px; right: 6px; background: var(--yellow); color: #1a1a1a;
+      font-size: 9px; font-weight: 800; padding: 2px 6px; border-radius: 2px;
+      font-family: 'Roboto Mono', monospace; pointer-events: none;
+    }
+    .ed-loading {
+      position: absolute; inset: 0; display: flex; flex-direction: column;
+      align-items: center; justify-content: center; gap: 14px;
+      background: rgba(20,20,20,0.85); z-index: 10;
+    }
+    .ed-loading p { color: rgba(255,255,255,0.6); font-size: 12px; letter-spacing: 0.12em; }
+    .ed-spinner { width: 36px; height: 36px; border: 3px solid rgba(212,212,50,0.2); border-top-color: var(--yellow); border-radius: 50%; animation: spin 0.7s linear infinite; }
+
+    /* CROP MODAL */
+    #crop-modal {
+      display: none; position: fixed; inset: 0; z-index: 1100;
+      background: rgba(0,0,0,0.92); flex-direction: column;
+    }
+    #crop-modal.active { display: flex; }
+    .crop-modal-header {
+      display: flex; align-items: center; gap: 12px; padding: 14px 20px;
+      background: #111; border-bottom: 2px solid var(--yellow); flex-shrink: 0;
+    }
+    .crop-modal-title { font-family: 'Roboto Slab', serif; font-weight: 900; font-size: 13px; color: #fff; flex: 1; }
+    .crop-modal-hint { font-size: 10px; color: rgba(255,255,255,0.4); letter-spacing: 0.08em; }
+    .crop-modal-body {
+      flex: 1; overflow: auto; display: flex; align-items: flex-start; justify-content: center; padding: 24px;
+    }
+    .crop-canvas-wrap { position: relative; cursor: crosshair; display: inline-block; box-shadow: 0 0 0 2px rgba(212,212,50,0.3); }
+    #crop-canvas { display: block; }
+    #crop-selection {
+      position: absolute; border: 2px solid var(--yellow);
+      box-shadow: 0 0 0 9999px rgba(0,0,0,0.55); pointer-events: none; display: none;
+    }
+    .crop-modal-footer {
+      display: flex; align-items: center; gap: 10px; justify-content: flex-end;
+      padding: 14px 20px; background: #111; border-top: 1px solid rgba(255,255,255,0.08); flex-shrink: 0;
+    }
+    .crop-btn-confirm {
+      padding: 10px 22px; background: var(--yellow); border: none; border-radius: 2px;
+      font-family: 'Roboto Mono', monospace; font-weight: 700; font-size: 12px; color: #1a1a1a; cursor: pointer;
+    }
+    .crop-btn-confirm:hover { opacity: 0.85; }
+    .crop-btn-confirm:disabled { opacity: 0.35; cursor: not-allowed; }
+    .crop-btn-clear {
+      padding: 10px 18px; background: transparent; border: 1.5px solid rgba(232,69,0,0.5); border-radius: 2px;
+      font-family: 'Roboto Mono', monospace; font-weight: 600; font-size: 12px; color: rgba(232,69,0,0.8); cursor: pointer;
+    }
+    .crop-btn-clear:hover { background: var(--red); color: #fff; border-color: var(--red); }
+    .crop-btn-cancel {
+      padding: 10px 18px; background: transparent; border: 1.5px solid rgba(255,255,255,0.15); border-radius: 2px;
+      font-family: 'Roboto Mono', monospace; font-weight: 600; font-size: 12px; color: rgba(255,255,255,0.5); cursor: pointer;
+    }
+    .crop-btn-cancel:hover { border-color: rgba(255,255,255,0.4); color: #fff; }
+    .crop-apply-all {
+      display: flex; align-items: center; gap: 7px; margin-right: auto;
+      font-size: 11px; color: rgba(255,255,255,0.5); cursor: pointer; font-family: 'Roboto Mono', monospace;
+    }
+    .crop-apply-all input { accent-color: var(--yellow); cursor: pointer; }
   </style>
 </head>
 <body>
@@ -387,6 +540,58 @@
       </div>
     </div>
 
+
+  <!-- PDF EDITOR OVERLAY -->
+  <div id="pdf-editor">
+    <div class="ed-topbar">
+      <div class="ed-topbar-title">Editor de PDF &nbsp;<span>·</span>&nbsp; <span id="ed-filename" style="color:rgba(255,255,255,0.5);font-weight:400;font-size:12px;"></span></div>
+      <div class="ed-tool-group">
+        <button class="ed-tool-btn active" id="btn-select-mode" onclick="setMode('select')">
+          ⇄ Reordenar
+        </button>
+        <button class="ed-tool-btn" id="btn-crop-mode" onclick="setMode('crop')">
+          ✂ Recortar
+        </button>
+      </div>
+      <button class="ed-btn-download" id="ed-btn-download" onclick="applyAndDownload()">
+        ↓ Baixar PDF Editado
+      </button>
+      <button class="ed-btn-close" onclick="closeEditor()" title="Fechar editor">✕</button>
+    </div>
+    <div class="ed-hintbar">
+      <span id="ed-hint-select"><strong>Reordenar:</strong> arraste as páginas para mudar a ordem · clique <strong>×</strong> para remover</span>
+      <span id="ed-hint-crop" style="display:none;"><strong>Recortar:</strong> clique em ✂ em qualquer página para definir o recorte</span>
+    </div>
+    <div style="position:relative;flex:1;overflow:hidden;display:flex;flex-direction:column;">
+      <div class="ed-loading" id="ed-loading">
+        <div class="ed-spinner"></div>
+        <p>RENDERIZANDO PÁGINAS…</p>
+      </div>
+      <div class="ed-pages-area" id="ed-pages-area"></div>
+    </div>
+  </div>
+
+  <!-- CROP MODAL -->
+  <div id="crop-modal">
+    <div class="crop-modal-header">
+      <div class="crop-modal-title">✂ Recortar página <span id="crop-page-label" style="color:var(--yellow)"></span></div>
+      <div class="crop-modal-hint">Arraste para selecionar a área que deseja manter</div>
+    </div>
+    <div class="crop-modal-body">
+      <div class="crop-canvas-wrap" id="crop-canvas-wrap">
+        <canvas id="crop-canvas"></canvas>
+        <div id="crop-selection"></div>
+      </div>
+    </div>
+    <div class="crop-modal-footer">
+      <label class="crop-apply-all">
+        <input type="checkbox" id="crop-apply-all-chk"> Aplicar a todas as páginas
+      </label>
+      <button class="crop-btn-clear" onclick="clearCropSelection()">Limpar seleção</button>
+      <button class="crop-btn-cancel" onclick="closeCropModal()">Cancelar</button>
+      <button class="crop-btn-confirm" id="crop-confirm-btn" onclick="confirmCrop()" disabled>Confirmar recorte</button>
+    </div>
+  </div>
   </div><!-- /page -->
 
   <script>
@@ -564,16 +769,22 @@
         });
         if (!pdfResp.ok) throw new Error((await pdfResp.text()) || `Erro Render ${pdfResp.status}`);
 
-        const blob = await pdfResp.blob();
+        const arrayBuffer = await pdfResp.arrayBuffer();
+        const filename    = `Relatorio_MDA_${new Date().toISOString().slice(0,10)}.pdf`;
+
+        // Download imediato
+        const blob = new Blob([arrayBuffer], { type: 'application/pdf' });
         const url  = URL.createObjectURL(blob);
         const a    = document.createElement('a');
-        a.href     = url;
-        a.download = `Relatorio_MDA_${new Date().toISOString().slice(0,10)}.pdf`;
+        a.href = url; a.download = filename;
         document.body.appendChild(a); a.click(); a.remove();
         URL.revokeObjectURL(url);
 
         status.className = 'status-box success';
-        status.textContent = '✅ PDF gerado e baixado com sucesso!';
+        status.textContent = '✅ PDF baixado! Editor aberto para recorte ou ajustes.';
+
+        // Abre editor em paralelo sem bloquear o download
+        openEditor(arrayBuffer, filename);
 
       } catch (err) {
         status.className = 'status-box error';
@@ -635,6 +846,266 @@
         reader.onerror = () => reject(new Error('Falha ao ler o arquivo'));
         reader.readAsDataURL(file);
       });
+    }
+
+    /* ════════════════════════════════════════
+       PDF.js + pdf-lib SETUP
+       ════════════════════════════════════════ */
+    pdfjsLib.GlobalWorkerOptions.workerSrc =
+      'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+
+    /* ════════════════════════════════════════
+       EDITOR STATE
+       ════════════════════════════════════════ */
+    let editorPdfBytes = null;
+    let editorPages    = [];
+    let editorFilename = 'Relatorio_Editado.pdf';
+    let editorMode     = 'select';
+    let dragSrcIndex   = null;
+
+    async function openEditor(pdfBytes, filename) {
+      editorPdfBytes = pdfBytes;
+      editorFilename = filename;
+      editorPages    = [];
+      document.getElementById('ed-filename').textContent = filename;
+      document.getElementById('pdf-editor').classList.add('active');
+      document.getElementById('ed-loading').style.display = 'flex';
+      document.getElementById('ed-pages-area').innerHTML = '';
+      document.getElementById('ed-btn-download').disabled = true;
+      setMode('select');
+      try {
+        const pdf = await pdfjsLib.getDocument({ data: pdfBytes.slice(0) }).promise;
+        for (let i = 1; i <= pdf.numPages; i++) {
+          const page = await pdf.getPage(i);
+          const origVP = page.getViewport({ scale: 1 });
+          const scale  = 180 / origVP.width;
+          const vp     = page.getViewport({ scale });
+          const canvas = document.createElement('canvas');
+          canvas.width  = Math.round(vp.width);
+          canvas.height = Math.round(vp.height);
+          await page.render({ canvasContext: canvas.getContext('2d'), viewport: vp }).promise;
+          editorPages.push({ origIndex: i - 1, canvas, included: true, cropBox: null, pdfWidth: origVP.width, pdfHeight: origVP.height });
+        }
+        renderPageGrid();
+      } catch (e) { alert('Erro ao renderizar: ' + e.message); closeEditor(); }
+      finally {
+        document.getElementById('ed-loading').style.display = 'none';
+        document.getElementById('ed-btn-download').disabled = false;
+      }
+    }
+
+    function closeEditor() {
+      document.getElementById('pdf-editor').classList.remove('active');
+      editorPages = []; editorPdfBytes = null;
+    }
+
+    function setMode(mode) {
+      editorMode = mode;
+      document.getElementById('btn-select-mode').classList.toggle('active', mode === 'select');
+      document.getElementById('btn-crop-mode').classList.toggle('active', mode === 'crop');
+      document.getElementById('ed-hint-select').style.display = mode === 'select' ? '' : 'none';
+      document.getElementById('ed-hint-crop').style.display   = mode === 'crop'   ? '' : 'none';
+      renderPageGrid();
+    }
+
+    function renderPageGrid() {
+      const area = document.getElementById('ed-pages-area');
+      area.innerHTML = '';
+      editorPages.forEach((pg, idx) => {
+        const card = document.createElement('div');
+        card.className = 'page-card' + (pg.included ? '' : ' excluded');
+        card.dataset.idx = idx;
+        card.draggable = (editorMode === 'select');
+        const thumb = document.createElement('canvas');
+        thumb.width  = pg.canvas.width;
+        thumb.height = pg.canvas.height;
+        thumb.getContext('2d').drawImage(pg.canvas, 0, 0);
+        card.appendChild(thumb);
+        if (pg.cropBox) {
+          const ci = document.createElement('div');
+          ci.className = 'crop-indicator';
+          const cb = pg.cropBox;
+          const sx = pg.canvas.width  / cb.cW;
+          const sy = pg.canvas.height / cb.cH;
+          ci.style.left   = Math.round(cb.x * sx) + 'px';
+          ci.style.top    = Math.round(cb.y * sy) + 'px';
+          ci.style.width  = Math.round(cb.w * sx) + 'px';
+          ci.style.height = Math.round(cb.h * sy) + 'px';
+          card.appendChild(ci);
+          card.classList.add('has-crop');
+        }
+        const badge = document.createElement('div');
+        badge.className = 'ed-pages-count';
+        badge.textContent = 'p. ' + (idx + 1);
+        card.appendChild(badge);
+        const footer = document.createElement('div');
+        footer.className = 'page-card-footer';
+        const num = document.createElement('span');
+        num.className = 'page-num';
+        num.textContent = 'Pág. ' + (idx + 1) + (pg.cropBox ? ' ✂' : '');
+        footer.appendChild(num);
+        const actions = document.createElement('div');
+        actions.className = 'page-card-actions';
+        const cropBtn = document.createElement('button');
+        cropBtn.className = 'page-action-btn crop-btn';
+        cropBtn.title = 'Recortar';
+        cropBtn.innerHTML = '✂';
+        cropBtn.onclick = (e) => { e.stopPropagation(); openCropModal(idx); };
+        actions.appendChild(cropBtn);
+        if (pg.included) {
+          const delBtn = document.createElement('button');
+          delBtn.className = 'page-action-btn del-btn';
+          delBtn.title = 'Remover página';
+          delBtn.innerHTML = '×';
+          delBtn.onclick = (e) => { e.stopPropagation(); editorPages[idx].included = false; renderPageGrid(); };
+          actions.appendChild(delBtn);
+        } else {
+          const restBtn = document.createElement('button');
+          restBtn.className = 'page-action-btn restore-btn';
+          restBtn.title = 'Restaurar página';
+          restBtn.innerHTML = '↩';
+          restBtn.onclick = (e) => { e.stopPropagation(); editorPages[idx].included = true; renderPageGrid(); };
+          actions.appendChild(restBtn);
+        }
+        footer.appendChild(actions);
+        card.appendChild(footer);
+        card.addEventListener('dragstart', onDragStart);
+        card.addEventListener('dragover',  onDragOver);
+        card.addEventListener('dragleave', onDragLeave);
+        card.addEventListener('drop',      onDrop);
+        card.addEventListener('dragend',   onDragEnd);
+        area.appendChild(card);
+      });
+    }
+
+    function onDragStart(e) { dragSrcIndex = parseInt(this.dataset.idx); this.classList.add('dragging'); e.dataTransfer.effectAllowed = 'move'; }
+    function onDragOver(e)  { e.preventDefault(); e.dataTransfer.dropEffect = 'move'; this.classList.add('drag-over'); }
+    function onDragLeave()  { this.classList.remove('drag-over'); }
+    function onDrop(e) {
+      e.preventDefault(); this.classList.remove('drag-over');
+      const dest = parseInt(this.dataset.idx);
+      if (dragSrcIndex === null || dragSrcIndex === dest) return;
+      const moved = editorPages.splice(dragSrcIndex, 1)[0];
+      editorPages.splice(dest, 0, moved);
+      renderPageGrid();
+    }
+    function onDragEnd() {
+      document.querySelectorAll('.page-card').forEach(c => c.classList.remove('dragging', 'drag-over'));
+      dragSrcIndex = null;
+    }
+
+    /* ── CROP MODAL ── */
+    let cropPageIdx = null, cropStart = null, cropRect = null, cropDragging = false;
+
+    async function openCropModal(idx) {
+      cropPageIdx = idx; cropRect = editorPages[idx].cropBox ? { ...editorPages[idx].cropBox } : null;
+      cropStart = null;
+      document.getElementById('crop-page-label').textContent = 'Pág. ' + (idx + 1);
+      document.getElementById('crop-modal').classList.add('active');
+      document.getElementById('crop-confirm-btn').disabled = !cropRect;
+      document.getElementById('crop-selection').style.display = 'none';
+      const pdf  = await pdfjsLib.getDocument({ data: editorPdfBytes.slice(0) }).promise;
+      const page = await pdf.getPage(editorPages[idx].origIndex + 1);
+      const origVP = page.getViewport({ scale: 1 });
+      const scale  = Math.min(500, window.innerWidth - 80) / origVP.width;
+      const vp     = page.getViewport({ scale });
+      const cc = document.getElementById('crop-canvas');
+      cc.width = Math.round(vp.width); cc.height = Math.round(vp.height);
+      await page.render({ canvasContext: cc.getContext('2d'), viewport: vp }).promise;
+      if (cropRect) {
+        const sx = cc.width / cropRect.cW, sy = cc.height / cropRect.cH;
+        drawCropSel(cropRect.x * sx, cropRect.y * sy, cropRect.w * sx, cropRect.h * sy);
+      }
+      const wrap = document.getElementById('crop-canvas-wrap');
+      wrap.onmousedown = e => {
+        const r = cc.getBoundingClientRect();
+        cropStart = { x: e.clientX - r.left, y: e.clientY - r.top };
+        cropDragging = true;
+        document.getElementById('crop-selection').style.display = 'none';
+        cropRect = null; document.getElementById('crop-confirm-btn').disabled = true;
+      };
+      wrap.onmousemove = e => {
+        if (!cropDragging || !cropStart) return;
+        const r = cc.getBoundingClientRect();
+        const cx = e.clientX - r.left, cy = e.clientY - r.top;
+        drawCropSel(Math.min(cropStart.x, cx), Math.min(cropStart.y, cy), Math.abs(cx - cropStart.x), Math.abs(cy - cropStart.y));
+      };
+      wrap.onmouseup = e => {
+        if (!cropDragging) return; cropDragging = false;
+        const r = cc.getBoundingClientRect();
+        const cx = e.clientX - r.left, cy = e.clientY - r.top;
+        cropRect = { x: Math.min(cropStart.x, cx), y: Math.min(cropStart.y, cy), w: Math.abs(cx - cropStart.x), h: Math.abs(cy - cropStart.y), cW: cc.width, cH: cc.height };
+        if (cropRect.w < 5 || cropRect.h < 5) { cropRect = null; document.getElementById('crop-selection').style.display = 'none'; return; }
+        document.getElementById('crop-confirm-btn').disabled = false;
+      };
+    }
+
+    function drawCropSel(x, y, w, h) {
+      const s = document.getElementById('crop-selection');
+      s.style.display = 'block'; s.style.left = x + 'px'; s.style.top = y + 'px';
+      s.style.width = w + 'px'; s.style.height = h + 'px';
+    }
+
+    function clearCropSelection() {
+      cropRect = null;
+      document.getElementById('crop-selection').style.display = 'none';
+      document.getElementById('crop-confirm-btn').disabled = true;
+      if (cropPageIdx !== null) { editorPages[cropPageIdx].cropBox = null; }
+    }
+
+    function confirmCrop() {
+      if (!cropRect || cropPageIdx === null) return;
+      const applyAll = document.getElementById('crop-apply-all-chk').checked;
+      if (applyAll) { editorPages.forEach(pg => { pg.cropBox = { ...cropRect }; }); }
+      else { editorPages[cropPageIdx].cropBox = { ...cropRect }; }
+      closeCropModal(); renderPageGrid();
+    }
+
+    function closeCropModal() {
+      document.getElementById('crop-modal').classList.remove('active');
+      const wrap = document.getElementById('crop-canvas-wrap');
+      wrap.onmousedown = null; wrap.onmousemove = null; wrap.onmouseup = null;
+      cropPageIdx = null; cropRect = null; cropStart = null; cropDragging = false;
+    }
+
+    /* ── APPLY EDITS + DOWNLOAD ── */
+    async function applyAndDownload() {
+      const btn = document.getElementById('ed-btn-download');
+      btn.disabled = true; btn.textContent = 'Processando…';
+      try {
+        const { PDFDocument } = PDFLib;
+        const srcDoc = await PDFDocument.load(editorPdfBytes);
+        const newDoc = await PDFDocument.create();
+        const included = editorPages.filter(p => p.included);
+        if (!included.length) { alert('Nenhuma página selecionada.'); return; }
+        const indices = included.map(p => p.origIndex);
+        const copied  = await newDoc.copyPages(srcDoc, indices);
+        copied.forEach((pdfPage, i) => {
+          const edPage = included[i];
+          if (edPage.cropBox) {
+            const cb = edPage.cropBox;
+            const { width: pW, height: pH } = pdfPage.getSize();
+            const sx = pW / cb.cW, sy = pH / cb.cH;
+            const left   = cb.x * sx;
+            const bottom = pH - (cb.y + cb.h) * sy;
+            const right  = (cb.x + cb.w) * sx;
+            const top    = pH - cb.y * sy;
+            pdfPage.setCropBox(left, bottom, right - left, top - bottom);
+            pdfPage.setMediaBox(left, bottom, right - left, top - bottom);
+          }
+          newDoc.addPage(pdfPage);
+        });
+        const bytes = await newDoc.save();
+        const blob  = new Blob([bytes], { type: 'application/pdf' });
+        const url   = URL.createObjectURL(blob);
+        const a     = document.createElement('a');
+        a.href = url; a.download = editorFilename.replace('.pdf', '_EDITADO.pdf');
+        document.body.appendChild(a); a.click(); a.remove();
+        URL.revokeObjectURL(url);
+      } catch (err) { alert('Erro ao processar: ' + err.message); }
+      finally {
+        btn.disabled = false; btn.textContent = '↓ Baixar PDF Editado';
+      }
     }
   </script>
 </body>
