@@ -1,18 +1,19 @@
 /**
  * in.Pacto PDF Server
- * Substitui o Browserless — roda Puppeteer diretamente no Render.com.
- * Recebe HTML já processado e devolve PDF.
+ * Usa puppeteer-core + @sparticuz/chromium para rodar no Render free.
+ * O Chrome vem embutido no pacote — sem depender do cache do sistema.
  */
 
-const express    = require('express');
-const puppeteer  = require('puppeteer');
+const express   = require('express');
+const puppeteer = require('puppeteer-core');
+const chromium  = require('@sparticuz/chromium');
 
 const app  = express();
 const PORT = process.env.PORT || 3000;
 
 app.use(express.json({ limit: '10mb' }));
 
-/* ── CORS — permite chamadas do Cloudflare Pages ── */
+/* ── CORS ── */
 app.use((req, res, next) => {
   res.setHeader('Access-Control-Allow-Origin',  '*');
   res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
@@ -26,29 +27,27 @@ let browserInstance = null;
 
 async function getBrowser() {
   if (browserInstance) {
-    try {
-      // Testa se ainda está vivo
-      await browserInstance.version();
-      return browserInstance;
-    } catch (_) {
-      browserInstance = null;
-    }
+    try { await browserInstance.version(); return browserInstance; }
+    catch (_) { browserInstance = null; }
   }
   browserInstance = await puppeteer.launch({
-    headless: 'new',
     args: [
-        '--no-sandbox',
-  '--disable-setuid-sandbox',
-  '--disable-dev-shm-usage',
-  '--disable-gpu',
-  '--no-zygote',
-  '--single-process',
-  '--disable-extensions',
-  '--disable-background-networking',
-  '--disable-default-apps',
-  '--mute-audio',
-  '--no-first-run',
+      ...chromium.args,
+      '--no-sandbox',
+      '--disable-setuid-sandbox',
+      '--disable-dev-shm-usage',
+      '--disable-gpu',
+      '--no-zygote',
+      '--single-process',
+      '--disable-extensions',
+      '--disable-background-networking',
+      '--disable-default-apps',
+      '--mute-audio',
+      '--no-first-run',
     ],
+    defaultViewport: chromium.defaultViewport,
+    executablePath:  await chromium.executablePath(),
+    headless:        chromium.headless,
   });
   return browserInstance;
 }
@@ -60,31 +59,24 @@ async function getBrowser() {
    ══════════════════════════════════════════════════════ */
 app.post('/pdf', async (req, res) => {
   const { html } = req.body;
-
-  if (!html) {
-    return res.status(400).send('Campo "html" obrigatório.');
-  }
+  if (!html) return res.status(400).send('Campo "html" obrigatório.');
 
   let page;
   try {
     const browser = await getBrowser();
     page = await browser.newPage();
-
     await page.setViewport({ width: 600, height: 800 });
 
-    /* Carrega o HTML — waitUntil networkidle2 com fallback para load */
     try {
       await page.setContent(html, { waitUntil: 'networkidle2', timeout: 20000 });
     } catch (_) {
       await page.setContent(html, { waitUntil: 'load', timeout: 15000 });
     }
 
-    /* Aguarda dois frames para garantir que scripts de medição rodaram */
     await page.evaluate(() =>
       new Promise(r => requestAnimationFrame(() => requestAnimationFrame(r)))
     );
 
-    /* Mede a altura real do conteúdo */
     const { contentHeight, contentTop } = await page.evaluate(() => {
       document.documentElement.style.cssText += ';margin:0;padding:0;border:0';
       document.body.style.cssText            += ';margin:0;padding:0;border:0';
@@ -109,7 +101,6 @@ app.post('/pdf', async (req, res) => {
       };
     });
 
-    /* Injeta @page com tamanho exato medido */
     await page.addStyleTag({ content: `
       @page {
         size: 600px ${contentHeight}px !important;
@@ -128,7 +119,6 @@ app.post('/pdf', async (req, res) => {
       ` : ''}
     `});
 
-    /* Gera o PDF */
     const pdfBuffer = await page.pdf({
       printBackground:   true,
       preferCSSPageSize: true,
