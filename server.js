@@ -67,11 +67,12 @@ app.post('/pdf', async (req, res) => {
     page = await browser.newPage();
     await page.setViewport({ width: 600, height: 800 });
 
-    try {
-      await page.setContent(html, { waitUntil: 'domcontentloaded', timeout: 30000 });
-    } catch (_) {
-      await page.setContent(html, { waitUntil: 'load', timeout: 30000 });
-    }
+    // Carrega o HTML sem timeout — o Puppeteer segue em frente
+    // independente de recursos externos que não respondem.
+    await page.setContent(html, { waitUntil: 'domcontentloaded', timeout: 0 });
+
+    // Aguarda até 5s extra para imagens inline renderizarem
+    await new Promise(r => setTimeout(r, 3000));
 
     await page.evaluate(() =>
       new Promise(r => requestAnimationFrame(() => requestAnimationFrame(r)))
