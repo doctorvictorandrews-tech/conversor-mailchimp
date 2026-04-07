@@ -67,13 +67,24 @@ app.post('/pdf', async (req, res) => {
     page = await browser.newPage();
     await page.setViewport({ width: 600, height: 800 });
 
-    // Carrega o HTML sem timeout — o Puppeteer segue em frente
-    // independente de recursos externos que não respondem.
+    // Bloqueia scripts de terceiros que travam o carregamento (tracking pixels,
+    // jQuery CDN, Kaspersky, etc.). Imagens, fontes e CSS sao liberados.
+    await page.setRequestInterception(true);
+    page.on('request', req => {
+      const type = req.resourceType();
+      const url  = req.url();
+      if (type === 'script' && !url.includes('mcusercontent.com')) {
+        req.abort();
+      } else {
+        req.continue();
+      }
+    });
+
+    // domcontentloaded dispara assim que o HTML e parseado.
+    // timeout: 0 = nunca lanca TimeoutError.
     await page.setContent(html, { waitUntil: 'domcontentloaded', timeout: 0 });
 
-    // Aguarda até 5s extra para imagens inline renderizarem
-    await new Promise(r => setTimeout(r, 3000));
-
+    // Dois frames para garantir que estilos inline foram aplicados
     await page.evaluate(() =>
       new Promise(r => requestAnimationFrame(() => requestAnimationFrame(r)))
     );
