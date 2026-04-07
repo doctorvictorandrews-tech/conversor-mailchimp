@@ -6,6 +6,11 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Ferramentas | Listening</title>
   <link href="https://fonts.googleapis.com/css2?family=Roboto+Mono:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400;1,700&family=Roboto+Slab:wght@400;700;800;900&display=swap" rel="stylesheet">
+
+  <!-- PDF.js (render) + pdf-lib (edit) -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf-lib/1.17.1/pdf-lib.min.js"></script>
+
   <style>
     :root {
       --yellow: #D4D432;
@@ -23,22 +28,13 @@
       --text-mid: #3D3D3D;
       --text-dim: rgba(0,0,0,0.38);
     }
-
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
     html, body {
-      width: 100%;
-      min-height: 100vh;
+      width: 100%; min-height: 100vh;
       font-family: 'Roboto Mono', monospace;
-      background: var(--bg);
-      color: var(--text);
-      overflow-x: hidden;
+      background: var(--bg); color: var(--text); overflow-x: hidden;
     }
-
-    /* ─── BG CANVAS ─── */
     #bg-canvas { position: fixed; inset: 0; z-index: 0; pointer-events: none; }
-
-    /* ─── FLOATING EMOJI ─── */
     .meme-float {
       position: fixed; font-size: 22px; pointer-events: none;
       z-index: 1; animation: floatUp linear infinite; opacity: 0; user-select: none;
@@ -49,345 +45,355 @@
       90%  { opacity: 0.18; }
       100% { transform: translateY(-10vh) rotate(360deg); opacity: 0; }
     }
-
-    /* ─── PAGE ─── */
     .page {
-      position: relative; z-index: 10;
-      min-height: 100vh;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      padding: 48px 20px;
-      gap: 18px;
+      position: relative; z-index: 10; min-height: 100vh;
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      padding: 48px 20px; gap: 18px;
     }
-
-    /* ─── CARD BASE ─── */
     .card {
       width: 100%; max-width: 640px;
       background: var(--surface);
-      border: 1.5px solid var(--border);
-      border-radius: 4px;
-      box-shadow:
-        0 2px 0 rgba(0,0,0,0.08),
-        0 12px 40px rgba(0,0,0,0.12);
+      border: 1.5px solid var(--border); border-radius: 4px;
+      box-shadow: 0 2px 0 rgba(0,0,0,0.08), 0 12px 40px rgba(0,0,0,0.12);
       overflow: hidden;
     }
     .card:first-child { animation: fadeUp 0.6s cubic-bezier(0.16,1,0.3,1) both; }
     .card:last-child  { animation: fadeUp 0.6s 0.1s cubic-bezier(0.16,1,0.3,1) both; }
-
     @keyframes fadeUp {
       from { opacity: 0; transform: translateY(20px); }
       to   { opacity: 1; transform: translateY(0); }
     }
-
-    /* ─── CARD HEADER (dark — logo branco visível) ─── */
     .card-header {
-      padding: 28px 40px 26px;
-      border-bottom: 2px solid var(--yellow);
-      position: relative;
-      background: var(--charcoal);
+      padding: 28px 40px 26px; border-bottom: 2px solid var(--yellow);
+      position: relative; background: var(--charcoal);
     }
     .card-header::before {
-      content: '';
-      position: absolute; top: 0; left: 0; right: 0; height: 3px;
+      content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px;
       background: var(--yellow);
     }
     .logo-img { height: 38px; width: auto; display: block; }
     .logo-fallback {
-      display: none;
-      font-family: 'Roboto Slab', serif;
-      font-weight: 900; font-size: 28px; letter-spacing: -1px; line-height: 1;
-      color: #fff;
+      display: none; font-family: 'Roboto Slab', serif;
+      font-weight: 900; font-size: 28px; letter-spacing: -1px; line-height: 1; color: #fff;
     }
     .logo-sub {
-      margin-top: 8px; font-size: 9px;
-      letter-spacing: 0.2em; text-transform: uppercase; color: rgba(255,255,255,0.38);
-      font-family: 'Roboto Mono', monospace;
+      margin-top: 8px; font-size: 9px; letter-spacing: 0.2em; text-transform: uppercase;
+      color: rgba(255,255,255,0.38); font-family: 'Roboto Mono', monospace;
     }
-
-    /* Card header do segundo card */
     .card-header-simple {
-      padding: 22px 40px 20px;
-      border-bottom: 2px solid var(--yellow);
-      position: relative;
-      background: var(--charcoal);
+      padding: 22px 40px 20px; border-bottom: 2px solid var(--yellow);
+      position: relative; background: var(--charcoal);
     }
     .card-header-simple::before {
-      content: '';
-      position: absolute; top: 0; left: 0; right: 0; height: 3px;
+      content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px;
       background: var(--yellow);
     }
-    .card-title {
-      font-family: 'Roboto Slab', serif;
-      font-weight: 900; font-size: 16px; color: #fff;
-      letter-spacing: 0.02em;
-    }
-    .card-title-sub {
-      margin-top: 5px; font-size: 9px;
-      letter-spacing: 0.18em; text-transform: uppercase; color: rgba(255,255,255,0.38);
-    }
-
-    /* ─── CARD BODY ─── */
+    .card-title { font-family: 'Roboto Slab', serif; font-weight: 900; font-size: 16px; color: #fff; letter-spacing: 0.02em; }
+    .card-title-sub { margin-top: 5px; font-size: 9px; letter-spacing: 0.18em; text-transform: uppercase; color: rgba(255,255,255,0.38); }
     .card-body { padding: 30px 40px 34px; background: var(--surface); }
-
-    /* Meme box */
     .meme-box {
-      display: flex; align-items: center; gap: 14px;
-      padding: 14px 18px;
-      background: var(--charcoal);
-      border-left: 3px solid var(--yellow);
-      border-radius: 2px;
-      margin-bottom: 26px;
-      animation: fadeUp 0.6s 0.06s cubic-bezier(0.16,1,0.3,1) both;
-      position: relative;
+      display: flex; align-items: center; gap: 14px; padding: 14px 18px;
+      background: var(--charcoal); border-left: 3px solid var(--yellow); border-radius: 2px;
+      margin-bottom: 26px; animation: fadeUp 0.6s 0.06s cubic-bezier(0.16,1,0.3,1) both;
     }
-    .meme-emoji-big {
-      font-size: 32px; line-height: 1; flex-shrink: 0;
-      animation: wiggle 3s ease-in-out infinite;
-    }
+    .meme-emoji-big { font-size: 32px; line-height: 1; flex-shrink: 0; animation: wiggle 3s ease-in-out infinite; }
     @keyframes wiggle {
-      0%,100% { transform: rotate(-5deg) scale(1); }
-      25%      { transform: rotate(5deg) scale(1.08); }
-      50%      { transform: rotate(-3deg) scale(1.03); }
-      75%      { transform: rotate(4deg) scale(1.06); }
+      0%,100% { transform: rotate(-5deg) scale(1); } 25% { transform: rotate(5deg) scale(1.08); }
+      50% { transform: rotate(-3deg) scale(1.03); } 75% { transform: rotate(4deg) scale(1.06); }
     }
-    .meme-text {
-      font-family: 'Roboto Mono', monospace;
-      font-weight: 600; font-size: 13px; line-height: 1.4; color: #fff;
-    }
-    .meme-text small {
-      display: block; font-weight: 300; font-size: 11px;
-      color: rgba(255,255,255,0.45); margin-top: 3px;
-    }
-
-    /* Steps */
-    .steps-label {
-      font-size: 9px; font-weight: 700; letter-spacing: 0.22em;
-      text-transform: uppercase; color: var(--text-dim);
-      margin-bottom: 12px; display: block;
-    }
-    .steps {
-      display: flex; flex-direction: column; gap: 8px;
-      margin-bottom: 26px;
-    }
+    .meme-text { font-family: 'Roboto Mono', monospace; font-weight: 600; font-size: 13px; line-height: 1.4; color: #fff; }
+    .meme-text small { display: block; font-weight: 300; font-size: 11px; color: rgba(255,255,255,0.45); margin-top: 3px; }
+    .steps-label { font-size: 9px; font-weight: 700; letter-spacing: 0.22em; text-transform: uppercase; color: var(--text-dim); margin-bottom: 12px; display: block; }
+    .steps { display: flex; flex-direction: column; gap: 8px; margin-bottom: 26px; }
     .step {
-      display: flex; gap: 14px; align-items: flex-start;
-      padding: 14px 16px;
-      background: rgba(255,255,255,0.6);
-      border: 1.5px solid var(--border);
-      border-radius: 2px;
+      display: flex; gap: 14px; align-items: flex-start; padding: 14px 16px;
+      background: rgba(255,255,255,0.6); border: 1.5px solid var(--border); border-radius: 2px;
       transition: border-color 0.2s, background 0.2s, transform 0.2s; cursor: default;
     }
-    .step:hover {
-      border-color: var(--yellow);
-      background: rgba(212,212,50,0.07);
-      transform: translateX(4px);
-    }
+    .step:hover { border-color: var(--yellow); background: rgba(212,212,50,0.07); transform: translateX(4px); }
     .step-num {
-      flex-shrink: 0; width: 24px; height: 24px;
-      background: var(--yellow); border-radius: 2px;
+      flex-shrink: 0; width: 24px; height: 24px; background: var(--yellow); border-radius: 2px;
       display: flex; align-items: center; justify-content: center;
-      font-family: 'Roboto Slab', serif; font-weight: 900; font-size: 11px; color: var(--charcoal);
-      margin-top: 1px;
+      font-family: 'Roboto Slab', serif; font-weight: 900; font-size: 11px; color: var(--charcoal); margin-top: 1px;
     }
     .step-body { flex: 1; }
-    .step-title {
-      font-family: 'Roboto Slab', serif;
-      font-weight: 700; font-size: 13px; color: var(--text); margin-bottom: 3px;
-    }
+    .step-title { font-family: 'Roboto Slab', serif; font-weight: 700; font-size: 13px; color: var(--text); margin-bottom: 3px; }
     .step-desc { font-size: 11.5px; color: var(--text-mid); line-height: 1.65; font-weight: 300; }
     .step-desc strong { color: var(--text); font-weight: 600; }
     .step-desc kbd {
-      display: inline-block; background: var(--charcoal);
-      border: 1px solid rgba(0,0,0,0.2); border-radius: 2px;
+      display: inline-block; background: var(--charcoal); border: 1px solid rgba(0,0,0,0.2); border-radius: 2px;
       padding: 1px 6px; font-family: 'Roboto Mono', monospace; font-size: 10px; color: #fff;
     }
-
-    .divider {
-      height: 1.5px;
-      background: var(--border);
-      margin-bottom: 22px;
-    }
-
-    .input-label {
-      font-size: 9px; font-weight: 700; letter-spacing: 0.22em;
-      text-transform: uppercase; color: var(--text-dim);
-      margin-bottom: 9px; display: block;
-    }
-
+    .divider { height: 1.5px; background: var(--border); margin-bottom: 22px; }
+    .input-label { font-size: 9px; font-weight: 700; letter-spacing: 0.22em; text-transform: uppercase; color: var(--text-dim); margin-bottom: 9px; display: block; }
     .textarea-wrap { position: relative; }
     textarea {
-      width: 100%; height: 150px;
-      background: rgba(255,255,255,0.7);
-      border: 1.5px solid var(--border); border-radius: 2px;
-      padding: 13px 13px 26px;
+      width: 100%; height: 150px; background: rgba(255,255,255,0.7);
+      border: 1.5px solid var(--border); border-radius: 2px; padding: 13px 13px 26px;
       font-family: 'Roboto Mono', monospace; font-size: 11.5px; color: var(--text-mid);
       resize: none; outline: none; line-height: 1.7; display: block;
       transition: border-color 0.2s, box-shadow 0.2s;
     }
-    textarea:focus {
-      border-color: var(--yellow);
-      box-shadow: 0 0 0 3px rgba(212,212,50,0.15);
-    }
+    textarea:focus { border-color: var(--yellow); box-shadow: 0 0 0 3px rgba(212,212,50,0.15); }
     textarea::placeholder { color: rgba(0,0,0,0.2); }
-
     .char-count {
-      position: absolute; bottom: 9px; right: 11px;
-      font-size: 9px; color: var(--text-dim); pointer-events: none; transition: color 0.2s;
-      font-family: 'Roboto Mono', monospace;
+      position: absolute; bottom: 9px; right: 11px; font-size: 9px; color: var(--text-dim);
+      pointer-events: none; transition: color 0.2s; font-family: 'Roboto Mono', monospace;
     }
     .char-count.has-content { color: var(--red); }
-
-    /* ─── UPLOAD ZONE ─── */
     .upload-zone {
-      width: 100%; min-height: 120px;
-      background: rgba(255,255,255,0.6);
+      width: 100%; min-height: 120px; background: rgba(255,255,255,0.6);
       border: 1.5px dashed rgba(0,0,0,0.2); border-radius: 2px;
       display: flex; flex-direction: column; align-items: center; justify-content: center;
       gap: 8px; cursor: pointer; transition: border-color 0.2s, background 0.2s;
       position: relative; padding: 22px;
     }
-    .upload-zone:hover, .upload-zone.drag-over {
-      border-color: var(--yellow);
-      background: rgba(212,212,50,0.06);
-    }
-    .upload-zone.has-file {
-      border-color: var(--yellow);
-      border-style: solid;
-      background: rgba(212,212,50,0.05);
-    }
-    .upload-zone input[type="file"] {
-      position: absolute; inset: 0; opacity: 0; cursor: pointer; width: 100%; height: 100%;
-    }
+    .upload-zone:hover, .upload-zone.drag-over { border-color: var(--yellow); background: rgba(212,212,50,0.06); }
+    .upload-zone.has-file { border-color: var(--yellow); border-style: solid; background: rgba(212,212,50,0.05); }
+    .upload-zone input[type="file"] { position: absolute; inset: 0; opacity: 0; cursor: pointer; width: 100%; height: 100%; }
     .upload-icon { font-size: 26px; line-height: 1; }
-    .upload-text {
-      font-family: 'Roboto Slab', serif;
-      font-weight: 700; font-size: 12px; color: var(--text); text-align: center;
-    }
-    .upload-text small {
-      display: block; font-family: 'Roboto Mono', monospace;
-      font-weight: 300; font-size: 10px; color: var(--text-dim); margin-top: 3px;
-    }
-    .upload-filename {
-      font-size: 11px; color: var(--red); font-weight: 600; text-align: center;
-      display: none; margin-top: 2px;
-      font-family: 'Roboto Mono', monospace;
-    }
-
-    /* ─── BOTÕES DE CONVERSÃO ─── */
-    .convert-btns {
-      display: grid; grid-template-columns: 1fr 1fr; gap: 10px;
-      margin-top: 14px;
-    }
-
-    /* ─── BOTÃO BASE ─── */
+    .upload-text { font-family: 'Roboto Slab', serif; font-weight: 700; font-size: 12px; color: var(--text); text-align: center; }
+    .upload-text small { display: block; font-family: 'Roboto Mono', monospace; font-weight: 300; font-size: 10px; color: var(--text-dim); margin-top: 3px; }
+    .upload-filename { font-size: 11px; color: var(--red); font-weight: 600; text-align: center; display: none; margin-top: 2px; font-family: 'Roboto Mono', monospace; }
+    .convert-btns { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 14px; }
     .btn {
-      padding: 15px 20px;
-      background: var(--charcoal);
-      border: 2px solid var(--charcoal);
-      border-radius: 2px;
-      font-family: 'Roboto Mono', monospace;
-      font-weight: 700; font-size: 13px; letter-spacing: 0.04em;
-      color: #fff; cursor: pointer;
-      display: flex; align-items: center; justify-content: center; gap: 8px;
-      position: relative; overflow: hidden;
-      transition: background 0.2s, border-color 0.2s, color 0.2s, transform 0.15s;
-      width: 100%;
+      padding: 15px 20px; background: var(--charcoal); border: 2px solid var(--charcoal); border-radius: 2px;
+      font-family: 'Roboto Mono', monospace; font-weight: 700; font-size: 13px; letter-spacing: 0.04em; color: #fff;
+      cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px;
+      position: relative; overflow: hidden; transition: background 0.2s, border-color 0.2s, color 0.2s, transform 0.15s; width: 100%;
     }
     .btn-full { margin-top: 14px; font-size: 14px; padding: 16px 24px; }
-    .btn:not(:disabled):hover {
-      background: var(--yellow);
-      border-color: var(--yellow);
-      color: var(--charcoal);
-      transform: translateY(-2px);
-    }
+    .btn:not(:disabled):hover { background: var(--yellow); border-color: var(--yellow); color: var(--charcoal); transform: translateY(-2px); }
     .btn:active { transform: translateY(0); }
-    .btn:disabled {
-      background: rgba(0,0,0,0.08);
-      border-color: rgba(0,0,0,0.08);
-      box-shadow: none;
-      cursor: not-allowed; transform: none; color: var(--text-dim);
-    }
-
-    /* Status */
+    .btn:disabled { background: rgba(0,0,0,0.08); border-color: rgba(0,0,0,0.08); box-shadow: none; cursor: not-allowed; transform: none; color: var(--text-dim); }
     .status-box {
-      display: none; margin-top: 10px; padding: 11px 15px;
-      border-radius: 2px; font-size: 12px; text-align: center;
-      border-left: 3px solid; color: var(--text-mid);
-      background: rgba(255,255,255,0.6);
+      display: none; margin-top: 10px; padding: 11px 15px; border-radius: 2px; font-size: 12px;
+      text-align: center; border-left: 3px solid; color: var(--text-mid); background: rgba(255,255,255,0.6);
       font-family: 'Roboto Mono', monospace;
     }
     .status-box.success { border-color: #4caf50; color: #2e7d32; background: rgba(76,175,80,0.07); }
     .status-box.error   { border-color: var(--red); color: var(--red); background: rgba(232,69,0,0.06); }
     .status-box.loading { border-color: var(--yellow); color: var(--charcoal); background: rgba(212,212,50,0.08); }
-
     .progress-bar { height: 2px; background: var(--border); border-radius: 0; margin-top: 8px; overflow: hidden; display: none; }
     .progress-bar.active { display: block; }
-    .progress-fill {
-      height: 100%;
-      background: var(--yellow);
-      border-radius: 0; animation: progressAnim 12s linear forwards;
-    }
-    .progress-bar.slow .progress-fill {
-      animation: progressAnimSlow 30s linear forwards;
-    }
+    .progress-fill { height: 100%; background: var(--yellow); border-radius: 0; animation: progressAnim 12s linear forwards; }
+    .progress-bar.slow .progress-fill { animation: progressAnimSlow 30s linear forwards; }
     @keyframes progressAnim { 0%{width:0%} 40%{width:55%} 80%{width:82%} 100%{width:95%} }
     @keyframes progressAnimSlow { 0%{width:0%} 30%{width:40%} 70%{width:70%} 95%{width:90%} 100%{width:95%} }
-
     .tip {
-      display: flex; gap: 10px; align-items: flex-start;
-      margin-top: 14px; padding: 12px 15px;
-      background: rgba(212,212,50,0.09);
-      border: 1.5px solid rgba(212,212,50,0.35);
-      border-radius: 2px;
+      display: flex; gap: 10px; align-items: flex-start; margin-top: 14px; padding: 12px 15px;
+      background: rgba(212,212,50,0.09); border: 1.5px solid rgba(212,212,50,0.35); border-radius: 2px;
     }
     .tip-icon { flex-shrink: 0; margin-top: 1px; }
     .tip p { font-size: 11.5px; color: var(--text-mid); line-height: 1.6; font-weight: 300; }
     .tip strong { color: var(--text); font-weight: 600; }
-
-    /* Footer */
     .card-footer {
       padding: 13px 40px 16px; border-top: 1.5px solid var(--border);
-      display: flex; align-items: center; justify-content: center; gap: 8px;
-      background: rgba(255,255,255,0.3);
+      display: flex; align-items: center; justify-content: center; gap: 8px; background: rgba(255,255,255,0.3);
     }
     .footer-dot { width: 4px; height: 4px; border-radius: 0; background: var(--yellow); }
     .footer-text { font-size: 9px; color: var(--text-dim); letter-spacing: 0.08em; font-family: 'Roboto Mono', monospace; }
-
-    .spinner {
-      display: inline-block; width: 13px; height: 13px;
-      border: 2px solid rgba(255,255,255,0.25); border-top-color: white;
-      border-radius: 50%; animation: spin 0.6s linear infinite;
-    }
-    .spinner-dark {
-      display: inline-block; width: 13px; height: 13px;
-      border: 2px solid rgba(0,0,0,0.15); border-top-color: var(--charcoal);
-      border-radius: 50%; animation: spin 0.6s linear infinite;
-    }
+    .spinner { display: inline-block; width: 13px; height: 13px; border: 2px solid rgba(255,255,255,0.25); border-top-color: white; border-radius: 50%; animation: spin 0.6s linear infinite; }
+    .spinner-dark { display: inline-block; width: 13px; height: 13px; border: 2px solid rgba(0,0,0,0.15); border-top-color: var(--charcoal); border-radius: 50%; animation: spin 0.6s linear infinite; }
     @keyframes spin { to { transform: rotate(360deg); } }
-
-    /* Geo accent squares (decorative, Listening-style) */
-    .geo-accent {
-      position: fixed; pointer-events: none; z-index: 1;
-      opacity: 0.12;
-    }
+    .geo-accent { position: fixed; pointer-events: none; z-index: 1; opacity: 0.12; }
     .geo-accent.y { background: var(--yellow); }
     .geo-accent.r { background: var(--red); }
     .geo-accent.c { background: var(--charcoal); }
-
     @media (max-width: 520px) {
       .page { padding: 20px 12px; }
       .card-header, .card-header-simple, .card-body, .card-footer { padding-left: 20px; padding-right: 20px; }
       .convert-btns { grid-template-columns: 1fr; }
     }
+
+    /* ═══════════════════════════════════════════
+       PDF EDITOR OVERLAY
+       ═══════════════════════════════════════════ */
+    #pdf-editor {
+      display: none;
+      position: fixed; inset: 0; z-index: 1000;
+      background: rgba(20,20,20,0.97);
+      flex-direction: column;
+      animation: editorFadeIn 0.25s ease both;
+    }
+    #pdf-editor.active { display: flex; }
+    @keyframes editorFadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+    /* Editor top bar */
+    .ed-topbar {
+      display: flex; align-items: center; gap: 12px; flex-shrink: 0;
+      padding: 0 24px; height: 58px;
+      background: #1A1A1A;
+      border-bottom: 2px solid var(--yellow);
+    }
+    .ed-topbar-title {
+      font-family: 'Roboto Slab', serif; font-weight: 900; font-size: 14px;
+      color: #fff; letter-spacing: 0.02em; flex: 1;
+    }
+    .ed-topbar-title span { color: var(--yellow); }
+    .ed-tool-group { display: flex; gap: 6px; }
+    .ed-tool-btn {
+      padding: 7px 14px; border-radius: 2px;
+      font-family: 'Roboto Mono', monospace; font-weight: 600; font-size: 11px;
+      cursor: pointer; border: 1.5px solid rgba(255,255,255,0.15);
+      color: rgba(255,255,255,0.7); background: transparent;
+      display: flex; align-items: center; gap: 6px;
+      transition: all 0.18s;
+    }
+    .ed-tool-btn:hover { border-color: var(--yellow); color: var(--yellow); }
+    .ed-tool-btn.active { background: var(--yellow); border-color: var(--yellow); color: #1A1A1A; }
+    .ed-btn-download {
+      padding: 9px 20px; background: var(--yellow); border: none; border-radius: 2px;
+      font-family: 'Roboto Mono', monospace; font-weight: 700; font-size: 12px; color: #1A1A1A;
+      cursor: pointer; display: flex; align-items: center; gap: 7px;
+      transition: opacity 0.18s, transform 0.15s;
+    }
+    .ed-btn-download:hover { opacity: 0.88; transform: translateY(-1px); }
+    .ed-btn-download:disabled { opacity: 0.4; cursor: not-allowed; transform: none; }
+    .ed-btn-close {
+      padding: 9px 14px; background: transparent; border: 1.5px solid rgba(255,255,255,0.15);
+      border-radius: 2px; color: rgba(255,255,255,0.5); font-size: 16px; cursor: pointer;
+      transition: all 0.18s; font-family: 'Roboto Mono', monospace;
+    }
+    .ed-btn-close:hover { border-color: var(--red); color: var(--red); }
+
+    /* Editor hint bar */
+    .ed-hintbar {
+      padding: 7px 24px; background: rgba(212,212,50,0.07); border-bottom: 1px solid rgba(212,212,50,0.15);
+      font-size: 10px; color: rgba(255,255,255,0.45); letter-spacing: 0.08em;
+      display: flex; align-items: center; gap: 16px; flex-shrink: 0;
+    }
+    .ed-hintbar strong { color: var(--yellow); font-weight: 600; }
+
+    /* Pages area */
+    .ed-pages-area {
+      flex: 1; overflow-y: auto; padding: 28px 24px;
+      display: flex; flex-wrap: wrap; gap: 16px; align-content: flex-start;
+    }
+    .ed-pages-area::-webkit-scrollbar { width: 6px; }
+    .ed-pages-area::-webkit-scrollbar-track { background: #1a1a1a; }
+    .ed-pages-area::-webkit-scrollbar-thumb { background: #444; border-radius: 3px; }
+
+    /* Page card */
+    .page-card {
+      position: relative; cursor: grab; user-select: none;
+      border: 2px solid rgba(255,255,255,0.1); border-radius: 3px;
+      transition: border-color 0.18s, transform 0.18s, opacity 0.18s;
+      background: #2a2a2a;
+    }
+    .page-card:hover { border-color: rgba(212,212,50,0.5); transform: translateY(-2px); }
+    .page-card.dragging { opacity: 0.4; transform: scale(0.97); cursor: grabbing; }
+    .page-card.drag-over { border-color: var(--yellow); box-shadow: 0 0 0 2px rgba(212,212,50,0.3); }
+    .page-card.excluded { opacity: 0.3; }
+    .page-card canvas { display: block; border-radius: 1px; }
+
+    /* Crop indicator overlay on thumbnail */
+    .page-card .crop-indicator {
+      position: absolute; border: 2px dashed var(--yellow); pointer-events: none;
+      box-shadow: 0 0 0 1000px rgba(0,0,0,0.45); display: none;
+    }
+    .page-card.has-crop .crop-indicator { display: block; }
+
+    /* Page card controls */
+    .page-card-footer {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 6px 8px; background: #1e1e1e;
+    }
+    .page-num {
+      font-size: 10px; font-weight: 600; color: rgba(255,255,255,0.4);
+      font-family: 'Roboto Mono', monospace;
+    }
+    .page-card-actions { display: flex; gap: 4px; }
+    .page-action-btn {
+      width: 22px; height: 22px; border-radius: 2px; border: none; cursor: pointer;
+      display: flex; align-items: center; justify-content: center; font-size: 11px;
+      transition: background 0.15s, color 0.15s;
+    }
+    .page-action-btn.del-btn { background: rgba(232,69,0,0.15); color: rgba(232,69,0,0.7); }
+    .page-action-btn.del-btn:hover { background: var(--red); color: #fff; }
+    .page-action-btn.crop-btn { background: rgba(212,212,50,0.1); color: rgba(212,212,50,0.7); }
+    .page-action-btn.crop-btn:hover { background: var(--yellow); color: #1a1a1a; }
+    .page-action-btn.restore-btn { background: rgba(76,175,80,0.12); color: rgba(76,175,80,0.7); }
+    .page-action-btn.restore-btn:hover { background: #4caf50; color: #fff; }
+
+    /* Page counter badge */
+    .ed-pages-count {
+      position: absolute; top: 6px; right: 6px;
+      background: var(--yellow); color: #1a1a1a;
+      font-size: 9px; font-weight: 800; padding: 2px 6px; border-radius: 2px;
+      font-family: 'Roboto Mono', monospace; pointer-events: none;
+    }
+
+    /* Loading overlay inside editor */
+    .ed-loading {
+      position: absolute; inset: 0; display: flex; flex-direction: column;
+      align-items: center; justify-content: center; gap: 14px;
+      background: rgba(20,20,20,0.85); z-index: 10;
+    }
+    .ed-loading p { color: rgba(255,255,255,0.6); font-size: 12px; letter-spacing: 0.12em; }
+    .ed-spinner { width: 36px; height: 36px; border: 3px solid rgba(212,212,50,0.2); border-top-color: var(--yellow); border-radius: 50%; animation: spin 0.7s linear infinite; }
+
+    /* ── CROP MODAL ── */
+    #crop-modal {
+      display: none; position: fixed; inset: 0; z-index: 1100;
+      background: rgba(0,0,0,0.92); flex-direction: column;
+    }
+    #crop-modal.active { display: flex; }
+    .crop-modal-header {
+      display: flex; align-items: center; gap: 12px; padding: 14px 20px;
+      background: #111; border-bottom: 2px solid var(--yellow); flex-shrink: 0;
+    }
+    .crop-modal-title { font-family: 'Roboto Slab', serif; font-weight: 900; font-size: 13px; color: #fff; flex: 1; }
+    .crop-modal-hint { font-size: 10px; color: rgba(255,255,255,0.4); letter-spacing: 0.08em; }
+    .crop-modal-body {
+      flex: 1; overflow: auto; display: flex; align-items: flex-start; justify-content: center;
+      padding: 24px;
+    }
+    .crop-canvas-wrap {
+      position: relative; cursor: crosshair; display: inline-block;
+      box-shadow: 0 0 0 2px rgba(212,212,50,0.3);
+    }
+    #crop-canvas { display: block; }
+    #crop-selection {
+      position: absolute; border: 2px solid var(--yellow);
+      box-shadow: 0 0 0 9999px rgba(0,0,0,0.55);
+      pointer-events: none; display: none;
+    }
+    .crop-modal-footer {
+      display: flex; align-items: center; gap: 10px; justify-content: flex-end;
+      padding: 14px 20px; background: #111; border-top: 1px solid rgba(255,255,255,0.08);
+      flex-shrink: 0;
+    }
+    .crop-btn-confirm {
+      padding: 10px 22px; background: var(--yellow); border: none; border-radius: 2px;
+      font-family: 'Roboto Mono', monospace; font-weight: 700; font-size: 12px; color: #1a1a1a;
+      cursor: pointer; transition: opacity 0.18s;
+    }
+    .crop-btn-confirm:hover { opacity: 0.85; }
+    .crop-btn-confirm:disabled { opacity: 0.35; cursor: not-allowed; }
+    .crop-btn-clear {
+      padding: 10px 18px; background: transparent; border: 1.5px solid rgba(232,69,0,0.5); border-radius: 2px;
+      font-family: 'Roboto Mono', monospace; font-weight: 600; font-size: 12px; color: rgba(232,69,0,0.8);
+      cursor: pointer; transition: all 0.18s;
+    }
+    .crop-btn-clear:hover { background: var(--red); color: #fff; border-color: var(--red); }
+    .crop-btn-cancel {
+      padding: 10px 18px; background: transparent; border: 1.5px solid rgba(255,255,255,0.15); border-radius: 2px;
+      font-family: 'Roboto Mono', monospace; font-weight: 600; font-size: 12px; color: rgba(255,255,255,0.5);
+      cursor: pointer; transition: all 0.18s;
+    }
+    .crop-btn-cancel:hover { border-color: rgba(255,255,255,0.4); color: #fff; }
+    .crop-apply-all {
+      display: flex; align-items: center; gap: 7px; margin-right: auto;
+      font-size: 11px; color: rgba(255,255,255,0.5); cursor: pointer;
+      font-family: 'Roboto Mono', monospace;
+    }
+    .crop-apply-all input { accent-color: var(--yellow); cursor: pointer; }
   </style>
 </head>
 <body>
-
   <canvas id="bg-canvas"></canvas>
 
-  <!-- Listening-style geometric accent squares -->
   <div class="geo-accent y" style="width:80px;height:80px;top:8%;left:3%;transform:rotate(5deg);"></div>
   <div class="geo-accent r" style="width:48px;height:48px;top:12%;left:5%;transform:rotate(-3deg);"></div>
   <div class="geo-accent c" style="width:60px;height:60px;top:18%;right:4%;transform:rotate(8deg);"></div>
@@ -407,7 +413,7 @@
 
   <div class="page">
 
-    <!-- ─── CARD 1: Mailchimp → PDF ─── -->
+    <!-- CARD 1: Mailchimp → PDF -->
     <div class="card">
       <div class="card-header">
         <img class="logo-img" src="./logo.png" alt="Listening"
@@ -415,9 +421,7 @@
         <div class="logo-fallback">Listening</div>
         <div class="logo-sub">Inteligência de Dados &nbsp;·&nbsp; Conversor de Relatórios</div>
       </div>
-
       <div class="card-body">
-
         <div class="meme-box">
           <div class="meme-emoji-big" id="meme-emoji">🧠</div>
           <div class="meme-text">
@@ -425,9 +429,7 @@
             <small id="meme-sub">Tecnologia de ponta a serviço da preguiça honesta.</small>
           </div>
         </div>
-
         <span class="steps-label">Como usar</span>
-
         <div class="steps">
           <div class="step">
             <div class="step-num">01</div>
@@ -446,22 +448,18 @@
           <div class="step">
             <div class="step-num">03</div>
             <div class="step-body">
-              <div class="step-title">Gere o PDF</div>
-              <div class="step-desc">Cole abaixo e clique em <strong>Gerar PDF</strong>. O download começa automaticamente, sem janela de impressão.</div>
+              <div class="step-title">Gere e edite o PDF</div>
+              <div class="step-desc">Cole abaixo e clique em <strong>Gerar PDF</strong>. O editor abre automaticamente — recorte, remova páginas e reorganize antes de baixar.</div>
             </div>
           </div>
         </div>
-
         <div class="divider"></div>
-
         <label class="input-label" for="htmlInput">Código-fonte do Mailchimp</label>
-
         <div class="textarea-wrap">
           <textarea id="htmlInput" placeholder="Cole aqui o código-fonte (CTRL+V)…"
             oninput="updateCharCount(this)" spellcheck="false"></textarea>
           <span class="char-count" id="charCount">0 caracteres</span>
         </div>
-
         <button class="btn btn-full" id="btn-pdf" onclick="generatePDF()">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
             <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
@@ -471,21 +469,17 @@
           </svg>
           Gerar PDF Agora
         </button>
-
         <div id="status-pdf" class="status-box"></div>
         <div class="progress-bar" id="progress-pdf"><div class="progress-fill"></div></div>
-
         <div class="tip">
           <svg class="tip-icon" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#D4D432" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
             <circle cx="12" cy="12" r="10"/>
             <line x1="12" y1="8" x2="12" y2="12"/>
             <line x1="12" y1="16" x2="12.01" y2="16"/>
           </svg>
-          <p>PDF gerado no servidor com fidelidade total ao design original. <strong>Nenhuma configuração manual necessária.</strong></p>
+          <p>PDF gerado no servidor com fidelidade total ao design. Após a geração, um <strong>editor visual</strong> abre para recorte, remoção de páginas e reordenação.</p>
         </div>
-
       </div>
-
       <div class="card-footer">
         <div class="footer-dot"></div>
         <span class="footer-text">Powered by Browserless · Cloudflare Workers &nbsp;·&nbsp; Feito com 💛 por Victor Andrews</span>
@@ -493,15 +487,13 @@
       </div>
     </div>
 
-    <!-- ─── CARD 2: PDF → PPTX / DOCX ─── -->
+    <!-- CARD 2: PDF → PPTX / DOCX -->
     <div class="card">
       <div class="card-header-simple">
         <div class="card-title">Converter PDF</div>
         <div class="card-title-sub">Para PowerPoint ou Word · Otimizado para OneDrive</div>
       </div>
-
       <div class="card-body">
-
         <span class="steps-label">Como usar</span>
         <div class="steps" style="margin-bottom: 22px;">
           <div class="step">
@@ -519,9 +511,7 @@
             </div>
           </div>
         </div>
-
         <label class="input-label">Selecione o arquivo PDF</label>
-
         <div class="upload-zone" id="upload-zone">
           <input type="file" id="pdf-input" accept=".pdf" onchange="onFileSelect(this)">
           <div class="upload-icon" id="upload-icon">📂</div>
@@ -531,12 +521,10 @@
           </div>
           <div class="upload-filename" id="upload-filename"></div>
         </div>
-
         <div class="convert-btns">
           <button class="btn" id="btn-pptx" onclick="convertFile('pptx')" disabled>
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-              <rect x="2" y="3" width="20" height="14" rx="2"/>
-              <path d="M8 21h8M12 17v4"/>
+              <rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/>
             </svg>
             → PowerPoint
           </button>
@@ -544,17 +532,14 @@
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
               <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
               <polyline points="14 2 14 8 20 8"/>
-              <line x1="16" y1="13" x2="8" y2="13"/>
-              <line x1="16" y1="17" x2="8" y2="17"/>
+              <line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/>
               <polyline points="10 9 9 9 8 9"/>
             </svg>
             → Word
           </button>
         </div>
-
         <div id="status-convert" class="status-box"></div>
         <div class="progress-bar" id="progress-convert"><div class="progress-fill"></div></div>
-
         <div class="tip" style="margin-top:14px;">
           <svg class="tip-icon" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#D4D432" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
             <circle cx="12" cy="12" r="10"/>
@@ -563,9 +548,7 @@
           </svg>
           <p>Conversão otimizada para <strong>visualização no OneDrive</strong>. Fontes e layout preservados ao máximo.</p>
         </div>
-
       </div>
-
       <div class="card-footer">
         <div class="footer-dot"></div>
         <span class="footer-text">Powered by Browserless · Cloudflare Workers &nbsp;·&nbsp; Feito com 💛 por Victor Andrews</span>
@@ -575,260 +558,706 @@
 
   </div><!-- /page -->
 
+  <!-- ═══════════════════════════════════════════════════
+       PDF EDITOR OVERLAY
+       ═══════════════════════════════════════════════════ -->
+  <div id="pdf-editor">
+    <!-- Top bar -->
+    <div class="ed-topbar">
+      <div class="ed-topbar-title">Editor de PDF &nbsp;<span>·</span>&nbsp; <span id="ed-filename" style="color:rgba(255,255,255,0.5);font-weight:400;font-size:12px;"></span></div>
+      <div class="ed-tool-group">
+        <button class="ed-tool-btn" id="btn-select-mode" onclick="setMode('select')" title="Mover páginas">
+          <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><path d="M5 9l-3 3 3 3M9 5l3-3 3 3M15 19l-3 3-3-3M19 9l3 3-3 3M12 3v18M3 12h18"/></svg>
+          Reordenar
+        </button>
+        <button class="ed-tool-btn" id="btn-crop-mode" onclick="setMode('crop')" title="Recortar página">
+          <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><polyline points="6 2 6 18 22 18"/><polyline points="2 6 18 6"/></svg>
+          Recortar
+        </button>
+      </div>
+      <button class="ed-btn-download" id="ed-btn-download" onclick="applyAndDownload()">
+        <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+        Baixar PDF editado
+      </button>
+      <button class="ed-btn-close" onclick="closeEditor()" title="Fechar editor">✕</button>
+    </div>
+
+    <!-- Hint bar -->
+    <div class="ed-hintbar">
+      <span id="ed-hint-select"><strong>Reordenar:</strong> arraste as páginas para mudar a ordem</span>
+      <span id="ed-hint-delete" style="opacity:0.7">· clique em <strong>×</strong> para remover uma página</span>
+      <span id="ed-hint-crop" style="display:none;"><strong>Recortar:</strong> clique no ✂ de uma página para abrir o recorte</span>
+    </div>
+
+    <!-- Pages grid (loading overlay inside) -->
+    <div style="position:relative;flex:1;overflow:hidden;display:flex;flex-direction:column;">
+      <div class="ed-loading" id="ed-loading">
+        <div class="ed-spinner"></div>
+        <p>RENDERIZANDO PÁGINAS…</p>
+      </div>
+      <div class="ed-pages-area" id="ed-pages-area"></div>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════════
+       CROP MODAL
+       ═══════════════════════════════════════════════════ -->
+  <div id="crop-modal">
+    <div class="crop-modal-header">
+      <div class="crop-modal-title">✂ Recortar página <span id="crop-page-label" style="color:var(--yellow)"></span></div>
+      <div class="crop-modal-hint">Arraste para selecionar a área que deseja manter</div>
+    </div>
+    <div class="crop-modal-body">
+      <div class="crop-canvas-wrap" id="crop-canvas-wrap">
+        <canvas id="crop-canvas"></canvas>
+        <div id="crop-selection"></div>
+      </div>
+    </div>
+    <div class="crop-modal-footer">
+      <label class="crop-apply-all">
+        <input type="checkbox" id="crop-apply-all-chk"> Aplicar a todas as páginas
+      </label>
+      <button class="crop-btn-clear" onclick="clearCropSelection()">Limpar seleção</button>
+      <button class="crop-btn-cancel" onclick="closeCropModal()">Cancelar</button>
+      <button class="crop-btn-confirm" id="crop-confirm-btn" onclick="confirmCrop()" disabled>Confirmar recorte</button>
+    </div>
+  </div>
+
   <script>
-    /* ── Meme rotator ── */
-    const memes = [
-      { emoji: '🧠', line: 'Ctrl+C, Ctrl+V, PDF. Brain too big.',        sub: 'Tecnologia de ponta a serviço da preguiça honesta.' },
-      { emoji: '😤', line: 'Mailchimp não te dá PDF. Nós sim.',           sub: 'Justiça para os analistas de comunicação.' },
-      { emoji: '🚀', line: 'Mais rápido que explicar pro TI.',             sub: 'É só colar e clicar. Promessa.' },
-      { emoji: '💀', line: 'Fazer PDF na mão? Aquele horror.',             sub: 'Nunca mais. A gente resolveu isso.' },
-      { emoji: '🔥', line: 'Hot take: relatório bom é relatório pronto.',  sub: 'E esse fica pronto em 10 segundos.' },
-      { emoji: '📊', line: 'Dados lindos merecem PDF lindo.',              sub: 'Fidelidade total ao design original.' },
-      { emoji: '☕', line: 'Café na mão, relatório na tela.',              sub: 'Você só precisa de Ctrl+V.' },
-      { emoji: '✅', line: 'Done. É isso. Simples assim.',                 sub: 'Por que complicar o que pode ser simples?' },
-    ];
-    let memeIdx = 0;
-    const emojiEl = document.getElementById('meme-emoji');
-    const lineEl  = document.getElementById('meme-line');
-    const subEl   = document.getElementById('meme-sub');
-    setInterval(() => {
-      memeIdx = (memeIdx + 1) % memes.length;
-      const m = memes[memeIdx];
-      emojiEl.style.transform = 'scale(0)';
-      setTimeout(() => {
-        emojiEl.textContent = m.emoji;
-        lineEl.textContent  = m.line;
-        subEl.textContent   = m.sub;
-        emojiEl.style.transform = '';
-      }, 180);
-    }, 4000);
+  /* ════════════════════════════════════════
+     PDF.js setup
+     ════════════════════════════════════════ */
+  pdfjsLib.GlobalWorkerOptions.workerSrc =
+    'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
 
-    /* ── Char counter ── */
-    function updateCharCount(el) {
-      const n = el.value.length;
-      const cc = document.getElementById('charCount');
-      cc.textContent = n.toLocaleString('pt-BR') + ' caracteres';
-      cc.classList.toggle('has-content', n > 0);
+  /* ════════════════════════════════════════
+     MEME ROTATOR
+     ════════════════════════════════════════ */
+  const memes = [
+    { emoji: '🧠', line: 'Ctrl+C, Ctrl+V, PDF. Brain too big.',        sub: 'Tecnologia de ponta a serviço da preguiça honesta.' },
+    { emoji: '😤', line: 'Mailchimp não te dá PDF. Nós sim.',           sub: 'Justiça para os analistas de comunicação.' },
+    { emoji: '🚀', line: 'Mais rápido que explicar pro TI.',             sub: 'É só colar e clicar. Promessa.' },
+    { emoji: '💀', line: 'Fazer PDF na mão? Aquele horror.',             sub: 'Nunca mais. A gente resolveu isso.' },
+    { emoji: '🔥', line: 'Hot take: relatório bom é relatório pronto.',  sub: 'E esse fica pronto em 10 segundos.' },
+    { emoji: '📊', line: 'Dados lindos merecem PDF lindo.',              sub: 'Fidelidade total ao design original.' },
+    { emoji: '☕', line: 'Café na mão, relatório na tela.',              sub: 'Você só precisa de Ctrl+V.' },
+    { emoji: '✅', line: 'Done. É isso. Simples assim.',                 sub: 'Por que complicar o que pode ser simples?' },
+  ];
+  let memeIdx = 0;
+  const emojiEl = document.getElementById('meme-emoji');
+  const lineEl  = document.getElementById('meme-line');
+  const subEl   = document.getElementById('meme-sub');
+  setInterval(() => {
+    memeIdx = (memeIdx + 1) % memes.length;
+    const m = memes[memeIdx];
+    emojiEl.style.transform = 'scale(0)';
+    setTimeout(() => {
+      emojiEl.textContent = m.emoji;
+      lineEl.textContent  = m.line;
+      subEl.textContent   = m.sub;
+      emojiEl.style.transform = '';
+    }, 180);
+  }, 4000);
+
+  /* ════════════════════════════════════════
+     HELPERS
+     ════════════════════════════════════════ */
+  function updateCharCount(el) {
+    const n = el.value.length;
+    const cc = document.getElementById('charCount');
+    cc.textContent = n.toLocaleString('pt-BR') + ' caracteres';
+    cc.classList.toggle('has-content', n > 0);
+  }
+
+  function startProgress(id, slow = false) {
+    const bar = document.getElementById(id);
+    bar.classList.remove('slow');
+    if (slow) bar.classList.add('slow');
+    bar.classList.add('active');
+    const fill = bar.querySelector('.progress-fill');
+    fill.style.animation = 'none'; void fill.offsetWidth; fill.style.animation = '';
+  }
+  function stopProgress(id) { document.getElementById(id).classList.remove('active'); }
+
+  function showConvertStatus(type, msg) {
+    const s = document.getElementById('status-convert');
+    s.className = `status-box ${type}`; s.style.display = 'block'; s.textContent = msg;
+  }
+
+  /* ════════════════════════════════════════
+     UPLOAD ZONE (card 2)
+     ════════════════════════════════════════ */
+  let selectedFile = null;
+  const zone = document.getElementById('upload-zone');
+  zone.addEventListener('dragover',  e => { e.preventDefault(); zone.classList.add('drag-over'); });
+  zone.addEventListener('dragleave', () => zone.classList.remove('drag-over'));
+  zone.addEventListener('drop', e => {
+    e.preventDefault(); zone.classList.remove('drag-over');
+    const f = e.dataTransfer.files[0];
+    if (f && f.type === 'application/pdf') setFile(f);
+    else showConvertStatus('error', '⚠️ Por favor, selecione apenas arquivos .pdf');
+  });
+  function onFileSelect(input) { if (input.files[0]) setFile(input.files[0]); }
+  function setFile(f) {
+    selectedFile = f;
+    document.getElementById('upload-icon').textContent = '✅';
+    document.getElementById('upload-text').innerHTML = `Arquivo selecionado<small>${formatBytes(f.size)}</small>`;
+    const fn = document.getElementById('upload-filename');
+    fn.textContent = f.name; fn.style.display = 'block';
+    zone.classList.add('has-file');
+    document.getElementById('btn-pptx').disabled = false;
+    document.getElementById('btn-docx').disabled = false;
+    document.getElementById('status-convert').style.display = 'none';
+  }
+  function formatBytes(bytes) {
+    if (bytes < 1024) return bytes + ' B';
+    if (bytes < 1048576) return (bytes / 1024).toFixed(1) + ' KB';
+    return (bytes / 1048576).toFixed(1) + ' MB';
+  }
+
+  /* ════════════════════════════════════════
+     CANVAS BACKGROUND
+     ════════════════════════════════════════ */
+  (function () {
+    const canvas = document.getElementById('bg-canvas');
+    const ctx = canvas.getContext('2d');
+    let W, H, particles = [];
+    function resize() { W = canvas.width = window.innerWidth; H = canvas.height = window.innerHeight; }
+    function makeParticle() {
+      const colors = ['rgba(212,212,50,', 'rgba(232,69,0,', 'rgba(42,42,42,'];
+      const c = colors[Math.floor(Math.random() * colors.length)];
+      return { x: Math.random()*W, y: Math.random()*H, r: Math.random()*1.2+0.3, vx: (Math.random()-0.5)*0.14, vy: (Math.random()-0.5)*0.14, a: Math.random()*0.22+0.04, color: c };
     }
-
-    /* ── Upload zone ── */
-    let selectedFile = null;
-    const zone = document.getElementById('upload-zone');
-
-    zone.addEventListener('dragover',  e => { e.preventDefault(); zone.classList.add('drag-over'); });
-    zone.addEventListener('dragleave', () => zone.classList.remove('drag-over'));
-    zone.addEventListener('drop', e => {
-      e.preventDefault();
-      zone.classList.remove('drag-over');
-      const f = e.dataTransfer.files[0];
-      if (f && f.type === 'application/pdf') setFile(f);
-      else showConvertStatus('error', '⚠️ Por favor, selecione apenas arquivos .pdf');
-    });
-
-    function onFileSelect(input) {
-      if (input.files[0]) setFile(input.files[0]);
-    }
-
-    function setFile(f) {
-      selectedFile = f;
-      document.getElementById('upload-icon').textContent = '✅';
-      document.getElementById('upload-text').innerHTML =
-        `Arquivo selecionado<small>${formatBytes(f.size)}</small>`;
-      const fn = document.getElementById('upload-filename');
-      fn.textContent = f.name;
-      fn.style.display = 'block';
-      zone.classList.add('has-file');
-      document.getElementById('btn-pptx').disabled = false;
-      document.getElementById('btn-docx').disabled = false;
-      const s = document.getElementById('status-convert');
-      s.style.display = 'none';
-    }
-
-    function formatBytes(bytes) {
-      if (bytes < 1024)       return bytes + ' B';
-      if (bytes < 1048576)    return (bytes / 1024).toFixed(1) + ' KB';
-      return (bytes / 1048576).toFixed(1) + ' MB';
-    }
-
-    /* ── Progress helper ── */
-    function startProgress(id, slow = false) {
-      const bar = document.getElementById(id);
-      bar.classList.remove('slow');
-      if (slow) bar.classList.add('slow');
-      bar.classList.add('active');
-      const fill = bar.querySelector('.progress-fill');
-      fill.style.animation = 'none';
-      void fill.offsetWidth;
-      fill.style.animation = '';
-    }
-    function stopProgress(id) {
-      document.getElementById(id).classList.remove('active');
-    }
-
-    function showConvertStatus(type, msg) {
-      const s = document.getElementById('status-convert');
-      s.className = `status-box ${type}`;
-      s.style.display = 'block';
-      s.textContent = msg;
-    }
-
-    /* ── Canvas background (light, Listening style) ── */
-    (function () {
-      const canvas = document.getElementById('bg-canvas');
-      const ctx    = canvas.getContext('2d');
-      let W, H, particles = [];
-      function resize() { W = canvas.width = window.innerWidth; H = canvas.height = window.innerHeight; }
-
-      function makeParticle() {
-        const colors = ['rgba(212,212,50,', 'rgba(232,69,0,', 'rgba(42,42,42,'];
-        const c = colors[Math.floor(Math.random() * colors.length)];
-        return {
-          x: Math.random()*W, y: Math.random()*H,
-          r: Math.random()*1.2+0.3,
-          vx: (Math.random()-0.5)*0.14, vy: (Math.random()-0.5)*0.14,
-          a: Math.random()*0.22+0.04,
-          color: c
-        };
-      }
-      function init() { resize(); particles = Array.from({length:70}, makeParticle); }
-      function draw() {
-        ctx.clearRect(0,0,W,H);
-        // Subtle blobs
-        [{x:W*.15,y:H*.2,r:W*.32,c:'rgba(212,212,50,0.06)'},{x:W*.85,y:H*.8,r:W*.28,c:'rgba(232,69,0,0.05)'},{x:W*.5,y:H*.5,r:W*.2,c:'rgba(42,42,42,0.04)'}]
-        .forEach(b => {
-          const g = ctx.createRadialGradient(b.x,b.y,0,b.x,b.y,b.r);
-          g.addColorStop(0,b.c); g.addColorStop(1,'transparent');
-          ctx.fillStyle=g; ctx.beginPath(); ctx.arc(b.x,b.y,b.r,0,Math.PI*2); ctx.fill();
-        });
-        particles.forEach(p => {
-          ctx.beginPath(); ctx.arc(p.x,p.y,p.r,0,Math.PI*2);
-          ctx.fillStyle=`${p.color}${p.a})`; ctx.fill();
-          p.x+=p.vx; p.y+=p.vy;
-          if(p.x<0||p.x>W) p.vx*=-1; if(p.y<0||p.y>H) p.vy*=-1;
-        });
-        for(let i=0;i<particles.length;i++) for(let j=i+1;j<particles.length;j++) {
-          const dx=particles[i].x-particles[j].x, dy=particles[i].y-particles[j].y;
-          const d=Math.sqrt(dx*dx+dy*dy);
-          if(d<90){ ctx.beginPath(); ctx.moveTo(particles[i].x,particles[i].y); ctx.lineTo(particles[j].x,particles[j].y);
-            ctx.strokeStyle=`rgba(0,0,0,${0.04*(1-d/90)})`; ctx.lineWidth=0.5; ctx.stroke(); }
-        }
-        requestAnimationFrame(draw);
-      }
-      window.addEventListener('resize', resize); init(); draw();
-    })();
-
-    /* ── URLs dos Workers ── */
-    const WORKER_PDF     = 'https://inpacto-pdf.doctorvictorandrews.workers.dev/pdf';
-    const WORKER_CONVERT = 'https://inpacto-convert.doctorvictorandrews.workers.dev';
-
-    /* ── PDF generation (card 1) ── */
-    async function generatePDF() {
-      const code   = document.getElementById('htmlInput').value.trim();
-      const btn    = document.getElementById('btn-pdf');
-      const status = document.getElementById('status-pdf');
-
-      if (!code) {
-        status.className = 'status-box error';
-        status.style.display = 'block';
-        status.textContent = '⚠️ Cole o código-fonte do Mailchimp primeiro.';
-        return;
-      }
-
-      btn.disabled = true;
-      btn.innerHTML = '<span class="spinner"></span> Gerando PDF…';
-      status.className = 'status-box loading';
-      status.style.display = 'block';
-      status.textContent = '⏳ Enviando para o servidor… isso leva cerca de 10 segundos.';
-      startProgress('progress-pdf');
-
-      try {
-        const response = await fetch(WORKER_PDF, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ html: code }),
-        });
-        if (!response.ok) throw new Error((await response.text()) || `Erro ${response.status}`);
-
-        const blob = await response.blob();
-        const url  = URL.createObjectURL(blob);
-        const a    = document.createElement('a');
-        a.href     = url;
-        a.download = `Relatorio_MDA_${new Date().toISOString().slice(0,10)}.pdf`;
-        document.body.appendChild(a); a.click(); a.remove();
-        URL.revokeObjectURL(url);
-
-        status.className = 'status-box success';
-        status.textContent = '✅ PDF gerado e baixado com sucesso!';
-      } catch (err) {
-        status.className = 'status-box error';
-        status.textContent = `❌ Erro: ${err.message}`;
-      } finally {
-        stopProgress('progress-pdf');
-        btn.disabled = false;
-        btn.innerHTML = `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="12" y1="18" x2="12" y2="12"/><polyline points="9 15 12 18 15 15"/></svg> Gerar PDF Agora`;
-      }
-    }
-
-    /* ── Convert PDF → PPTX / DOCX (card 2) ── */
-    async function convertFile(format) {
-      if (!selectedFile) return;
-
-      const btnId   = format === 'pptx' ? 'btn-pptx' : 'btn-docx';
-      const otherId = format === 'pptx' ? 'btn-docx'  : 'btn-pptx';
-      const btn     = document.getElementById(btnId);
-      const label   = format === 'pptx' ? 'PowerPoint' : 'Word';
-
-      btn.disabled = true;
-      document.getElementById(otherId).disabled = true;
-      btn.innerHTML = `<span class="spinner"></span> Convertendo…`;
-
-      showConvertStatus('loading', `⏳ Convertendo para ${label}… pode levar até 30 segundos.`);
-      startProgress('progress-convert', true);
-
-      try {
-        const base64 = await fileToBase64(selectedFile);
-
-        const response = await fetch(`${WORKER_CONVERT}/to-${format}`, {
-          method:  'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body:    JSON.stringify({ pdf: base64 }),
-        });
-
-        if (!response.ok) throw new Error((await response.text()) || `Erro ${response.status}`);
-
-        const blob = await response.blob();
-        const url  = URL.createObjectURL(blob);
-        const a    = document.createElement('a');
-        const ext  = format === 'pptx' ? '.pptx' : '.docx';
-        a.href     = url;
-        a.download = selectedFile.name.replace(/\.pdf$/i, ext);
-        document.body.appendChild(a); a.click(); a.remove();
-        URL.revokeObjectURL(url);
-
-        showConvertStatus('success', `✅ ${label} gerado e baixado com sucesso!`);
-      } catch (err) {
-        showConvertStatus('error', `❌ Erro: ${err.message}`);
-      } finally {
-        stopProgress('progress-convert');
-        btn.disabled = false;
-        document.getElementById(otherId).disabled = false;
-
-        const icons = {
-          pptx: `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/></svg> → PowerPoint`,
-          docx: `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg> → Word`,
-        };
-        btn.innerHTML = icons[format];
-      }
-    }
-
-    function fileToBase64(file) {
-      return new Promise((resolve, reject) => {
-        const reader = new FileReader();
-        reader.onload  = () => resolve(reader.result.split(',')[1]);
-        reader.onerror = () => reject(new Error('Falha ao ler o arquivo'));
-        reader.readAsDataURL(file);
+    function init() { resize(); particles = Array.from({length:70}, makeParticle); }
+    function draw() {
+      ctx.clearRect(0,0,W,H);
+      [{x:W*.15,y:H*.2,r:W*.32,c:'rgba(212,212,50,0.06)'},{x:W*.85,y:H*.8,r:W*.28,c:'rgba(232,69,0,0.05)'},{x:W*.5,y:H*.5,r:W*.2,c:'rgba(42,42,42,0.04)'}]
+      .forEach(b => {
+        const g = ctx.createRadialGradient(b.x,b.y,0,b.x,b.y,b.r);
+        g.addColorStop(0,b.c); g.addColorStop(1,'transparent');
+        ctx.fillStyle=g; ctx.beginPath(); ctx.arc(b.x,b.y,b.r,0,Math.PI*2); ctx.fill();
       });
+      particles.forEach(p => {
+        ctx.beginPath(); ctx.arc(p.x,p.y,p.r,0,Math.PI*2);
+        ctx.fillStyle=`${p.color}${p.a})`; ctx.fill();
+        p.x+=p.vx; p.y+=p.vy;
+        if(p.x<0||p.x>W) p.vx*=-1; if(p.y<0||p.y>H) p.vy*=-1;
+      });
+      for(let i=0;i<particles.length;i++) for(let j=i+1;j<particles.length;j++) {
+        const dx=particles[i].x-particles[j].x, dy=particles[i].y-particles[j].y;
+        const d=Math.sqrt(dx*dx+dy*dy);
+        if(d<90){ ctx.beginPath(); ctx.moveTo(particles[i].x,particles[i].y); ctx.lineTo(particles[j].x,particles[j].y);
+          ctx.strokeStyle=`rgba(0,0,0,${0.04*(1-d/90)})`; ctx.lineWidth=0.5; ctx.stroke(); }
+      }
+      requestAnimationFrame(draw);
     }
+    window.addEventListener('resize', resize); init(); draw();
+  })();
+
+  /* ════════════════════════════════════════
+     WORKER URLs
+     ════════════════════════════════════════ */
+  const WORKER_PDF     = 'https://inpacto-pdf.doctorvictorandrews.workers.dev/pdf';
+  const WORKER_CONVERT = 'https://inpacto-convert.doctorvictorandrews.workers.dev';
+
+  /* ════════════════════════════════════════
+     PDF GENERATION → opens editor
+     ════════════════════════════════════════ */
+  async function generatePDF() {
+    const code   = document.getElementById('htmlInput').value.trim();
+    const btn    = document.getElementById('btn-pdf');
+    const status = document.getElementById('status-pdf');
+
+    if (!code) {
+      status.className = 'status-box error';
+      status.style.display = 'block';
+      status.textContent = '⚠️ Cole o código-fonte do Mailchimp primeiro.';
+      return;
+    }
+
+    btn.disabled = true;
+    btn.innerHTML = '<span class="spinner"></span> Gerando PDF…';
+    status.className = 'status-box loading';
+    status.style.display = 'block';
+    status.textContent = '⏳ Enviando para o servidor… isso leva cerca de 10 segundos.';
+    startProgress('progress-pdf');
+
+    try {
+      const response = await fetch(WORKER_PDF, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ html: code }),
+      });
+      if (!response.ok) throw new Error((await response.text()) || `Erro ${response.status}`);
+
+      const arrayBuffer = await response.arrayBuffer();
+      const filename = `Relatorio_MDA_${new Date().toISOString().slice(0,10)}.pdf`;
+
+      // Download imediato
+      const blob = new Blob([arrayBuffer], { type: 'application/pdf' });
+      const url  = URL.createObjectURL(blob);
+      const a    = document.createElement('a');
+      a.href     = url; a.download = filename;
+      document.body.appendChild(a); a.click(); a.remove();
+      URL.revokeObjectURL(url);
+
+      status.className = 'status-box success';
+      status.textContent = '✅ PDF baixado! O editor está aberto caso queira recortar ou ajustar.';
+      stopProgress('progress-pdf');
+
+      // Abre editor em paralelo (não bloqueia o download)
+      await openEditor(arrayBuffer, filename);
+
+    } catch (err) {
+      status.className = 'status-box error';
+      status.textContent = `❌ Erro: ${err.message}`;
+      stopProgress('progress-pdf');
+    } finally {
+      btn.disabled = false;
+      btn.innerHTML = `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="12" y1="18" x2="12" y2="12"/><polyline points="9 15 12 18 15 15"/></svg> Gerar PDF Agora`;
+    }
+  }
+
+  /* ════════════════════════════════════════
+     EDITOR STATE
+     ════════════════════════════════════════ */
+  let editorPdfBytes  = null;   // original ArrayBuffer
+  let editorPages     = [];     // [{origIndex, canvas, included, cropBox:{x,y,w,h,cW,cH}}]
+  let editorFilename  = 'Relatorio_Editado.pdf';
+  let editorMode      = 'select'; // 'select' | 'crop'
+  let dragSrcIndex    = null;
+
+  async function openEditor(pdfBytes, filename) {
+    editorPdfBytes = pdfBytes;
+    editorFilename = filename;
+    editorPages    = [];
+
+    document.getElementById('ed-filename').textContent = filename;
+    document.getElementById('pdf-editor').classList.add('active');
+    document.getElementById('ed-loading').style.display = 'flex';
+    document.getElementById('ed-pages-area').innerHTML = '';
+    document.getElementById('ed-btn-download').disabled = true;
+    setMode('select');
+
+    try {
+      const pdf = await pdfjsLib.getDocument({ data: pdfBytes.slice(0) }).promise;
+      const THUMB_W = 180; // target thumbnail width in px
+
+      for (let i = 1; i <= pdf.numPages; i++) {
+        const page     = await pdf.getPage(i);
+        const origVP   = page.getViewport({ scale: 1 });
+        const scale    = THUMB_W / origVP.width;
+        const viewport = page.getViewport({ scale });
+
+        const canvas  = document.createElement('canvas');
+        canvas.width  = Math.round(viewport.width);
+        canvas.height = Math.round(viewport.height);
+        await page.render({ canvasContext: canvas.getContext('2d'), viewport }).promise;
+
+        editorPages.push({
+          origIndex: i - 1,
+          canvas,
+          included: true,
+          cropBox: null,
+          pdfWidth:  origVP.width,
+          pdfHeight: origVP.height,
+        });
+      }
+
+      renderPageGrid();
+    } catch (e) {
+      alert('Erro ao renderizar páginas: ' + e.message);
+      closeEditor();
+    } finally {
+      document.getElementById('ed-loading').style.display = 'none';
+      document.getElementById('ed-btn-download').disabled = false;
+    }
+  }
+
+  function closeEditor() {
+    document.getElementById('pdf-editor').classList.remove('active');
+    editorPages = [];
+    editorPdfBytes = null;
+  }
+
+  function setMode(mode) {
+    editorMode = mode;
+    document.getElementById('btn-select-mode').classList.toggle('active', mode === 'select');
+    document.getElementById('btn-crop-mode').classList.toggle('active', mode === 'crop');
+    document.getElementById('ed-hint-select').style.display = mode === 'select' ? '' : 'none';
+    document.getElementById('ed-hint-delete').style.display = mode === 'select' ? '' : 'none';
+    document.getElementById('ed-hint-crop').style.display   = mode === 'crop'   ? '' : 'none';
+    renderPageGrid();
+  }
+
+  /* ── Render the page grid ── */
+  function renderPageGrid() {
+    const area = document.getElementById('ed-pages-area');
+    area.innerHTML = '';
+
+    editorPages.forEach((pg, idx) => {
+      const card = document.createElement('div');
+      card.className = 'page-card' + (pg.included ? '' : ' excluded');
+      card.dataset.idx = idx;
+      card.draggable = (editorMode === 'select');
+
+      // Thumbnail canvas clone
+      const thumb = pg.canvas.cloneNode();
+      thumb.getContext('2d').drawImage(pg.canvas, 0, 0);
+      card.appendChild(thumb);
+
+      // Crop indicator overlay
+      if (pg.cropBox) {
+        const ci = document.createElement('div');
+        ci.className = 'crop-indicator';
+        const cb = pg.cropBox;
+        // scale from crop canvas coords back to thumbnail coords
+        const scaleX = pg.canvas.width  / cb.cW;
+        const scaleY = pg.canvas.height / cb.cH;
+        ci.style.left   = Math.round(cb.x * scaleX) + 'px';
+        ci.style.top    = Math.round(cb.y * scaleY) + 'px';
+        ci.style.width  = Math.round(cb.w * scaleX) + 'px';
+        ci.style.height = Math.round(cb.h * scaleY) + 'px';
+        card.appendChild(ci);
+        card.classList.add('has-crop');
+      }
+
+      // Badge
+      const badge = document.createElement('div');
+      badge.className = 'ed-pages-count';
+      badge.textContent = 'p. ' + (idx + 1);
+      card.appendChild(badge);
+
+      // Footer
+      const footer = document.createElement('div');
+      footer.className = 'page-card-footer';
+
+      const num = document.createElement('span');
+      num.className = 'page-num';
+      num.textContent = `Pág. ${idx + 1}${pg.cropBox ? ' ✂' : ''}`;
+      footer.appendChild(num);
+
+      const actions = document.createElement('div');
+      actions.className = 'page-card-actions';
+
+      // Crop button
+      const cropBtn = document.createElement('button');
+      cropBtn.className = 'page-action-btn crop-btn';
+      cropBtn.title = 'Recortar esta página';
+      cropBtn.innerHTML = '✂';
+      cropBtn.onclick = (e) => { e.stopPropagation(); openCropModal(idx); };
+      actions.appendChild(cropBtn);
+
+      // Delete / Restore
+      if (pg.included) {
+        const delBtn = document.createElement('button');
+        delBtn.className = 'page-action-btn del-btn';
+        delBtn.title = 'Remover página';
+        delBtn.innerHTML = '×';
+        delBtn.onclick = (e) => { e.stopPropagation(); togglePage(idx); };
+        actions.appendChild(delBtn);
+      } else {
+        const restBtn = document.createElement('button');
+        restBtn.className = 'page-action-btn restore-btn';
+        restBtn.title = 'Restaurar página';
+        restBtn.innerHTML = '↩';
+        restBtn.onclick = (e) => { e.stopPropagation(); togglePage(idx); };
+        actions.appendChild(restBtn);
+      }
+
+      footer.appendChild(actions);
+      card.appendChild(footer);
+
+      // Drag events
+      card.addEventListener('dragstart', onDragStart);
+      card.addEventListener('dragover',  onDragOver);
+      card.addEventListener('dragleave', onDragLeave);
+      card.addEventListener('drop',      onDrop);
+      card.addEventListener('dragend',   onDragEnd);
+
+      area.appendChild(card);
+    });
+  }
+
+  function togglePage(idx) {
+    editorPages[idx].included = !editorPages[idx].included;
+    renderPageGrid();
+  }
+
+  /* ── Drag-to-reorder ── */
+  function onDragStart(e) {
+    dragSrcIndex = parseInt(this.dataset.idx);
+    this.classList.add('dragging');
+    e.dataTransfer.effectAllowed = 'move';
+  }
+  function onDragOver(e) {
+    e.preventDefault(); e.dataTransfer.dropEffect = 'move';
+    this.classList.add('drag-over');
+  }
+  function onDragLeave() { this.classList.remove('drag-over'); }
+  function onDrop(e) {
+    e.preventDefault();
+    this.classList.remove('drag-over');
+    const destIndex = parseInt(this.dataset.idx);
+    if (dragSrcIndex === null || dragSrcIndex === destIndex) return;
+    const moved = editorPages.splice(dragSrcIndex, 1)[0];
+    editorPages.splice(destIndex, 0, moved);
+    renderPageGrid();
+  }
+  function onDragEnd() {
+    document.querySelectorAll('.page-card').forEach(c => {
+      c.classList.remove('dragging', 'drag-over');
+    });
+    dragSrcIndex = null;
+  }
+
+  /* ════════════════════════════════════════
+     CROP MODAL
+     ════════════════════════════════════════ */
+  let cropPageIdx    = null;  // index in editorPages
+  let cropStart      = null;  // {x, y}
+  let cropRect       = null;  // {x, y, w, h}
+  let cropIsDragging = false;
+
+  const CROP_RENDER_SCALE = 1.5; // render at 1.5x for crop modal clarity
+
+  async function openCropModal(idx) {
+    cropPageIdx = idx;
+    cropRect    = editorPages[idx].cropBox ? { ...editorPages[idx].cropBox } : null;
+    cropStart   = null;
+
+    document.getElementById('crop-page-label').textContent = `Pág. ${idx + 1}`;
+    document.getElementById('crop-modal').classList.add('active');
+    document.getElementById('crop-confirm-btn').disabled = !cropRect;
+    document.getElementById('crop-selection').style.display = 'none';
+
+    // Render page at higher scale for the crop modal
+    const pdf      = await pdfjsLib.getDocument({ data: editorPdfBytes.slice(0) }).promise;
+    const page     = await pdf.getPage(editorPages[idx].origIndex + 1);
+    const origVP   = page.getViewport({ scale: 1 });
+
+    // Scale to max 500px wide
+    const maxW  = Math.min(500, window.innerWidth - 80);
+    const scale = maxW / origVP.width;
+    const vp    = page.getViewport({ scale });
+
+    const cropCanvas = document.getElementById('crop-canvas');
+    cropCanvas.width  = Math.round(vp.width);
+    cropCanvas.height = Math.round(vp.height);
+    await page.render({ canvasContext: cropCanvas.getContext('2d'), viewport: vp }).promise;
+
+    // Restore existing crop selection if any
+    if (cropRect) {
+      const scaleX = cropCanvas.width  / cropRect.cW;
+      const scaleY = cropCanvas.height / cropRect.cH;
+      drawCropSelection(
+        cropRect.x * scaleX,
+        cropRect.y * scaleY,
+        cropRect.w * scaleX,
+        cropRect.h * scaleY
+      );
+    }
+
+    // Mouse events for drawing selection
+    const wrap = document.getElementById('crop-canvas-wrap');
+    wrap.onmousedown = cropMouseDown;
+    wrap.onmousemove = cropMouseMove;
+    wrap.onmouseup   = cropMouseUp;
+  }
+
+  function getCanvasCoords(e) {
+    const rect = document.getElementById('crop-canvas').getBoundingClientRect();
+    return { x: e.clientX - rect.left, y: e.clientY - rect.top };
+  }
+
+  function cropMouseDown(e) {
+    if (e.button !== 0) return;
+    cropStart     = getCanvasCoords(e);
+    cropIsDragging = true;
+    document.getElementById('crop-selection').style.display = 'none';
+    cropRect = null;
+    document.getElementById('crop-confirm-btn').disabled = true;
+  }
+
+  function cropMouseMove(e) {
+    if (!cropIsDragging || !cropStart) return;
+    const curr = getCanvasCoords(e);
+    const x = Math.min(cropStart.x, curr.x);
+    const y = Math.min(cropStart.y, curr.y);
+    const w = Math.abs(curr.x - cropStart.x);
+    const h = Math.abs(curr.y - cropStart.y);
+    drawCropSelection(x, y, w, h);
+  }
+
+  function cropMouseUp(e) {
+    if (!cropIsDragging) return;
+    cropIsDragging = false;
+    const curr = getCanvasCoords(e);
+    const cW = document.getElementById('crop-canvas').width;
+    const cH = document.getElementById('crop-canvas').height;
+    cropRect = {
+      x: Math.min(cropStart.x, curr.x),
+      y: Math.min(cropStart.y, curr.y),
+      w: Math.abs(curr.x - cropStart.x),
+      h: Math.abs(curr.y - cropStart.y),
+      cW, cH,
+    };
+    if (cropRect.w < 5 || cropRect.h < 5) {
+      cropRect = null;
+      document.getElementById('crop-selection').style.display = 'none';
+      document.getElementById('crop-confirm-btn').disabled = true;
+      return;
+    }
+    document.getElementById('crop-confirm-btn').disabled = false;
+  }
+
+  function drawCropSelection(x, y, w, h) {
+    const sel = document.getElementById('crop-selection');
+    sel.style.display = 'block';
+    sel.style.left   = x + 'px';
+    sel.style.top    = y + 'px';
+    sel.style.width  = w + 'px';
+    sel.style.height = h + 'px';
+  }
+
+  function clearCropSelection() {
+    cropRect = null;
+    document.getElementById('crop-selection').style.display = 'none';
+    document.getElementById('crop-confirm-btn').disabled = true;
+    // Also clear from page
+    if (cropPageIdx !== null) {
+      editorPages[cropPageIdx].cropBox = null;
+    }
+  }
+
+  function confirmCrop() {
+    if (!cropRect || cropPageIdx === null) return;
+    const applyAll = document.getElementById('crop-apply-all-chk').checked;
+
+    if (applyAll) {
+      editorPages.forEach(pg => { pg.cropBox = { ...cropRect }; });
+    } else {
+      editorPages[cropPageIdx].cropBox = { ...cropRect };
+    }
+    closeCropModal();
+    renderPageGrid();
+  }
+
+  function closeCropModal() {
+    document.getElementById('crop-modal').classList.remove('active');
+    const wrap = document.getElementById('crop-canvas-wrap');
+    wrap.onmousedown = null; wrap.onmousemove = null; wrap.onmouseup = null;
+    cropPageIdx = null; cropRect = null; cropStart = null; cropIsDragging = false;
+  }
+
+  /* ════════════════════════════════════════
+     APPLY EDITS + DOWNLOAD
+     ════════════════════════════════════════ */
+  async function applyAndDownload() {
+    const btn = document.getElementById('ed-btn-download');
+    btn.disabled = true;
+    btn.innerHTML = '<span class="spinner-dark"></span> Processando…';
+
+    try {
+      const { PDFDocument } = PDFLib;
+      const srcDoc = await PDFDocument.load(editorPdfBytes);
+      const newDoc = await PDFDocument.create();
+
+      const included = editorPages.filter(p => p.included);
+      if (!included.length) { alert('Nenhuma página selecionada.'); return; }
+
+      const indices     = included.map(p => p.origIndex);
+      const copiedPages = await newDoc.copyPages(srcDoc, indices);
+
+      copiedPages.forEach((pdfPage, i) => {
+        const edPage = included[i];
+        if (edPage.cropBox) {
+          const cb = edPage.cropBox;
+          const { width: pW, height: pH } = pdfPage.getSize();
+          // canvas → PDF coordinate transform
+          const scaleX = pW / cb.cW;
+          const scaleY = pH / cb.cH;
+          // PDF origin: bottom-left; canvas origin: top-left
+          const left   = cb.x * scaleX;
+          const bottom = pH - (cb.y + cb.h) * scaleY;
+          const right  = (cb.x + cb.w) * scaleX;
+          const top    = pH - cb.y * scaleY;
+          pdfPage.setCropBox(left, bottom, right - left, top - bottom);
+          // Also shrink MediaBox so rendered size matches crop
+          pdfPage.setMediaBox(left, bottom, right - left, top - bottom);
+        }
+        newDoc.addPage(pdfPage);
+      });
+
+      const pdfBytes = await newDoc.save();
+      const blob = new Blob([pdfBytes], { type: 'application/pdf' });
+      const url  = URL.createObjectURL(blob);
+      const a    = document.createElement('a');
+      a.href     = url;
+      a.download = editorFilename.replace('.pdf', '_EDITADO.pdf');
+      document.body.appendChild(a); a.click(); a.remove();
+      URL.revokeObjectURL(url);
+
+    } catch (err) {
+      alert('Erro ao processar PDF: ' + err.message);
+    } finally {
+      btn.disabled = false;
+      btn.innerHTML = `<svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg> Baixar PDF`;
+    }
+  }
+
+  /* ════════════════════════════════════════
+     CONVERT PDF → PPTX / DOCX  (card 2)
+     ════════════════════════════════════════ */
+  async function convertFile(format) {
+    if (!selectedFile) return;
+    const btnId   = format === 'pptx' ? 'btn-pptx' : 'btn-docx';
+    const otherId = format === 'pptx' ? 'btn-docx'  : 'btn-pptx';
+    const btn     = document.getElementById(btnId);
+    const label   = format === 'pptx' ? 'PowerPoint' : 'Word';
+    btn.disabled = true;
+    document.getElementById(otherId).disabled = true;
+    btn.innerHTML = `<span class="spinner"></span> Convertendo…`;
+    showConvertStatus('loading', `⏳ Convertendo para ${label}… pode levar até 30 segundos.`);
+    startProgress('progress-convert', true);
+    try {
+      const base64 = await fileToBase64(selectedFile);
+      const response = await fetch(`${WORKER_CONVERT}/to-${format}`, {
+        method:  'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body:    JSON.stringify({ pdf: base64 }),
+      });
+      if (!response.ok) throw new Error((await response.text()) || `Erro ${response.status}`);
+      const blob = await response.blob();
+      const url  = URL.createObjectURL(blob);
+      const a    = document.createElement('a');
+      const ext  = format === 'pptx' ? '.pptx' : '.docx';
+      a.href     = url; a.download = selectedFile.name.replace(/\.pdf$/i, ext);
+      document.body.appendChild(a); a.click(); a.remove();
+      URL.revokeObjectURL(url);
+      showConvertStatus('success', `✅ ${label} gerado e baixado com sucesso!`);
+    } catch (err) {
+      showConvertStatus('error', `❌ Erro: ${err.message}`);
+    } finally {
+      stopProgress('progress-convert');
+      btn.disabled = false;
+      document.getElementById(otherId).disabled = false;
+      const icons = {
+        pptx: `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/></svg> → PowerPoint`,
+        docx: `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg> → Word`,
+      };
+      btn.innerHTML = icons[format];
+    }
+  }
+
+  function fileToBase64(file) {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload  = () => resolve(reader.result.split(',')[1]);
+      reader.onerror = () => reject(new Error('Falha ao ler o arquivo'));
+      reader.readAsDataURL(file);
+    });
+  }
   </script>
 </body>
 </html>
