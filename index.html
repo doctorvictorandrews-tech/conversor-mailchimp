@@ -577,7 +577,7 @@
       </div>
       <button class="ed-btn-download" id="ed-btn-download" onclick="applyAndDownload()">
         <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-        Baixar PDF editado
+        Baixar PDF
       </button>
       <button class="ed-btn-close" onclick="closeEditor()" title="Fechar editor">✕</button>
     </div>
@@ -755,13 +755,21 @@
   })();
 
   /* ════════════════════════════════════════
-     WORKER URLs
+     WORKER URLs + BROWSERLESS
+     Worker agora só processa HTML → devolve JSON.
+     A chamada ao Browserless é feita daqui diretamente,
+     sem passar pelo Worker, eliminando o limite de 30s.
+     Substitua SEU_TOKEN_AQUI pelo seu token do Browserless.
      ════════════════════════════════════════ */
-  const WORKER_PDF     = 'https://inpacto-pdf.doctorvictorandrews.workers.dev/pdf';
-  const WORKER_CONVERT = 'https://inpacto-convert.doctorvictorandrews.workers.dev';
+  const WORKER_PDF          = 'https://inpacto-pdf.doctorvictorandrews.workers.dev/pdf';
+  const WORKER_CONVERT      = 'https://inpacto-convert.doctorvictorandrews.workers.dev';
+  const BROWSERLESS_TOKEN   = 'SEU_TOKEN_AQUI';
+  const BROWSERLESS_PDF_URL = `https://production-sfo.browserless.io/pdf?token=${BROWSERLESS_TOKEN}`;
 
   /* ════════════════════════════════════════
-     PDF GENERATION → opens editor
+     PDF GENERATION — dois passos
+     Passo A: Worker limpa o HTML (< 2s, dentro do limite)
+     Passo B: browser chama Browserless diretamente (sem limite)
      ════════════════════════════════════════ */
   async function generatePDF() {
     const code   = document.getElementById('htmlInput').value.trim();
@@ -779,25 +787,47 @@
     btn.innerHTML = '<span class="spinner"></span> Gerando PDF…';
     status.className = 'status-box loading';
     status.style.display = 'block';
-    status.textContent = '⏳ Enviando para o servidor… isso leva cerca de 10 segundos.';
     startProgress('progress-pdf');
 
     try {
-      const response = await fetch(WORKER_PDF, {
+      // ── Passo A: Worker processa e devolve HTML limpo ──
+      status.textContent = '⏳ Processando HTML… (1/2)';
+      const workerResp = await fetch(WORKER_PDF, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ html: code }),
       });
-      if (!response.ok) throw new Error((await response.text()) || `Erro ${response.status}`);
+      if (!workerResp.ok) throw new Error((await workerResp.text()) || `Erro Worker ${workerResp.status}`);
+      const { html: processedHTML } = await workerResp.json();
 
-      const arrayBuffer = await response.arrayBuffer();
-      const filename = `Relatorio_MDA_${new Date().toISOString().slice(0,10)}.pdf`;
+      // ── Passo B: browser chama Browserless diretamente ──
+      status.textContent = '⏳ Gerando PDF… (2/2) — isso leva alguns segundos.';
+      const pdfResp = await fetch(BROWSERLESS_PDF_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          html: processedHTML,
+          options: {
+            printBackground:   true,
+            preferCSSPageSize: true,
+            margin: { top: '0', right: '0', bottom: '0', left: '0' },
+          },
+          gotoOptions: {
+            waitUntil: 'networkidle2',
+            timeout:   60000,
+          },
+        }),
+      });
+      if (!pdfResp.ok) throw new Error((await pdfResp.text()) || `Erro Browserless ${pdfResp.status}`);
+
+      const arrayBuffer = await pdfResp.arrayBuffer();
+      const filename    = `Relatorio_MDA_${new Date().toISOString().slice(0,10)}.pdf`;
 
       // Download imediato
       const blob = new Blob([arrayBuffer], { type: 'application/pdf' });
       const url  = URL.createObjectURL(blob);
       const a    = document.createElement('a');
-      a.href     = url; a.download = filename;
+      a.href = url; a.download = filename;
       document.body.appendChild(a); a.click(); a.remove();
       URL.revokeObjectURL(url);
 
