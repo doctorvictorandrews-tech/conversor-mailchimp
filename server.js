@@ -68,9 +68,10 @@ app.post('/pdf', async (req, res) => {
     await page.setViewport({ width: 600, height: 800 });
 
     try {
-      await page.setContent(html, { waitUntil: 'networkidle2', timeout: 20000 });
+      await page.setContent(html, { waitUntil: 'domcontentloaded', timeout: 30000 });
     } catch (_) {
-      await page.setContent(html, { waitUntil: 'load', timeout: 15000 });
+      // fallback: força continuar mesmo sem carregar tudo
+      await page.setContent(html, { waitUntil: 'commit', timeout: 15000 });
     }
 
     await page.evaluate(() =>
