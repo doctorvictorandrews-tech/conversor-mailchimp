@@ -27,18 +27,13 @@
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
     html, body {
-      width: 100%;
-      min-height: 100vh;
+      width: 100%; min-height: 100vh;
       font-family: 'Roboto Mono', monospace;
-      background: var(--bg);
-      color: var(--text);
-      overflow-x: hidden;
+      background: var(--bg); color: var(--text); overflow-x: hidden;
     }
 
-    /* ─── BG CANVAS ─── */
     #bg-canvas { position: fixed; inset: 0; z-index: 0; pointer-events: none; }
 
-    /* ─── FLOATING EMOJI ─── */
     .meme-float {
       position: fixed; font-size: 22px; pointer-events: none;
       z-index: 1; animation: floatUp linear infinite; opacity: 0; user-select: none;
@@ -50,272 +45,142 @@
       100% { transform: translateY(-10vh) rotate(360deg); opacity: 0; }
     }
 
-    /* ─── PAGE ─── */
     .page {
-      position: relative; z-index: 10;
-      min-height: 100vh;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      padding: 48px 20px;
-      gap: 18px;
+      position: relative; z-index: 10; min-height: 100vh;
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      padding: 48px 20px; gap: 18px;
     }
 
-    /* ─── CARD BASE ─── */
     .card {
-      width: 100%; max-width: 640px;
-      background: var(--surface);
-      border: 1.5px solid var(--border);
-      border-radius: 4px;
-      box-shadow:
-        0 2px 0 rgba(0,0,0,0.08),
-        0 12px 40px rgba(0,0,0,0.12);
+      width: 100%; max-width: 640px; background: var(--surface);
+      border: 1.5px solid var(--border); border-radius: 4px;
+      box-shadow: 0 2px 0 rgba(0,0,0,0.08), 0 12px 40px rgba(0,0,0,0.12);
       overflow: hidden;
     }
     .card:first-child { animation: fadeUp 0.6s cubic-bezier(0.16,1,0.3,1) both; }
     .card:last-child  { animation: fadeUp 0.6s 0.1s cubic-bezier(0.16,1,0.3,1) both; }
-
     @keyframes fadeUp {
       from { opacity: 0; transform: translateY(20px); }
       to   { opacity: 1; transform: translateY(0); }
     }
 
-    /* ─── CARD HEADER (dark — logo branco visível) ─── */
     .card-header {
-      padding: 28px 40px 26px;
-      border-bottom: 2px solid var(--yellow);
-      position: relative;
-      background: var(--charcoal);
+      padding: 28px 40px 26px; border-bottom: 2px solid var(--yellow);
+      position: relative; background: var(--charcoal);
     }
     .card-header::before {
-      content: '';
-      position: absolute; top: 0; left: 0; right: 0; height: 3px;
+      content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px;
       background: var(--yellow);
     }
     .logo-img { height: 38px; width: auto; display: block; }
     .logo-fallback {
-      display: none;
-      font-family: 'Roboto Slab', serif;
-      font-weight: 900; font-size: 28px; letter-spacing: -1px; line-height: 1;
-      color: #fff;
+      display: none; font-family: 'Roboto Slab', serif;
+      font-weight: 900; font-size: 28px; letter-spacing: -1px; line-height: 1; color: #fff;
     }
     .logo-sub {
-      margin-top: 8px; font-size: 9px;
-      letter-spacing: 0.2em; text-transform: uppercase; color: rgba(255,255,255,0.38);
-      font-family: 'Roboto Mono', monospace;
+      margin-top: 8px; font-size: 9px; letter-spacing: 0.2em; text-transform: uppercase;
+      color: rgba(255,255,255,0.38); font-family: 'Roboto Mono', monospace;
     }
 
-    /* Card header do segundo card */
     .card-header-simple {
-      padding: 22px 40px 20px;
-      border-bottom: 2px solid var(--yellow);
-      position: relative;
-      background: var(--charcoal);
+      padding: 22px 40px 20px; border-bottom: 2px solid var(--yellow);
+      position: relative; background: var(--charcoal);
     }
     .card-header-simple::before {
-      content: '';
-      position: absolute; top: 0; left: 0; right: 0; height: 3px;
+      content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px;
       background: var(--yellow);
     }
-    .card-title {
-      font-family: 'Roboto Slab', serif;
-      font-weight: 900; font-size: 16px; color: #fff;
-      letter-spacing: 0.02em;
-    }
-    .card-title-sub {
-      margin-top: 5px; font-size: 9px;
-      letter-spacing: 0.18em; text-transform: uppercase; color: rgba(255,255,255,0.38);
-    }
+    .card-title { font-family: 'Roboto Slab', serif; font-weight: 900; font-size: 16px; color: #fff; letter-spacing: 0.02em; }
+    .card-title-sub { margin-top: 5px; font-size: 9px; letter-spacing: 0.18em; text-transform: uppercase; color: rgba(255,255,255,0.38); }
 
-    /* ─── CARD BODY ─── */
     .card-body { padding: 30px 40px 34px; background: var(--surface); }
 
-    /* Meme box */
     .meme-box {
-      display: flex; align-items: center; gap: 14px;
-      padding: 14px 18px;
-      background: var(--charcoal);
-      border-left: 3px solid var(--yellow);
-      border-radius: 2px;
-      margin-bottom: 26px;
-      animation: fadeUp 0.6s 0.06s cubic-bezier(0.16,1,0.3,1) both;
-      position: relative;
+      display: flex; align-items: center; gap: 14px; padding: 14px 18px;
+      background: var(--charcoal); border-left: 3px solid var(--yellow); border-radius: 2px;
+      margin-bottom: 26px; animation: fadeUp 0.6s 0.06s cubic-bezier(0.16,1,0.3,1) both;
     }
-    .meme-emoji-big {
-      font-size: 32px; line-height: 1; flex-shrink: 0;
-      animation: wiggle 3s ease-in-out infinite;
-    }
+    .meme-emoji-big { font-size: 32px; line-height: 1; flex-shrink: 0; animation: wiggle 3s ease-in-out infinite; }
     @keyframes wiggle {
-      0%,100% { transform: rotate(-5deg) scale(1); }
-      25%      { transform: rotate(5deg) scale(1.08); }
-      50%      { transform: rotate(-3deg) scale(1.03); }
-      75%      { transform: rotate(4deg) scale(1.06); }
+      0%,100% { transform: rotate(-5deg) scale(1); } 25% { transform: rotate(5deg) scale(1.08); }
+      50% { transform: rotate(-3deg) scale(1.03); }  75% { transform: rotate(4deg) scale(1.06); }
     }
-    .meme-text {
-      font-family: 'Roboto Mono', monospace;
-      font-weight: 600; font-size: 13px; line-height: 1.4; color: #fff;
-    }
-    .meme-text small {
-      display: block; font-weight: 300; font-size: 11px;
-      color: rgba(255,255,255,0.45); margin-top: 3px;
-    }
+    .meme-text { font-family: 'Roboto Mono', monospace; font-weight: 600; font-size: 13px; line-height: 1.4; color: #fff; }
+    .meme-text small { display: block; font-weight: 300; font-size: 11px; color: rgba(255,255,255,0.45); margin-top: 3px; }
 
-    /* Steps */
-    .steps-label {
-      font-size: 9px; font-weight: 700; letter-spacing: 0.22em;
-      text-transform: uppercase; color: var(--text-dim);
-      margin-bottom: 12px; display: block;
-    }
-    .steps {
-      display: flex; flex-direction: column; gap: 8px;
-      margin-bottom: 26px;
-    }
+    .steps-label { font-size: 9px; font-weight: 700; letter-spacing: 0.22em; text-transform: uppercase; color: var(--text-dim); margin-bottom: 12px; display: block; }
+    .steps { display: flex; flex-direction: column; gap: 8px; margin-bottom: 26px; }
     .step {
-      display: flex; gap: 14px; align-items: flex-start;
-      padding: 14px 16px;
-      background: rgba(255,255,255,0.6);
-      border: 1.5px solid var(--border);
-      border-radius: 2px;
+      display: flex; gap: 14px; align-items: flex-start; padding: 14px 16px;
+      background: rgba(255,255,255,0.6); border: 1.5px solid var(--border); border-radius: 2px;
       transition: border-color 0.2s, background 0.2s, transform 0.2s; cursor: default;
     }
-    .step:hover {
-      border-color: var(--yellow);
-      background: rgba(212,212,50,0.07);
-      transform: translateX(4px);
-    }
+    .step:hover { border-color: var(--yellow); background: rgba(212,212,50,0.07); transform: translateX(4px); }
     .step-num {
-      flex-shrink: 0; width: 24px; height: 24px;
-      background: var(--yellow); border-radius: 2px;
+      flex-shrink: 0; width: 24px; height: 24px; background: var(--yellow); border-radius: 2px;
       display: flex; align-items: center; justify-content: center;
-      font-family: 'Roboto Slab', serif; font-weight: 900; font-size: 11px; color: var(--charcoal);
-      margin-top: 1px;
+      font-family: 'Roboto Slab', serif; font-weight: 900; font-size: 11px; color: var(--charcoal); margin-top: 1px;
     }
     .step-body { flex: 1; }
-    .step-title {
-      font-family: 'Roboto Slab', serif;
-      font-weight: 700; font-size: 13px; color: var(--text); margin-bottom: 3px;
-    }
+    .step-title { font-family: 'Roboto Slab', serif; font-weight: 700; font-size: 13px; color: var(--text); margin-bottom: 3px; }
     .step-desc { font-size: 11.5px; color: var(--text-mid); line-height: 1.65; font-weight: 300; }
     .step-desc strong { color: var(--text); font-weight: 600; }
     .step-desc kbd {
-      display: inline-block; background: var(--charcoal);
-      border: 1px solid rgba(0,0,0,0.2); border-radius: 2px;
+      display: inline-block; background: var(--charcoal); border: 1px solid rgba(0,0,0,0.2); border-radius: 2px;
       padding: 1px 6px; font-family: 'Roboto Mono', monospace; font-size: 10px; color: #fff;
     }
 
-    .divider {
-      height: 1.5px;
-      background: var(--border);
-      margin-bottom: 22px;
-    }
-
-    .input-label {
-      font-size: 9px; font-weight: 700; letter-spacing: 0.22em;
-      text-transform: uppercase; color: var(--text-dim);
-      margin-bottom: 9px; display: block;
-    }
+    .divider { height: 1.5px; background: var(--border); margin-bottom: 22px; }
+    .input-label { font-size: 9px; font-weight: 700; letter-spacing: 0.22em; text-transform: uppercase; color: var(--text-dim); margin-bottom: 9px; display: block; }
 
     .textarea-wrap { position: relative; }
     textarea {
-      width: 100%; height: 150px;
-      background: rgba(255,255,255,0.7);
-      border: 1.5px solid var(--border); border-radius: 2px;
-      padding: 13px 13px 26px;
+      width: 100%; height: 150px; background: rgba(255,255,255,0.7);
+      border: 1.5px solid var(--border); border-radius: 2px; padding: 13px 13px 26px;
       font-family: 'Roboto Mono', monospace; font-size: 11.5px; color: var(--text-mid);
       resize: none; outline: none; line-height: 1.7; display: block;
       transition: border-color 0.2s, box-shadow 0.2s;
     }
-    textarea:focus {
-      border-color: var(--yellow);
-      box-shadow: 0 0 0 3px rgba(212,212,50,0.15);
-    }
+    textarea:focus { border-color: var(--yellow); box-shadow: 0 0 0 3px rgba(212,212,50,0.15); }
     textarea::placeholder { color: rgba(0,0,0,0.2); }
-
     .char-count {
-      position: absolute; bottom: 9px; right: 11px;
-      font-size: 9px; color: var(--text-dim); pointer-events: none; transition: color 0.2s;
-      font-family: 'Roboto Mono', monospace;
+      position: absolute; bottom: 9px; right: 11px; font-size: 9px; color: var(--text-dim);
+      pointer-events: none; transition: color 0.2s; font-family: 'Roboto Mono', monospace;
     }
     .char-count.has-content { color: var(--red); }
 
-    /* ─── UPLOAD ZONE ─── */
     .upload-zone {
-      width: 100%; min-height: 120px;
-      background: rgba(255,255,255,0.6);
+      width: 100%; min-height: 120px; background: rgba(255,255,255,0.6);
       border: 1.5px dashed rgba(0,0,0,0.2); border-radius: 2px;
       display: flex; flex-direction: column; align-items: center; justify-content: center;
       gap: 8px; cursor: pointer; transition: border-color 0.2s, background 0.2s;
       position: relative; padding: 22px;
     }
-    .upload-zone:hover, .upload-zone.drag-over {
-      border-color: var(--yellow);
-      background: rgba(212,212,50,0.06);
-    }
-    .upload-zone.has-file {
-      border-color: var(--yellow);
-      border-style: solid;
-      background: rgba(212,212,50,0.05);
-    }
-    .upload-zone input[type="file"] {
-      position: absolute; inset: 0; opacity: 0; cursor: pointer; width: 100%; height: 100%;
-    }
+    .upload-zone:hover, .upload-zone.drag-over { border-color: var(--yellow); background: rgba(212,212,50,0.06); }
+    .upload-zone.has-file { border-color: var(--yellow); border-style: solid; background: rgba(212,212,50,0.05); }
+    .upload-zone input[type="file"] { position: absolute; inset: 0; opacity: 0; cursor: pointer; width: 100%; height: 100%; }
     .upload-icon { font-size: 26px; line-height: 1; }
-    .upload-text {
-      font-family: 'Roboto Slab', serif;
-      font-weight: 700; font-size: 12px; color: var(--text); text-align: center;
-    }
-    .upload-text small {
-      display: block; font-family: 'Roboto Mono', monospace;
-      font-weight: 300; font-size: 10px; color: var(--text-dim); margin-top: 3px;
-    }
-    .upload-filename {
-      font-size: 11px; color: var(--red); font-weight: 600; text-align: center;
-      display: none; margin-top: 2px;
-      font-family: 'Roboto Mono', monospace;
-    }
+    .upload-text { font-family: 'Roboto Slab', serif; font-weight: 700; font-size: 12px; color: var(--text); text-align: center; }
+    .upload-text small { display: block; font-family: 'Roboto Mono', monospace; font-weight: 300; font-size: 10px; color: var(--text-dim); margin-top: 3px; }
+    .upload-filename { font-size: 11px; color: var(--red); font-weight: 600; text-align: center; display: none; margin-top: 2px; font-family: 'Roboto Mono', monospace; }
 
-    /* ─── BOTÕES DE CONVERSÃO ─── */
-    .convert-btns {
-      display: grid; grid-template-columns: 1fr 1fr; gap: 10px;
-      margin-top: 14px;
-    }
+    .convert-btns { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 14px; }
 
-    /* ─── BOTÃO BASE ─── */
     .btn {
-      padding: 15px 20px;
-      background: var(--charcoal);
-      border: 2px solid var(--charcoal);
-      border-radius: 2px;
-      font-family: 'Roboto Mono', monospace;
-      font-weight: 700; font-size: 13px; letter-spacing: 0.04em;
-      color: #fff; cursor: pointer;
-      display: flex; align-items: center; justify-content: center; gap: 8px;
+      padding: 15px 20px; background: var(--charcoal); border: 2px solid var(--charcoal); border-radius: 2px;
+      font-family: 'Roboto Mono', monospace; font-weight: 700; font-size: 13px; letter-spacing: 0.04em;
+      color: #fff; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px;
       position: relative; overflow: hidden;
-      transition: background 0.2s, border-color 0.2s, color 0.2s, transform 0.15s;
-      width: 100%;
+      transition: background 0.2s, border-color 0.2s, color 0.2s, transform 0.15s; width: 100%;
     }
     .btn-full { margin-top: 14px; font-size: 14px; padding: 16px 24px; }
-    .btn:not(:disabled):hover {
-      background: var(--yellow);
-      border-color: var(--yellow);
-      color: var(--charcoal);
-      transform: translateY(-2px);
-    }
+    .btn:not(:disabled):hover { background: var(--yellow); border-color: var(--yellow); color: var(--charcoal); transform: translateY(-2px); }
     .btn:active { transform: translateY(0); }
-    .btn:disabled {
-      background: rgba(0,0,0,0.08);
-      border-color: rgba(0,0,0,0.08);
-      box-shadow: none;
-      cursor: not-allowed; transform: none; color: var(--text-dim);
-    }
+    .btn:disabled { background: rgba(0,0,0,0.08); border-color: rgba(0,0,0,0.08); box-shadow: none; cursor: not-allowed; transform: none; color: var(--text-dim); }
 
-    /* Status */
     .status-box {
-      display: none; margin-top: 10px; padding: 11px 15px;
-      border-radius: 2px; font-size: 12px; text-align: center;
-      border-left: 3px solid; color: var(--text-mid);
-      background: rgba(255,255,255,0.6);
+      display: none; margin-top: 10px; padding: 11px 15px; border-radius: 2px; font-size: 12px;
+      text-align: center; border-left: 3px solid; color: var(--text-mid); background: rgba(255,255,255,0.6);
       font-family: 'Roboto Mono', monospace;
     }
     .status-box.success { border-color: #4caf50; color: #2e7d32; background: rgba(76,175,80,0.07); }
@@ -324,54 +189,31 @@
 
     .progress-bar { height: 2px; background: var(--border); border-radius: 0; margin-top: 8px; overflow: hidden; display: none; }
     .progress-bar.active { display: block; }
-    .progress-fill {
-      height: 100%;
-      background: var(--yellow);
-      border-radius: 0; animation: progressAnim 12s linear forwards;
-    }
-    .progress-bar.slow .progress-fill {
-      animation: progressAnimSlow 30s linear forwards;
-    }
-    @keyframes progressAnim { 0%{width:0%} 40%{width:55%} 80%{width:82%} 100%{width:95%} }
+    .progress-fill { height: 100%; background: var(--yellow); border-radius: 0; animation: progressAnim 25s linear forwards; }
+    .progress-bar.slow .progress-fill { animation: progressAnimSlow 60s linear forwards; }
+    @keyframes progressAnim     { 0%{width:0%} 40%{width:55%} 80%{width:82%} 100%{width:95%} }
     @keyframes progressAnimSlow { 0%{width:0%} 30%{width:40%} 70%{width:70%} 95%{width:90%} 100%{width:95%} }
 
     .tip {
-      display: flex; gap: 10px; align-items: flex-start;
-      margin-top: 14px; padding: 12px 15px;
-      background: rgba(212,212,50,0.09);
-      border: 1.5px solid rgba(212,212,50,0.35);
-      border-radius: 2px;
+      display: flex; gap: 10px; align-items: flex-start; margin-top: 14px; padding: 12px 15px;
+      background: rgba(212,212,50,0.09); border: 1.5px solid rgba(212,212,50,0.35); border-radius: 2px;
     }
     .tip-icon { flex-shrink: 0; margin-top: 1px; }
     .tip p { font-size: 11.5px; color: var(--text-mid); line-height: 1.6; font-weight: 300; }
     .tip strong { color: var(--text); font-weight: 600; }
 
-    /* Footer */
     .card-footer {
       padding: 13px 40px 16px; border-top: 1.5px solid var(--border);
-      display: flex; align-items: center; justify-content: center; gap: 8px;
-      background: rgba(255,255,255,0.3);
+      display: flex; align-items: center; justify-content: center; gap: 8px; background: rgba(255,255,255,0.3);
     }
     .footer-dot { width: 4px; height: 4px; border-radius: 0; background: var(--yellow); }
     .footer-text { font-size: 9px; color: var(--text-dim); letter-spacing: 0.08em; font-family: 'Roboto Mono', monospace; }
 
-    .spinner {
-      display: inline-block; width: 13px; height: 13px;
-      border: 2px solid rgba(255,255,255,0.25); border-top-color: white;
-      border-radius: 50%; animation: spin 0.6s linear infinite;
-    }
-    .spinner-dark {
-      display: inline-block; width: 13px; height: 13px;
-      border: 2px solid rgba(0,0,0,0.15); border-top-color: var(--charcoal);
-      border-radius: 50%; animation: spin 0.6s linear infinite;
-    }
+    .spinner { display: inline-block; width: 13px; height: 13px; border: 2px solid rgba(255,255,255,0.25); border-top-color: white; border-radius: 50%; animation: spin 0.6s linear infinite; }
+    .spinner-dark { display: inline-block; width: 13px; height: 13px; border: 2px solid rgba(0,0,0,0.15); border-top-color: var(--charcoal); border-radius: 50%; animation: spin 0.6s linear infinite; }
     @keyframes spin { to { transform: rotate(360deg); } }
 
-    /* Geo accent squares (decorative, Listening-style) */
-    .geo-accent {
-      position: fixed; pointer-events: none; z-index: 1;
-      opacity: 0.12;
-    }
+    .geo-accent { position: fixed; pointer-events: none; z-index: 1; opacity: 0.12; }
     .geo-accent.y { background: var(--yellow); }
     .geo-accent.r { background: var(--red); }
     .geo-accent.c { background: var(--charcoal); }
@@ -387,7 +229,6 @@
 
   <canvas id="bg-canvas"></canvas>
 
-  <!-- Listening-style geometric accent squares -->
   <div class="geo-accent y" style="width:80px;height:80px;top:8%;left:3%;transform:rotate(5deg);"></div>
   <div class="geo-accent r" style="width:48px;height:48px;top:12%;left:5%;transform:rotate(-3deg);"></div>
   <div class="geo-accent c" style="width:60px;height:60px;top:18%;right:4%;transform:rotate(8deg);"></div>
@@ -407,7 +248,7 @@
 
   <div class="page">
 
-    <!-- ─── CARD 1: Mailchimp → PDF ─── -->
+    <!-- CARD 1: Mailchimp → PDF -->
     <div class="card">
       <div class="card-header">
         <img class="logo-img" src="./logo.png" alt="Listening"
@@ -415,9 +256,7 @@
         <div class="logo-fallback">Listening</div>
         <div class="logo-sub">Inteligência de Dados &nbsp;·&nbsp; Conversor de Relatórios</div>
       </div>
-
       <div class="card-body">
-
         <div class="meme-box">
           <div class="meme-emoji-big" id="meme-emoji">🧠</div>
           <div class="meme-text">
@@ -425,9 +264,7 @@
             <small id="meme-sub">Tecnologia de ponta a serviço da preguiça honesta.</small>
           </div>
         </div>
-
         <span class="steps-label">Como usar</span>
-
         <div class="steps">
           <div class="step">
             <div class="step-num">01</div>
@@ -451,17 +288,13 @@
             </div>
           </div>
         </div>
-
         <div class="divider"></div>
-
         <label class="input-label" for="htmlInput">Código-fonte do Mailchimp</label>
-
         <div class="textarea-wrap">
           <textarea id="htmlInput" placeholder="Cole aqui o código-fonte (CTRL+V)…"
             oninput="updateCharCount(this)" spellcheck="false"></textarea>
           <span class="char-count" id="charCount">0 caracteres</span>
         </div>
-
         <button class="btn btn-full" id="btn-pdf" onclick="generatePDF()">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
             <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
@@ -471,37 +304,29 @@
           </svg>
           Gerar PDF Agora
         </button>
-
         <div id="status-pdf" class="status-box"></div>
         <div class="progress-bar" id="progress-pdf"><div class="progress-fill"></div></div>
-
         <div class="tip">
           <svg class="tip-icon" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#D4D432" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-            <circle cx="12" cy="12" r="10"/>
-            <line x1="12" y1="8" x2="12" y2="12"/>
-            <line x1="12" y1="16" x2="12.01" y2="16"/>
+            <circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>
           </svg>
           <p>PDF gerado no servidor com fidelidade total ao design original. <strong>Nenhuma configuração manual necessária.</strong></p>
         </div>
-
       </div>
-
       <div class="card-footer">
         <div class="footer-dot"></div>
-        <span class="footer-text">Powered by Browserless · Cloudflare Workers &nbsp;·&nbsp; Feito com 💛 por Victor Andrews</span>
+        <span class="footer-text">Powered by Puppeteer · Cloudflare Workers · Render &nbsp;·&nbsp; Feito com 💛 por Victor Andrews</span>
         <div class="footer-dot"></div>
       </div>
     </div>
 
-    <!-- ─── CARD 2: PDF → PPTX / DOCX ─── -->
+    <!-- CARD 2: PDF → PPTX / DOCX -->
     <div class="card">
       <div class="card-header-simple">
         <div class="card-title">Converter PDF</div>
         <div class="card-title-sub">Para PowerPoint ou Word · Otimizado para OneDrive</div>
       </div>
-
       <div class="card-body">
-
         <span class="steps-label">Como usar</span>
         <div class="steps" style="margin-bottom: 22px;">
           <div class="step">
@@ -519,9 +344,7 @@
             </div>
           </div>
         </div>
-
         <label class="input-label">Selecione o arquivo PDF</label>
-
         <div class="upload-zone" id="upload-zone">
           <input type="file" id="pdf-input" accept=".pdf" onchange="onFileSelect(this)">
           <div class="upload-icon" id="upload-icon">📂</div>
@@ -531,12 +354,10 @@
           </div>
           <div class="upload-filename" id="upload-filename"></div>
         </div>
-
         <div class="convert-btns">
           <button class="btn" id="btn-pptx" onclick="convertFile('pptx')" disabled>
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-              <rect x="2" y="3" width="20" height="14" rx="2"/>
-              <path d="M8 21h8M12 17v4"/>
+              <rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/>
             </svg>
             → PowerPoint
           </button>
@@ -544,31 +365,24 @@
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
               <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
               <polyline points="14 2 14 8 20 8"/>
-              <line x1="16" y1="13" x2="8" y2="13"/>
-              <line x1="16" y1="17" x2="8" y2="17"/>
+              <line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/>
               <polyline points="10 9 9 9 8 9"/>
             </svg>
             → Word
           </button>
         </div>
-
         <div id="status-convert" class="status-box"></div>
         <div class="progress-bar" id="progress-convert"><div class="progress-fill"></div></div>
-
         <div class="tip" style="margin-top:14px;">
           <svg class="tip-icon" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#D4D432" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-            <circle cx="12" cy="12" r="10"/>
-            <line x1="12" y1="8" x2="12" y2="12"/>
-            <line x1="12" y1="16" x2="12.01" y2="16"/>
+            <circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>
           </svg>
           <p>Conversão otimizada para <strong>visualização no OneDrive</strong>. Fontes e layout preservados ao máximo.</p>
         </div>
-
       </div>
-
       <div class="card-footer">
         <div class="footer-dot"></div>
-        <span class="footer-text">Powered by Browserless · Cloudflare Workers &nbsp;·&nbsp; Feito com 💛 por Victor Andrews</span>
+        <span class="footer-text">Powered by Puppeteer · Cloudflare Workers · Render &nbsp;·&nbsp; Feito com 💛 por Victor Andrews</span>
         <div class="footer-dot"></div>
       </div>
     </div>
@@ -576,7 +390,18 @@
   </div><!-- /page -->
 
   <script>
-    /* ── Meme rotator ── */
+    /* ════════════════════════════════════════
+       URLS
+       Worker: pré-processa HTML → devolve JSON
+       Render: recebe HTML limpo → devolve PDF
+       ════════════════════════════════════════ */
+    const WORKER_PDF     = 'https://inpacto-pdf.doctorvictorandrews.workers.dev/pdf';
+    const WORKER_CONVERT = 'https://inpacto-convert.doctorvictorandrews.workers.dev';
+    const RENDER_PDF     = 'https://conversor-mailchimp.onrender.com/pdf';
+
+    /* ════════════════════════════════════════
+       MEME ROTATOR
+       ════════════════════════════════════════ */
     const memes = [
       { emoji: '🧠', line: 'Ctrl+C, Ctrl+V, PDF. Brain too big.',        sub: 'Tecnologia de ponta a serviço da preguiça honesta.' },
       { emoji: '😤', line: 'Mailchimp não te dá PDF. Nós sim.',           sub: 'Justiça para os analistas de comunicação.' },
@@ -603,97 +428,76 @@
       }, 180);
     }, 4000);
 
-    /* ── Char counter ── */
+    /* ════════════════════════════════════════
+       HELPERS
+       ════════════════════════════════════════ */
     function updateCharCount(el) {
       const n = el.value.length;
       const cc = document.getElementById('charCount');
       cc.textContent = n.toLocaleString('pt-BR') + ' caracteres';
       cc.classList.toggle('has-content', n > 0);
     }
-
-    /* ── Upload zone ── */
-    let selectedFile = null;
-    const zone = document.getElementById('upload-zone');
-
-    zone.addEventListener('dragover',  e => { e.preventDefault(); zone.classList.add('drag-over'); });
-    zone.addEventListener('dragleave', () => zone.classList.remove('drag-over'));
-    zone.addEventListener('drop', e => {
-      e.preventDefault();
-      zone.classList.remove('drag-over');
-      const f = e.dataTransfer.files[0];
-      if (f && f.type === 'application/pdf') setFile(f);
-      else showConvertStatus('error', '⚠️ Por favor, selecione apenas arquivos .pdf');
-    });
-
-    function onFileSelect(input) {
-      if (input.files[0]) setFile(input.files[0]);
-    }
-
-    function setFile(f) {
-      selectedFile = f;
-      document.getElementById('upload-icon').textContent = '✅';
-      document.getElementById('upload-text').innerHTML =
-        `Arquivo selecionado<small>${formatBytes(f.size)}</small>`;
-      const fn = document.getElementById('upload-filename');
-      fn.textContent = f.name;
-      fn.style.display = 'block';
-      zone.classList.add('has-file');
-      document.getElementById('btn-pptx').disabled = false;
-      document.getElementById('btn-docx').disabled = false;
-      const s = document.getElementById('status-convert');
-      s.style.display = 'none';
-    }
-
-    function formatBytes(bytes) {
-      if (bytes < 1024)       return bytes + ' B';
-      if (bytes < 1048576)    return (bytes / 1024).toFixed(1) + ' KB';
-      return (bytes / 1048576).toFixed(1) + ' MB';
-    }
-
-    /* ── Progress helper ── */
     function startProgress(id, slow = false) {
       const bar = document.getElementById(id);
       bar.classList.remove('slow');
       if (slow) bar.classList.add('slow');
       bar.classList.add('active');
       const fill = bar.querySelector('.progress-fill');
-      fill.style.animation = 'none';
-      void fill.offsetWidth;
-      fill.style.animation = '';
+      fill.style.animation = 'none'; void fill.offsetWidth; fill.style.animation = '';
     }
-    function stopProgress(id) {
-      document.getElementById(id).classList.remove('active');
-    }
-
+    function stopProgress(id) { document.getElementById(id).classList.remove('active'); }
     function showConvertStatus(type, msg) {
       const s = document.getElementById('status-convert');
-      s.className = `status-box ${type}`;
-      s.style.display = 'block';
-      s.textContent = msg;
+      s.className = `status-box ${type}`; s.style.display = 'block'; s.textContent = msg;
     }
 
-    /* ── Canvas background (light, Listening style) ── */
+    /* ════════════════════════════════════════
+       UPLOAD ZONE
+       ════════════════════════════════════════ */
+    let selectedFile = null;
+    const zone = document.getElementById('upload-zone');
+    zone.addEventListener('dragover',  e => { e.preventDefault(); zone.classList.add('drag-over'); });
+    zone.addEventListener('dragleave', () => zone.classList.remove('drag-over'));
+    zone.addEventListener('drop', e => {
+      e.preventDefault(); zone.classList.remove('drag-over');
+      const f = e.dataTransfer.files[0];
+      if (f && f.type === 'application/pdf') setFile(f);
+      else showConvertStatus('error', '⚠️ Por favor, selecione apenas arquivos .pdf');
+    });
+    function onFileSelect(input) { if (input.files[0]) setFile(input.files[0]); }
+    function setFile(f) {
+      selectedFile = f;
+      document.getElementById('upload-icon').textContent = '✅';
+      document.getElementById('upload-text').innerHTML = `Arquivo selecionado<small>${formatBytes(f.size)}</small>`;
+      const fn = document.getElementById('upload-filename');
+      fn.textContent = f.name; fn.style.display = 'block';
+      zone.classList.add('has-file');
+      document.getElementById('btn-pptx').disabled = false;
+      document.getElementById('btn-docx').disabled = false;
+      document.getElementById('status-convert').style.display = 'none';
+    }
+    function formatBytes(b) {
+      if (b < 1024) return b + ' B';
+      if (b < 1048576) return (b/1024).toFixed(1) + ' KB';
+      return (b/1048576).toFixed(1) + ' MB';
+    }
+
+    /* ════════════════════════════════════════
+       CANVAS BACKGROUND
+       ════════════════════════════════════════ */
     (function () {
       const canvas = document.getElementById('bg-canvas');
-      const ctx    = canvas.getContext('2d');
+      const ctx = canvas.getContext('2d');
       let W, H, particles = [];
       function resize() { W = canvas.width = window.innerWidth; H = canvas.height = window.innerHeight; }
-
       function makeParticle() {
         const colors = ['rgba(212,212,50,', 'rgba(232,69,0,', 'rgba(42,42,42,'];
         const c = colors[Math.floor(Math.random() * colors.length)];
-        return {
-          x: Math.random()*W, y: Math.random()*H,
-          r: Math.random()*1.2+0.3,
-          vx: (Math.random()-0.5)*0.14, vy: (Math.random()-0.5)*0.14,
-          a: Math.random()*0.22+0.04,
-          color: c
-        };
+        return { x: Math.random()*W, y: Math.random()*H, r: Math.random()*1.2+0.3, vx: (Math.random()-0.5)*0.14, vy: (Math.random()-0.5)*0.14, a: Math.random()*0.22+0.04, color: c };
       }
       function init() { resize(); particles = Array.from({length:70}, makeParticle); }
       function draw() {
         ctx.clearRect(0,0,W,H);
-        // Subtle blobs
         [{x:W*.15,y:H*.2,r:W*.32,c:'rgba(212,212,50,0.06)'},{x:W*.85,y:H*.8,r:W*.28,c:'rgba(232,69,0,0.05)'},{x:W*.5,y:H*.5,r:W*.2,c:'rgba(42,42,42,0.04)'}]
         .forEach(b => {
           const g = ctx.createRadialGradient(b.x,b.y,0,b.x,b.y,b.r);
@@ -717,11 +521,11 @@
       window.addEventListener('resize', resize); init(); draw();
     })();
 
-    /* ── URLs dos Workers ── */
-    const WORKER_PDF     = 'https://inpacto-pdf.doctorvictorandrews.workers.dev/pdf';
-    const WORKER_CONVERT = 'https://inpacto-convert.doctorvictorandrews.workers.dev';
-
-    /* ── PDF generation (card 1) ── */
+    /* ════════════════════════════════════════
+       PDF GENERATION
+       Passo A: Worker limpa HTML (< 2s)
+       Passo B: Render gera PDF (sem limite)
+       ════════════════════════════════════════ */
     async function generatePDF() {
       const code   = document.getElementById('htmlInput').value.trim();
       const btn    = document.getElementById('btn-pdf');
@@ -738,18 +542,29 @@
       btn.innerHTML = '<span class="spinner"></span> Gerando PDF…';
       status.className = 'status-box loading';
       status.style.display = 'block';
-      status.textContent = '⏳ Enviando para o servidor… isso leva cerca de 10 segundos.';
       startProgress('progress-pdf');
 
       try {
-        const response = await fetch(WORKER_PDF, {
+        // Passo A — Worker processa o HTML
+        status.textContent = '⏳ Processando HTML… (1/2)';
+        const workerResp = await fetch(WORKER_PDF, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ html: code }),
         });
-        if (!response.ok) throw new Error((await response.text()) || `Erro ${response.status}`);
+        if (!workerResp.ok) throw new Error((await workerResp.text()) || `Erro Worker ${workerResp.status}`);
+        const { html: processedHTML } = await workerResp.json();
 
-        const blob = await response.blob();
+        // Passo B — Render gera o PDF com Puppeteer
+        status.textContent = '⏳ Gerando PDF… (2/2) — aguarde alguns segundos.';
+        const pdfResp = await fetch(RENDER_PDF, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ html: processedHTML }),
+        });
+        if (!pdfResp.ok) throw new Error((await pdfResp.text()) || `Erro Render ${pdfResp.status}`);
+
+        const blob = await pdfResp.blob();
         const url  = URL.createObjectURL(blob);
         const a    = document.createElement('a');
         a.href     = url;
@@ -759,6 +574,7 @@
 
         status.className = 'status-box success';
         status.textContent = '✅ PDF gerado e baixado com sucesso!';
+
       } catch (err) {
         status.className = 'status-box error';
         status.textContent = `❌ Erro: ${err.message}`;
@@ -769,42 +585,34 @@
       }
     }
 
-    /* ── Convert PDF → PPTX / DOCX (card 2) ── */
+    /* ════════════════════════════════════════
+       CONVERT PDF → PPTX / DOCX
+       ════════════════════════════════════════ */
     async function convertFile(format) {
       if (!selectedFile) return;
-
       const btnId   = format === 'pptx' ? 'btn-pptx' : 'btn-docx';
       const otherId = format === 'pptx' ? 'btn-docx'  : 'btn-pptx';
       const btn     = document.getElementById(btnId);
       const label   = format === 'pptx' ? 'PowerPoint' : 'Word';
-
       btn.disabled = true;
       document.getElementById(otherId).disabled = true;
       btn.innerHTML = `<span class="spinner"></span> Convertendo…`;
-
       showConvertStatus('loading', `⏳ Convertendo para ${label}… pode levar até 30 segundos.`);
       startProgress('progress-convert', true);
-
       try {
         const base64 = await fileToBase64(selectedFile);
-
         const response = await fetch(`${WORKER_CONVERT}/to-${format}`, {
-          method:  'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body:    JSON.stringify({ pdf: base64 }),
+          method: 'POST', headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ pdf: base64 }),
         });
-
         if (!response.ok) throw new Error((await response.text()) || `Erro ${response.status}`);
-
         const blob = await response.blob();
         const url  = URL.createObjectURL(blob);
         const a    = document.createElement('a');
         const ext  = format === 'pptx' ? '.pptx' : '.docx';
-        a.href     = url;
-        a.download = selectedFile.name.replace(/\.pdf$/i, ext);
+        a.href = url; a.download = selectedFile.name.replace(/\.pdf$/i, ext);
         document.body.appendChild(a); a.click(); a.remove();
         URL.revokeObjectURL(url);
-
         showConvertStatus('success', `✅ ${label} gerado e baixado com sucesso!`);
       } catch (err) {
         showConvertStatus('error', `❌ Erro: ${err.message}`);
@@ -812,7 +620,6 @@
         stopProgress('progress-convert');
         btn.disabled = false;
         document.getElementById(otherId).disabled = false;
-
         const icons = {
           pptx: `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/></svg> → PowerPoint`,
           docx: `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg> → Word`,
