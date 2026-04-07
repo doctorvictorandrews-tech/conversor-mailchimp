@@ -37,12 +37,17 @@ async function getBrowser() {
   browserInstance = await puppeteer.launch({
     headless: 'new',
     args: [
-      '--no-sandbox',
-      '--disable-setuid-sandbox',
-      '--disable-dev-shm-usage',
-      '--disable-gpu',
-      '--no-zygote',
-      '--single-process',
+        '--no-sandbox',
+  '--disable-setuid-sandbox',
+  '--disable-dev-shm-usage',
+  '--disable-gpu',
+  '--no-zygote',
+  '--single-process',
+  '--disable-extensions',
+  '--disable-background-networking',
+  '--disable-default-apps',
+  '--mute-audio',
+  '--no-first-run',
     ],
   });
   return browserInstance;
