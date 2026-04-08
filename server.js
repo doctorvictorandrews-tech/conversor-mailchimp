@@ -113,8 +113,9 @@ app.post('/pdf', async (req, res) => {
 app.get('/', (req, res) => res.send('in.Pacto PDF Server — online ✅'));
 
 /* ── Keep-alive (evita spin down no free tier) ── */
+const http = require('http');
 setInterval(() => {
-  fetch(`http://localhost:${PORT}/`).catch(() => {});
+  http.get(`http://localhost:${PORT}/`).on('error', () => {});
 }, 14 * 60 * 1000);
 
 app.listen(PORT, () => console.log(`Servidor rodando na porta ${PORT}`));
