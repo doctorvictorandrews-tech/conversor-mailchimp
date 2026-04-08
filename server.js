@@ -1,9 +1,3 @@
-/**
- * in.Pacto PDF Server
- * Usa puppeteer-core + @sparticuz/chromium para rodar no Render free.
- * O Chrome vem embutido no pacote — sem depender do cache do sistema.
- */
-
 const express   = require('express');
 const puppeteer = require('puppeteer-core');
 const chromium  = require('@sparticuz/chromium');
@@ -22,15 +16,16 @@ app.use((req, res, next) => {
   next();
 });
 
-/* ── Reutiliza o browser entre requisições ── */
-let browserInstance = null;
+/* ── Executablepath cacheado (extração é lenta) ── */
+let execPath = null;
+async function getExecPath() {
+  if (!execPath) execPath = await chromium.executablePath();
+  return execPath;
+}
 
+/* ── Lança browser por requisição (mais estável no free tier) ── */
 async function getBrowser() {
-  if (browserInstance) {
-    try { await browserInstance.version(); return browserInstance; }
-    catch (_) { browserInstance = null; }
-  }
-  browserInstance = await puppeteer.launch({
+  return puppeteer.launch({
     args: [
       ...chromium.args,
       '--no-sandbox',
@@ -38,42 +33,26 @@ async function getBrowser() {
       '--disable-dev-shm-usage',
       '--disable-gpu',
       '--no-zygote',
-      '--single-process',
-      '--disable-extensions',
-      '--disable-background-networking',
-      '--disable-default-apps',
-      '--mute-audio',
-      '--no-first-run',
+      // REMOVIDO: --single-process  ← causava crashes
     ],
     defaultViewport: chromium.defaultViewport,
-    executablePath:  await chromium.executablePath(),
+    executablePath:  await getExecPath(),
     headless:        chromium.headless,
   });
-  return browserInstance;
 }
 
-/* ══════════════════════════════════════════════════════
-   POST /pdf
-   Body: { html: string }
-   Retorna: application/pdf
-   ══════════════════════════════════════════════════════ */
+/* ── POST /pdf ── */
 app.post('/pdf', async (req, res) => {
   const { html } = req.body;
   if (!html) return res.status(400).send('Campo "html" obrigatório.');
 
-  let page;
+  let browser, page;
   try {
-    const browser = await getBrowser();
-    page = await browser.newPage();
+    browser = await getBrowser();
+    page    = await browser.newPage();
     await page.setViewport({ width: 600, height: 800 });
-
-    // Carrega o HTML sem timeout — o Puppeteer segue em frente
-    // independente de recursos externos que não respondem.
     await page.setContent(html, { waitUntil: 'domcontentloaded', timeout: 0 });
-
-    // Aguarda até 5s extra para imagens inline renderizarem
     await new Promise(r => setTimeout(r, 3000));
-
     await page.evaluate(() =>
       new Promise(r => requestAnimationFrame(() => requestAnimationFrame(r)))
     );
@@ -81,10 +60,8 @@ app.post('/pdf', async (req, res) => {
     const { contentHeight, contentTop } = await page.evaluate(() => {
       document.documentElement.style.cssText += ';margin:0;padding:0;border:0';
       document.body.style.cssText            += ';margin:0;padding:0;border:0';
-
       const all = document.querySelectorAll('*');
       let minTop = Infinity, maxBottom = 0;
-
       all.forEach(el => {
         const s = window.getComputedStyle(el);
         if (s.display === 'none' || s.visibility === 'hidden') return;
@@ -95,7 +72,6 @@ app.post('/pdf', async (req, res) => {
         if (r.top    < minTop)    minTop    = r.top;
         if (r.bottom > maxBottom) maxBottom = r.bottom;
       });
-
       return {
         contentTop:    minTop    === Infinity ? 0    : Math.floor(minTop),
         contentHeight: maxBottom === 0        ? 3000 : Math.ceil(maxBottom) - (minTop === Infinity ? 0 : Math.floor(minTop)),
@@ -103,21 +79,12 @@ app.post('/pdf', async (req, res) => {
     });
 
     await page.addStyleTag({ content: `
-      @page {
-        size: 600px ${contentHeight}px !important;
-        margin: 0 !important;
-      }
+      @page { size: 600px ${contentHeight}px !important; margin: 0 !important; }
       html, body {
-        width:    600px !important;
-        height:   ${contentHeight}px !important;
-        overflow: hidden !important;
-        margin:   0 !important;
-        padding:  0 !important;
+        width: 600px !important; height: ${contentHeight}px !important;
+        overflow: hidden !important; margin: 0 !important; padding: 0 !important;
       }
-      ${contentTop > 1 ? `
-        body > *:first-child { margin-top: -${contentTop}px !important; }
-        body > *:not(:first-child) { margin-top: 0 !important; }
-      ` : ''}
+      ${contentTop > 1 ? `body > *:first-child { margin-top: -${contentTop}px !important; }` : ''}
     `});
 
     const pdfBuffer = await page.pdf({
@@ -137,11 +104,17 @@ app.post('/pdf', async (req, res) => {
     console.error('[PDF ERROR]', err.message);
     res.status(500).send(`Erro ao gerar PDF: ${err.message}`);
   } finally {
-    if (page) await page.close().catch(() => {});
+    if (page)    await page.close().catch(() => {});
+    if (browser) await browser.close().catch(() => {}); // fecha tudo após cada request
   }
 });
 
 /* ── Health check ── */
 app.get('/', (req, res) => res.send('in.Pacto PDF Server — online ✅'));
+
+/* ── Keep-alive (evita spin down no free tier) ── */
+setInterval(() => {
+  fetch(`http://localhost:${PORT}/`).catch(() => {});
+}, 14 * 60 * 1000);
 
 app.listen(PORT, () => console.log(`Servidor rodando na porta ${PORT}`));
